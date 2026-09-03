@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPTD Puskesmas Lanjut - Integrasi Layanan Primer</title>
+    <!-- Library SheetJS untuk membaca Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Library Supabase JS Client dari CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #047857;
+            --primary-hover: #065f46;
+            --accent: #0ea5e9;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            color: var(--text-main);
+            height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: #f1f5f9; 
+            background-image: url('WhatsApp Image 2026-08-23 at 19.22.56.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Header Transparan Kaca */
+        header {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .navbar {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            background: white;
+        }
+
+        .logo-text-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .logo-subtext {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* NAV MENU DAN DROPDOWN RESPONSIVE */
+        .nav-links {
+            display: flex;
+            gap: 6px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background-color: rgba(255, 255, 255, 0.5); 
+            color: var(--text-main); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            font-size: 0.85rem; 
+            font-weight: 600;
+            cursor: pointer; 
+            padding: 6px 12px; 
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out; 
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+        }
+
+        .nav-btn.active, .nav-btn:hover { 
+            background-color: var(--primary); 
+            color: white; 
+            border-color: var(--primary);
+        }
+
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 110%;
+            left: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            min-width: 180px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            z-index: 1000;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            animation: fadeInDrop 0.2s ease-in-out;
+        }
+
+        @keyframes fadeInDrop {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-dropdown-content a {
+            color: var(--text-main);
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            border-bottom: 1px solid rgba(241, 245, 249, 0.6);
+        }
+
+        .nav-dropdown-content a:last-child { border-bottom: none; }
+        .nav-dropdown-content a:hover { background-color: rgba(4, 120, 87, 0.15); color: var(--primary); }
+        .nav-dropdown:hover .nav-dropdown-content { display: block; }
+
+        /* Tombol Hamburger Mobile */
+        .mobile-menu-toggle {
+            display: none;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            font-size: 1.25rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        /* Container Utama Dashboard */
+        .main-container {
+            flex-grow: 1;
+            max-width: 1350px;
+            width: 100%;
+            margin: 10px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Workspace Card Interaktif */
+        .workspace-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 16px;
+            width: 100%;
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            animation: fadeIn 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+            background: rgba(248, 250, 252, 0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 { font-size: 1.1rem; color: var(--primary); }
+        .card-header p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+        .btn-close-card {
+            background: #ef4444; color: white; border: none; padding: 5px 12px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+        .btn-close-card:hover { background: #dc2626; }
+
+        .card-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; max-height: calc(100vh - 200px); }
+
+        /* Area Kalender */
+        .full-year-calendar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .mini-month-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border: 1px solid rgba(203, 213, 225, 0.6); border-radius: 8px; padding: 8px; }
+        .mini-month-card h4 { font-size: 0.8rem; color: var(--primary); text-align: center; margin-bottom: 4px; font-weight: 700; border-bottom: 1px solid rgba(226, 232, 240, 0.6); padding-bottom: 3px; }
+        .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); font-size: 0.6rem; text-align: center; gap: 2px; }
+        .mini-grid .day-name { font-weight: bold; color: var(--text-muted); margin-bottom: 2px; }
+        .mini-grid .date-cell { padding: 2px 0; border-radius: 50%; }
+        .mini-grid .date-cell.meeting-date { background-color: var(--primary); color: white; font-weight: bold; }
+
+        /* Area Unggah Berkas */
+        .upload-area {
+            border: 2px dashed var(--accent); padding: 12px; text-align: center;
+            border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+            background-color: rgba(248, 250, 252, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        .upload-area:hover { background-color: rgba(14, 165, 233, 0.1); border-color: var(--primary); }
+        .btn-upload { 
+            background-color: var(--primary); color: white; padding: 6px 16px; 
+            border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
+        }
+        .file-input-hidden { display: none; }
+
+        /* Daftar Berkas */
+        .file-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .file-item { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(203, 213, 225, 0.6); border-left: 4px solid var(--primary); }
+        .file-item a { color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.8rem; }
+        .file-item a:hover { color: var(--primary); text-decoration: underline; }
+        .file-actions { display: flex; gap: 6px; align-items: center; }
+        .btn-preview { background: var(--accent); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
+        .btn-delete-cross { background: #ef4444; color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; }
+
+        /* Slideshow Gallery */
+        #slideshowDisplayArea {
+            display: none; width: 100%; height: 300px; flex-direction: column; justify-content: center; align-items: center; position: relative; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); border-radius: 12px; overflow: hidden;
+        }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        .slide-img { max-width: 100%; max-height: 100%; object-fit: contain; position: absolute; opacity: 0; transition: opacity 1s ease-in-out; }
+        .slide-img.active { opacity: 1; }
+
+        /* Modal Box Fullscreen / Pratinjau */
+        #previewModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.75); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(8px); }
+        .modal-content-full { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); width: 100%; height: 100%; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-header-full { padding: 12px 25px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .btn-close-back { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+        .modal-body-full { flex-grow: 1; background: rgba(241, 245, 249, 0.7); overflow: auto; position: relative; }
+        .modal-body-full iframe, .modal-body-full embed { width: 100%; height: 100%; border: none; }
+        .excel-table-container { padding: 30px; background: white; min-height: 100%; }
+        .excel-table-container table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+        .excel-table-container th, .excel-table-container td { border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; }
+        .excel-table-container th { background-color: #f8fafc; color: var(--primary); position: sticky; top: 0; }
+
+        /* Modal Informasi Sistem */
+        #infoModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.5); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .info-modal-box { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); width: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease-out; border: 1px solid rgba(255, 255, 255, 0.6); }
+        .info-modal-header { background: var(--primary); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.95rem; }
+        .info-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .info-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px dashed rgba(241, 245, 249, 0.8); }
+        .info-item:last-child { border-bottom: none; }
+        .info-label { color: var(--text-muted); font-weight: 600; }
+        .info-value { font-weight: 700; color: var(--text-main); }
+        .badge-active { background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+        .btn-close-info { background: transparent; border: none; color: white; font-size: 1rem; cursor: pointer; }
+
+        /* Modal Password Kustom agar Aman & Tersembunyi (Titik-titik) */
+        #passwordModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .password-modal-box { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); width: 350px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.25); animation: fadeIn 0.2s ease-out; border: 1px solid rgba(255, 255, 255, 0.6); }
+        .password-modal-header { background: var(--primary); color: white; padding: 12px 20px; font-weight: 700; font-size: 0.95rem; }
+        .password-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .password-modal-body p { font-size: 0.85rem; color: var(--text-main); }
+        .password-modal-body input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; }
+        .password-modal-body input:focus { border-color: var(--primary); }
+        .password-modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 0 20px 20px 20px; }
+        .btn-pass-cancel { background: #cbd5e1; color: var(--text-main); border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .btn-pass-submit { background: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+
+        /* Home View Dashboard */
+        #homeViewContainer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Footer / Running Text & Jam Otomatis */
+        footer {
+            background: rgba(4, 120, 87, 0.75);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .footer-running {
+            flex-grow: 1;
+            overflow: hidden;
+            margin: 0 20px;
+        }
+
+        .footer-running marquee {
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-clock {
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        
+        /* Tombol Informasi Sistem Bawah Kiri */
+        .btn-info-fixed {
+            position: fixed;
+            bottom: 60px;
+            left: 20px;
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.7);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+        .btn-info-fixed:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Responsif untuk Handphone / Layar Kecil */
+        @media screen and (max-width: 992px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(15px);
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px 20px;
+                gap: 10px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                border-bottom: 1px solid var(--border);
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .nav-btn {
+                width: 100%;
+                justify-content: flex-start;
+                padding: 10px 14px;
+                background: rgba(255, 255, 255, 0.8);
+            }
+
+            .nav-dropdown {
+                width: 100%;
+            }
+
+            .nav-dropdown-content {
+                position: static;
+                width: 100%;
+                box-shadow: none;
+                border: none;
+                background: rgba(241, 245, 249, 0.7);
+                margin-top: 5px;
+                display: none;
+            }
+
+            .nav-dropdown.active-dropdown .nav-dropdown-content {
+                display: block;
+            }
+
+            .full-year-calendar {
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+            .main-container {
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header & Navbar -->
+    <header>
+        <div class="navbar">
+            <a href="#" class="logo-container" onclick="resetToHome()">
+                <img src="WhatsApp Image 2026-08-23 at 21.43.36 (1).jpeg" alt="Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/40/047857/FFFFFF?text=P'">
+                <div class="logo-text-wrapper">
+                    <span class="logo-text">UPTD PUSKESMAS LANJUT</span>
+                    <span class="logo-subtext">Integrasi Layanan Primer</span>
+                </div>
+            </a>
+
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+
+            <ul class="nav-links" id="navLinksContainer">
+                <!-- DROPDOWN 1: Laporan Bulanan (Dengan Password) -->
+                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">📁 Laporan Bulanan <span>▾</span></button>
+                    <div class="nav-dropdown-content" id="dropLaporanBulanan"></div>
+                </li>
+
+                <!-- DROPDOWN 2: PPT Lokmin (Dengan Password) -->
+                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">📊 PPT Lokmin <span>▾</span></button>
+                    <div class="nav-dropdown-content" id="dropPPT"></div>
+                </li>
+
+                <li><button class="nav-btn" onclick="selectMenu('jadwal', 'all', 'Jadwal Rapat', 'Kalender 1 Tahun (2026)'); closeMobileMenu();">📅 Jadwal Rapat</button></li>
+                <li><button class="nav-btn" onclick="selectMenu('dokrapat', 'all', 'Dokumentasi Rapat', 'Semua Data'); closeMobileMenu();">📋 Dokumentasi</button></li>
+                <li><button class="nav-btn" onclick="selectMenu('gallery', 'all', 'Gallery Dokumentasi', 'Semua Foto'); closeMobileMenu();">🖼️ Gallery</button></li>
+                
+                <li><button class="nav-btn" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data'); closeMobileMenu();">📚 Informasi dan Edukasi</button></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Container Utama -->
+    <div class="main-container">
+        <div id="activeUI" class="workspace-card" style="display: none;">
+            <div class="card-header">
+                <div>
+                    <h2 id="activeTitle">Judul Menu</h2>
+                    <p id="activeSubtitle">Periode</p>
+                </div>
+                <button class="btn-close-card" onclick="resetToHome()">Tutup ✕</button>
+            </div>
+            
+            <div class="card-body">
+                <div id="calendarDisplayArea" style="display: none;">
+                    <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
+                </div>
+
+                <div id="slideshowDisplayArea">
+                    <div class="slideshow-container" id="slideshowContainerImages"></div>
+                </div>
+
+                <div class="upload-area" id="uploadAreaContainer" onclick="triggerUpload()">
+                    <button class="btn-upload" type="button">Pilih Berkas</button>
+                    <input type="file" id="dynamicFileInput" class="file-input-hidden" multiple onchange="handleFiles(this)">
+                </div>
+                
+                <div class="file-list-container" id="fileListContainerArea">
+                    <ul id="dynamicFileList" class="file-list"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="homeViewContainer"></div>
+    </div>
+    
+    <!-- Tombol Informasi Sistem Bawah Kiri -->
+    <button class="btn-info-fixed" onclick="checkPasswordAndOpenInfo()">ℹ️ Informasi Sistem</button>
+
+    <!-- Modal Box Pratinjau Dokumen -->
+    <div id="previewModal">
+        <div class="modal-content-full">
+            <div class="modal-header-full">
+                <h3 id="modalTitle">Pratinjau Dokumen</h3>
+                <button class="btn-close-back" onclick="closeModal()">← Kembali / Tutup</button>
+            </div>
+            <div class="modal-body-full" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Modal Informasi Sistem -->
+    <div id="infoModal">
+        <div class="info-modal-box">
+            <div class="info-modal-header">
+                <span>ℹ️ Informasi Sistem</span>
+                <button class="btn-close-info" onclick="closeInfoModal()">✕</button>
+            </div>
+            <div class="info-modal-body">
+                <div class="info-item">
+                    <span class="info-label">Total File</span>
+                    <span class="info-value" id="statTotalFile">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Penyimpanan Terpakai</span>
+                    <span class="info-value" id="statStorageSize">0 MB</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Status Sistem</span>
+                    <span class="badge-active">Aktif (Supabase)</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Backup Otomatis</span>
+                    <span class="badge-active">Aktif</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Input Password Kustom (Tersembunyi Menjadi Titik-Titik) -->
+    <div id="passwordModal">
+        <div class="password-modal-box">
+            <div class="password-modal-header" id="passModalTitle">Autentikasi Password</div>
+            <div class="password-modal-body">
+                <p id="passModalDesc">Masukkan password untuk mengakses menu ini:</p>
+                <!-- Menggunakan type="password" agar ketikan otomatis disembunyikan -->
+                <input type="password" id="passwordInputBox" placeholder="Ketik password..." onkeydown="handlePassKeydown(event)">
+            </div>
+            <div class="password-modal-footer">
+                <button class="btn-pass-cancel" onclick="closePasswordModal(false)">Batal</button>
+                <button class="btn-pass-submit" onclick="submitPasswordModal()">Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-running">
+            <marquee scrollamount="5">LINTAS KLASTER UPTD PUSKESMAS LANJUT</marquee>
+        </div>
+        <div class="footer-clock" id="liveClock">-</div>
+    </footer>
+
+    <!-- JavaScript Logika Aplikasi dengan Integrasi Supabase -->
+    <script>
+        // INISIALISASI SUPABASE & NAMA BUCKET STORAGE
+        const SUPABASE_URL = 'https://nrqdqysorzakicxorfoh.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycWRxeXNvcnpha2ljeG9yZm9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNTY0MjQsImV4cCI6MjEwMzkzMjQyNH0.7beU__rd0wLEK50lSVkQJ0v5GStWUpwbO2w1hnTPY4k';
+        const STORAGE_BUCKET = "lintasklasterplp-eng-org";
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        
+        const meetingDates2026 = {
+            0: [21], 1: [21], 2: [10], 3: [22], 4: [23], 5: [23], 
+            6: [22], 7: [22], 8: [19], 9: [22], 10: [21], 11: [16]  
+        };
+
+        let passwordCallback = null;
+
+        // FUNGSI MODAL PASSWORD KUSTOM
+        function showPasswordPrompt(title, description, callback) {
+            document.getElementById('passModalTitle').innerText = title;
+            document.getElementById('passModalDesc').innerText = description;
+            const inputField = document.getElementById('passwordInputBox');
+            inputField.value = "";
+            document.getElementById('passwordModal').style.display = 'flex';
+            inputField.focus();
+            passwordCallback = callback;
+        }
+
+        function closePasswordModal(isSuccess, value = "") {
+            document.getElementById('passwordModal').style.display = 'none';
+            if (passwordCallback) {
+                passwordCallback(isSuccess, value);
+                passwordCallback = null;
+            }
+        }
+
+        function submitPasswordModal() {
+            const val = document.getElementById('passwordInputBox').value;
+            closePasswordModal(true, val);
+        }
+
+        function handlePassKeydown(event) {
+            if (event.key === 'Enter') {
+                submitPasswordModal();
+            }
+        }
+
+        // FUNGSI UNTUK CEK PASSWORD SAAT MEMBUKA INFO SISTEM
+        function checkPasswordAndOpenInfo() {
+            showPasswordPrompt("Informasi Sistem", "Masukkan password untuk melihat Informasi Sistem:", (success, pwd) => {
+                if(success) {
+                    if(pwd === "admin") {
+                        openInfoModal();
+                    } else if(pwd !== "") {
+                        alert("Password yang Anda masukkan salah!");
+                    }
+                }
+            });
+        }
+
+        // FUNGSI CEK PASSWORD KHUSUS LAPORAN BULANAN & PPT LOKMIN
+        function verifyAndSelectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
+            showPasswordPrompt("Autentikasi Akses", `Masukkan password untuk mengakses ${mainTitle} - ${subTitle}:`, (success, pwd) => {
+                if(success) {
+                    if (pwd === "admin") {
+                        selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle);
+                        closeMobileMenu();
+                    } else if (pwd !== "") {
+                        alert("Password yang Anda masukkan salah!");
+                    }
+                }
+            });
+        }
+
+        // FUNGSI UNTUK MENGUNGGAH BERKAS
+        function triggerUpload() { 
+            document.getElementById('dynamicFileInput').click();
+        }
+
+        function toggleMobileMenu() {
+            const nav = document.getElementById('navLinksContainer');
+            nav.classList.toggle('show');
+        }
+
+        function closeMobileMenu() {
+            const nav = document.getElementById('navLinksContainer');
+            if (nav.classList.contains('show')) {
+                nav.classList.remove('show');
+            }
+        }
+
+        function toggleDropdown(element, event) {
+            if (window.innerWidth <= 992) {
+                event.stopPropagation();
+                document.querySelectorAll('.nav-dropdown').forEach(drop => {
+                    if (drop !== element) drop.classList.remove('active-dropdown');
+                });
+                element.classList.toggle('active-dropdown');
+            }
+        }
+
+        function updateLiveClock() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('id-ID', options);
+            const timeStr = now.toLocaleTimeString('id-ID');
+            document.getElementById('liveClock').innerText = `${dateStr} | ${timeStr}`;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
+        function generateDropdowns() {
+            const dropLaporan = document.getElementById('dropLaporanBulanan');
+            const dropPPT = document.getElementById('dropPPT');
+
+            let htmlLaporan = "", htmlPPT = "";
+            for(let i=0; i<12; i++) {
+                htmlLaporan += `<a onclick="verifyAndSelectMenu('lokmin', ${i}, 'Laporan Bulanan', '${monthNames[i]}')">${monthNames[i]}</a>`;
+                htmlPPT += `<a onclick="verifyAndSelectMenu('pptlokmin', ${i}, 'PPT Lokmin', '${monthNames[i]}')">${monthNames[i]}</a>`;
+            }
+            dropLaporan.innerHTML = htmlLaporan;
+            dropPPT.innerHTML = htmlPPT;
+        }
+        generateDropdowns();
+
+        function renderFullYearCalendar() {
+            const gridContainer = document.getElementById('fullYearCalendarGrid');
+            if(!gridContainer) return;
+            gridContainer.innerHTML = '';
+            const year = 2026;
+            for (let m = 0; m < 12; m++) {
+                const monthCard = document.createElement('div');
+                monthCard.className = 'mini-month-card';
+                let html = `<h4>${monthNames[m]} ${year}</h4><div class="mini-grid">`;
+                const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+                days.forEach(d => { html += `<div class="day-name">${d}</div>`; });
+                const firstDayIndex = new Date(year, m, 1).getDay();
+                const totalDays = new Date(year, m + 1, 0).getDate();
+                const meetingDays = meetingDates2026[m] || [];
+                for (let i = 0; i < firstDayIndex; i++) { html += `<div></div>`; }
+                for (let d = 1; d <= totalDays; d++) {
+                    const isMeeting = meetingDays.includes(d);
+                    const cellClass = isMeeting ? 'date-cell meeting-date' : 'date-cell';
+                    html += `<div class="${cellClass}">${d}</div>`;
+                }
+                html += `</div>`;
+                monthCard.innerHTML = html;
+                gridContainer.appendChild(monthCard);
+            }
+        }
+
+        async function updateSystemStats() {
+            try {
+                const { data, error } = await supabaseClient.from('docs').select('*');
+                if (error) throw error;
+                
+                document.getElementById('statTotalFile').innerText = data.length;
+                let totalBytes = data.reduce((acc, curr) => acc + (curr.fileSize || 0), 0);
+                let sizeStr = (totalBytes / (1024 * 1024)).toFixed(1) + ' MB';
+                if(totalBytes === 0) sizeStr = '0 MB';
+                document.getElementById('statStorageSize').innerText = sizeStr;
+            } catch (err) {
+                console.warn("Tabel Supabase 'docs' belum siap atau koneksi terbatas:", err.message);
+            }
+        }
+        updateSystemStats();
+
+        let currentMenuId = ""; 
+        let slideshowInterval = null;
+
+        function openInfoModal() {
+            updateSystemStats();
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeInfoModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
+            currentMenuId = categoryCode + "-" + periodIdentifier;
+
+            document.getElementById('homeViewContainer').style.display = 'none';
+            document.getElementById('activeUI').style.display = 'flex';
+            document.getElementById('activeTitle').innerText = mainTitle;
+            document.getElementById('activeSubtitle').innerText = "Periode: " + subTitle;
+
+            const calArea = document.getElementById('calendarDisplayArea');
+            const uploadArea = document.getElementById('uploadAreaContainer');
+            const slideshowArea = document.getElementById('slideshowDisplayArea');
+            const fileListArea = document.getElementById('fileListContainerArea');
+
+            if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
+
+            if (categoryCode === 'jadwal') {
+                calArea.style.display = 'block';
+                renderFullYearCalendar();
+                uploadArea.style.display = 'none';
+                slideshowArea.style.display = 'none';
+                fileListArea.style.display = 'none';
+            } else if (categoryCode === 'dokrapat' || categoryCode === 'gallery') {
+                calArea.style.display = 'none';
+                uploadArea.style.display = 'block';
+                slideshowArea.style.display = 'flex';
+                fileListArea.style.display = 'none';
+            } else {
+                calArea.style.display = 'none';
+                uploadArea.style.display = 'block';
+                slideshowArea.style.display = 'none';
+                fileListArea.style.display = 'block';
+            }
+
+            document.getElementById('dynamicFileList').innerHTML = '';
+            document.getElementById('slideshowContainerImages').innerHTML = '';
+            loadFilesForCurrentMenu(categoryCode);
+        }
+
+        function resetToHome() {
+            if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
+            document.getElementById('activeUI').style.display = 'none';
+            document.getElementById('homeViewContainer').style.display = 'block';
+            currentMenuId = "";
+            updateSystemStats();
+        }
+
+        async function handleFiles(input) {
+            const files = input.files;
+            if (files.length === 0 || currentMenuId === "") return;
+
+            let categoryCode = currentMenuId.split("-")[0];
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                try {
+                    const filePath = `${currentMenuId}/${Date.now()}_${file.name}`;
+                    const { data: storageData, error: storageError } = await supabaseClient.storage
+                        .from(STORAGE_BUCKET)
+                        .upload(filePath, file);
+
+                    if (storageError) throw storageError;
+
+                    const { data: { publicUrl } } = supabaseClient.storage
+                        .from(STORAGE_BUCKET)
+                        .getPublicUrl(filePath);
+
+                    const { data: insertData, error: insertError } = await supabaseClient
+                        .from('docs')
+                        .insert([{
+                            menuId: currentMenuId,
+                            fileName: file.name,
+                            fileType: file.type,
+                            fileSize: file.size,
+                            fileUrl: publicUrl
+                        }])
+                        .select();
+
+                    if (insertError) throw insertError;
+
+                    if (categoryCode === 'dokrapat' || categoryCode === 'gallery') {
+                        loadFilesForCurrentMenu(categoryCode);
+                    } else if (insertData && insertData.length > 0) {
+                        renderFileItem(insertData[0]); 
+                    }
+                    updateSystemStats();
+                } catch (err) {
+                    console.error("Gagal mengunggah file:", err);
+                    alert("Gagal mengunggah file. Pastikan Bucket '" + STORAGE_BUCKET + "' dan Tabel 'docs' sudah dibuat di Supabase.");
+                }
+            }
+            input.value = '';
+        }
+
+        async function loadFilesForCurrentMenu(categoryCode) {
+            try {
+                const { data: matchedDocs, error } = await supabaseClient
+                    .from('docs')
+                    .select('*')
+                    .eq('menuId', currentMenuId);
+
+                if (error) throw error;
+
+                if (categoryCode === 'dokrapat' || categoryCode === 'gallery') {
+                    let imageDocs = matchedDocs.filter(data => data.fileType.includes('image/') || data.fileName.match(/\.(jpg|jpeg|png|gif)$/i));
+                    renderSlideshowImages(imageDocs);
+                } else {
+                    matchedDocs.forEach(data => { renderFileItem(data); });
+                }
+            } catch (err) {
+                console.warn("Gagal memuat file dari tabel docs:", err.message);
+            }
+        }
+
+        function renderFileItem(data) {
+            const listContainer = document.getElementById('dynamicFileList');
+            const li = document.createElement('li');
+            li.className = 'file-item';
+            const fileURL = data.fileUrl;
+            let fileSize = (data.fileSize / 1024).toFixed(1) + ' KB';
+            if (data.fileSize > 1024 * 1024) fileSize = (data.fileSize / (1024 * 1024)).toFixed(1) + ' MB';
+            li.innerHTML = `
+                <div style="display:flex; align-items:center; gap:8px; max-width:60%;">
+                    <span>📄</span>
+                    <a href="${fileURL}" target="_blank" title="Unduh File" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${data.fileName}</a>
+                </div>
+                <div class="file-actions">
+                    <small style="color:var(--text-muted);">(${fileSize})</small>
+                    <button class="btn-preview" onclick="openPreview('${fileURL}', '${data.fileName}', '${data.fileType}')">Tampilkan</button>
+                    <button class="btn-delete-cross" onclick="deleteFile(${data.id}, '${data.fileUrl}', this.parentElement.parentElement)" title="Hapus File">✕</button>
+                </div>
+            `;
+            listContainer.appendChild(li);
+        }
+
+        function renderSlideshowImages(imageDocs) {
+            const container = document.getElementById('slideshowContainerImages');
+            container.innerHTML = '';
+            if (imageDocs.length === 0) {
+                container.innerHTML = `<div style="color: white; font-size: 0.9rem; font-weight: 600;">Belum ada foto/gambar yang diunggah.</div>`;
+                return;
+            }
+            imageDocs.forEach((doc, index) => {
+                const fileURL = doc.fileUrl;
+                const img = document.createElement('img');
+                img.src = fileURL;
+                img.className = 'slide-img' + (index === 0 ? ' active' : '');
+                container.appendChild(img);
+            });
+            if (imageDocs.length > 1) {
+                let currentIndex = 0;
+                const slides = container.querySelectorAll('.slide-img');
+                if (slideshowInterval) clearInterval(slideshowInterval);
+                slideshowInterval = setInterval(() => {
+                    slides[currentIndex].classList.remove('active');
+                    currentIndex = (currentIndex + 1) % slides.length;
+                    slides[currentIndex].classList.add('active');
+                }, 3500);
+            }
+        }
+
+        async function deleteFile(id, fileUrl, listElement) {
+            if(!confirm("Anda yakin ingin menghapus dokumen ini?")) return;
+            try {
+                const { error } = await supabaseClient
+                    .from('docs')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                listElement.remove(); 
+                updateSystemStats();
+            } catch (err) {
+                console.error("Gagal menghapus file:", err);
+                alert("Gagal menghapus file dari server.");
+            }
+        }
+
+        function openPreview(url, name, type) {
+            const modal = document.getElementById('previewModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            modalTitle.innerText = "Pratinjau Dokumen: " + name;
+            modalBody.innerHTML = '<div style="padding:60px; text-align:center; font-weight:bold; color:var(--primary); font-size:1.2rem;">Memuat pratinjau dokumen...</div>';
+            modal.style.display = 'flex';
+
+            setTimeout(() => {
+                if (type.includes('pdf') || name.toLowerCase().endsWith('.pdf')) {
+                    modalBody.innerHTML = `<embed src="${url}" type="application/pdf">`;
+                } else if (name.match(/\.(xlsx|xls|csv)$/i)) {
+                    modalBody.innerHTML = '<div style="padding:40px; text-align:center;">Membaca struktur tabel Excel...</div>';
+                    fetch(url).then(res => res.arrayBuffer()).then(ab => {
+                            const workbook = XLSX.read(ab, { type: 'array' });
+                            const htmlTable = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]], { id: 'excel-table' });
+                            modalBody.innerHTML = `<div class="excel-table-container"><h4 style="margin-bottom:15px; color:var(--primary);">Lembar: ${workbook.SheetNames[0]}</h4>${htmlTable}</div>`;
+                        }).catch(err => {
+                            modalBody.innerHTML = `<div style="padding:40px; text-align:center; color:red;">Gagal memuat Excel.</div>`;
+                        });
+                } else if (type.includes('image/') || name.match(/\.(jpg|jpeg|png|gif)$/i)) {
+                    modalBody.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; width:100%; height:100%; padding:20px;"><img src="${url}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;"></div>`;
+                } else {
+                    modalBody.innerHTML = `
+                        <div style="padding: 80px; text-align: center;">
+                            <span style="font-size:4rem; margin-bottom:20px; display:block;">📂</span>
+                            <h2 style="margin-bottom: 15px; color:var(--primary);">Pratinjau Penuh Tidak Tersedia</h2>
+                            <p style="margin-bottom: 25px;">Format file ini tidak dapat dibuka langsung di dalam web.<br>Silakan unduh untuk membukanya secara manual.</p>
+                            <a href="${url}" download="${name}" class="btn-upload" style="text-decoration: none; display: inline-block;">Unduh File Sekarang</a>
+                        </div>`;
+                }
+            }, 300);
+        }
+
+        function closeModal() {
+            document.getElementById('previewModal').style.display = 'none';
+            document.getElementById('modalBody').innerHTML = ''; 
+        }
+    </script>
+</body>
+</html>
