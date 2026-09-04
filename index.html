@@ -485,7 +485,7 @@
                 <li><button class="nav-btn" onclick="selectMenu('jadwal', 'all', 'Jadwal Rapat', 'Kalender 1 Tahun (2026)'); closeMobileMenu();">📅 Jadwal</button></li>
                 <li><button class="nav-btn" onclick="selectMenu('gallery', 'all', 'Gallery Dokumentasi', 'Semua Foto'); closeMobileMenu();">🖼️ Gallery</button></li>
                 
-                <!-- DROPDOWN: Inventaris (Meminta Password) -->
+                <!-- DROPDOWN: Inventaris -->
                 <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
                     <button class="nav-btn" style="width: 100%; justify-content: space-between;">📦 Inventaris <span>▾</span></button>
                     <div class="nav-dropdown-content">
@@ -503,9 +503,19 @@
                     </div>
                 </li>
 
+                <!-- DROPDOWN: Skrining (Masing-masing 1 Kolom Link) -->
+                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">📋 Skrining <span>▾</span></button>
+                    <div class="nav-dropdown-content">
+                        <a onclick="selectMenu('skrining', 'get_up_and_go', 'Skrining', 'Skrining Resiko jatuh (Get up And Go)'); closeMobileMenu();">Skrining Resiko jatuh (Get up And Go)</a>
+                        <a onclick="selectMenu('skrining', 'morse', 'Skrining', 'Skrining Resiko jatuh (Skala Morse)'); closeMobileMenu();">Skrining Resiko jatuh (Skala Morse)</a>
+                        <a onclick="selectMenu('skrining', 'humpty_dumpty', 'Skrining', 'Skrining Resiko Jatuh (Humpty Dumpty)'); closeMobileMenu();">Skrining Resiko Jatuh (Humpty Dumpty)</a>
+                    </div>
+                </li>
+
                 <li><button class="nav-btn" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data'); closeMobileMenu();">📚 Edukasi</button></li>
                 
-                <!-- TAMBAHAN: Menu Pengaturan Ganti Password -->
+                <!-- Pengaturan -->
                 <li><button class="nav-btn" onclick="bukaPengaturanPassword(); closeMobileMenu();">⚙️ Pengaturan</button></li>
             </ul>
         </div>
@@ -528,12 +538,11 @@
                     <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
                 </div>
 
-                <!-- Area Form Tautan / Link (Untuk Rujukan & Inventaris) -->
+                <!-- Area Form Tautan / Link (3 Kolom untuk Rujukan/Inventaris) -->
                 <div id="formDisplayArea" style="display: none;">
                     <div class="form-area-container">
                         <h3 style="color: var(--primary);" id="formTitleLabel">Form Data Tautan</h3>
                         
-                        <!-- Kolom Link 1 -->
                         <div class="form-group">
                             <label>Link 1:</label>
                             <div style="display: flex; gap: 10px;">
@@ -542,7 +551,6 @@
                             </div>
                         </div>
 
-                        <!-- Kolom Link 2 -->
                         <div class="form-group">
                             <label>Link 2:</label>
                             <div style="display: flex; gap: 10px;">
@@ -551,7 +559,6 @@
                             </div>
                         </div>
 
-                        <!-- Kolom Link 3 -->
                         <div class="form-group">
                             <label>Link 3:</label>
                             <div style="display: flex; gap: 10px;">
@@ -560,8 +567,22 @@
                             </div>
                         </div>
 
-                        <!-- Tombol Simpan Semua -->
                         <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 10px; width: 100%;">Simpan Semua Tautan</button>
+                    </div>
+                </div>
+
+                <!-- Area Form Tautan Khusus Skrining (1 Kolom Saja) -->
+                <div id="formSkriningArea" style="display: none;">
+                    <div class="form-area-container">
+                        <h3 style="color: var(--primary);" id="formSkriningTitleLabel">Form Skrining</h3>
+                        <div class="form-group">
+                            <label>Link:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="inputUrlSkrining" placeholder="https://..." style="flex-grow: 1;">
+                                <button class="btn-submit-form" type="button" id="btnBukaSkrining" style="background-color: var(--accent); display: none;" onclick="bukaUrlSkrining()">Buka Link</button>
+                            </div>
+                        </div>
+                        <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
                     </div>
                 </div>
 
@@ -776,6 +797,37 @@
             }
         }
 
+        // Fungsi Simpan, Muat, dan Buka Tautan Khusus Skrining (1 Kolom)
+        function simpanUrlSkrining() {
+            const urlInput = document.getElementById('inputUrlSkrining').value;
+            localStorage.setItem('url_skrining_' + currentMenuId, urlInput);
+            alert("Tautan skrining berhasil disimpan!");
+            muatUrlSkrining();
+        }
+
+        function muatUrlSkrining() {
+            const urlTersimpan = localStorage.getItem('url_skrining_' + currentMenuId);
+            const inputField = document.getElementById('inputUrlSkrining');
+            const btnBuka = document.getElementById('btnBukaSkrining');
+            
+            if (urlTersimpan && urlTersimpan.trim() !== "") {
+                inputField.value = urlTersimpan;
+                btnBuka.style.display = 'block';
+            } else {
+                inputField.value = '';
+                btnBuka.style.display = 'none';
+            }
+        }
+
+        function bukaUrlSkrining() {
+            const urlTersimpan = localStorage.getItem('url_skrining_' + currentMenuId);
+            if (urlTersimpan && urlTersimpan.trim() !== "") {
+                window.open(urlTersimpan, '_blank');
+            } else {
+                alert("Tautan kosong. Silakan isi dan simpan terlebih dahulu!");
+            }
+        }
+
         function triggerUpload() { 
             document.getElementById('dynamicFileInput').click();
         }
@@ -893,6 +945,7 @@
             const slideshowArea = document.getElementById('slideshowDisplayArea');
             const fileListArea = document.getElementById('fileListContainerArea');
             const formArea = document.getElementById('formDisplayArea');
+            const formSkriningArea = document.getElementById('formSkriningArea');
 
             if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
 
@@ -901,6 +954,7 @@
             slideshowArea.style.display = 'none';
             fileListArea.style.display = 'none';
             formArea.style.display = 'none';
+            formSkriningArea.style.display = 'none';
 
             if (categoryCode === 'jadwal') {
                 calArea.style.display = 'block';
@@ -914,6 +968,12 @@
                 uploadArea.style.display = 'block';
                 fileListArea.style.display = 'block';
                 muatUrlRujukan();
+            } else if (categoryCode === 'skrining') {
+                formSkriningArea.style.display = 'block';
+                document.getElementById('formSkriningTitleLabel').innerText = subTitle;
+                uploadArea.style.display = 'block';
+                fileListArea.style.display = 'block';
+                muatUrlSkrining();
             } else {
                 uploadArea.style.display = 'block';
                 fileListArea.style.display = 'block';
@@ -1124,5 +1184,6 @@
     </script>
 </body>
 </html>
+
 
 
