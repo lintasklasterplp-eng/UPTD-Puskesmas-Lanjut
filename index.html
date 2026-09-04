@@ -503,7 +503,7 @@
                     </div>
                 </li>
 
-                <!-- DROPDOWN: Skrining (Masing-masing 1 Kolom Link) -->
+                <!-- DROPDOWN: Skrining -->
                 <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
                     <button class="nav-btn" style="width: 100%; justify-content: space-between;">📋 Skrining <span>▾</span></button>
                     <div class="nav-dropdown-content">
@@ -538,7 +538,7 @@
                     <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
                 </div>
 
-                <!-- Area Form Tautan / Link (3 Kolom untuk Rujukan/Inventaris) -->
+                <!-- Area Form Tautan / Link (3 Kolom untuk Rujukan & Inventaris) -->
                 <div id="formDisplayArea" style="display: none;">
                     <div class="form-area-container">
                         <h3 style="color: var(--primary);" id="formTitleLabel">Form Data Tautan</h3>
@@ -571,7 +571,7 @@
                     </div>
                 </div>
 
-                <!-- Area Form Tautan Khusus Skrining (1 Kolom Saja) -->
+                <!-- Area Form Tautan Skrining (1 Kolom) -->
                 <div id="formSkriningArea" style="display: none;">
                     <div class="form-area-container">
                         <h3 style="color: var(--primary);" id="formSkriningTitleLabel">Form Skrining</h3>
@@ -797,7 +797,6 @@
             }
         }
 
-        // Fungsi Simpan, Muat, dan Buka Tautan Khusus Skrining (1 Kolom)
         function simpanUrlSkrining() {
             const urlInput = document.getElementById('inputUrlSkrining').value;
             localStorage.setItem('url_skrining_' + currentMenuId, urlInput);
@@ -965,7 +964,7 @@
             } else if (categoryCode === 'rujukan' || categoryCode === 'inventaris') {
                 formArea.style.display = 'block';
                 document.getElementById('formTitleLabel').innerText = "Tautan - " + subTitle;
-                uploadArea.style.display = 'block';
+                // Sengaja tidak menampilkan uploadArea untuk Rujukan dan Inventaris sesuai permintaan
                 fileListArea.style.display = 'block';
                 muatUrlRujukan();
             } else if (categoryCode === 'skrining') {
@@ -1036,6 +1035,7 @@
                 }
             }
             input.value = '';
+            checkUploadAreaVisibility();
         }
 
         async function loadFilesForCurrentMenu(categoryCode) {
@@ -1053,8 +1053,29 @@
                 } else {
                     matchedDocs.forEach(data => { renderFileItem(data); });
                 }
+                checkUploadAreaVisibility();
             } catch (err) {
                 console.warn("Gagal memuat file dari tabel docs:", err.message);
+            }
+        }
+
+        // Fungsi mengecek apakah tombol/area unggah file harus disembunyikan atau dimunculkan
+        function checkUploadAreaVisibility() {
+            const categoryCode = currentMenuId.split("-")[0];
+            const uploadArea = document.getElementById('uploadAreaContainer');
+            
+            // Jika menu adalah rujukan atau inventaris, tombol "Pilih Berkas" sepenuhnya tidak ditampilkan
+            if (categoryCode === 'rujukan' || categoryCode === 'inventaris') {
+                uploadArea.style.display = 'none';
+                return;
+            }
+
+            const listContainer = document.getElementById('dynamicFileList');
+            // Jika sudah ada file di dalam list, sembunyikan tombol "Pilih Berkas"
+            if (listContainer.children.length > 0) {
+                uploadArea.style.display = 'none';
+            } else {
+                uploadArea.style.display = 'block';
             }
         }
 
@@ -1078,6 +1099,7 @@
                 </div>
             `;
             listContainer.appendChild(li);
+            checkUploadAreaVisibility();
         }
 
         function renderSlideshowImages(imageDocs) {
@@ -1118,6 +1140,7 @@
 
                 listElement.remove(); 
                 updateSystemStats();
+                checkUploadAreaVisibility(); // Memunculkan kembali tombol Pilih Berkas jika file terhapus habis
             } catch (err) {
                 console.error("Gagal menghapus file:", err);
                 alert("Gagal menghapus file dari server.");
