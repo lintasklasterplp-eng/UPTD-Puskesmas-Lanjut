@@ -51,9 +51,9 @@
         }
 
         .navbar {
-            max-width: 1400px;
+            max-width: 1450px;
             margin: 0 auto;
-            padding: 10px 20px;
+            padding: 8px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -63,13 +63,13 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             text-decoration: none;
         }
 
         .logo-img {
-            width: 40px;
-            height: 40px;
+            width: 34px;
+            height: 34px;
             object-fit: cover;
             border-radius: 50%;
             border: 2px solid var(--primary);
@@ -82,39 +82,40 @@
         }
 
         .logo-text {
-            font-size: 1.05rem;
+            font-size: 0.95rem;
             font-weight: 800;
             color: var(--primary);
             white-space: nowrap;
         }
 
         .logo-subtext {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             color: var(--text-muted);
         }
 
-        /* NAV MENU DAN DROPDOWN RESPONSIVE */
+        /* NAV MENU & TOMBOL DIPERKECIL AGAR CUKUP 1 BARIS */
         .nav-links {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             list-style: none;
             align-items: center;
+            flex-wrap: nowrap; /* Memastikan tetap dalam 1 baris */
         }
 
         .nav-btn {
             background-color: rgba(255, 255, 255, 0.5); 
             color: var(--text-main); 
             border: 1px solid rgba(255, 255, 255, 0.6); 
-            font-size: 0.85rem; 
+            font-size: 0.75rem; /* Ukuran font diperkecil */
             font-weight: 600;
             cursor: pointer; 
-            padding: 6px 12px; 
-            border-radius: 8px;
+            padding: 4px 8px; /* Padding diperkecil */
+            border-radius: 6px;
             transition: all 0.2s ease-in-out; 
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             text-decoration: none;
             backdrop-filter: blur(4px);
             white-space: nowrap;
@@ -136,9 +137,9 @@
             position: absolute;
             top: 110%;
             left: 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            min-width: 180px;
+            min-width: 170px;
             box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
             border-radius: 8px;
             z-index: 1000;
@@ -154,10 +155,10 @@
 
         .nav-dropdown-content a {
             color: var(--text-main);
-            padding: 10px 16px;
+            padding: 8px 12px;
             text-decoration: none;
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s, color 0.2s;
@@ -173,9 +174,9 @@
             display: none;
             background: rgba(255, 255, 255, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.8);
-            font-size: 1.25rem;
-            padding: 6px 10px;
-            border-radius: 8px;
+            font-size: 1.15rem;
+            padding: 4px 8px;
+            border-radius: 6px;
             cursor: pointer;
             color: var(--primary);
         }
@@ -243,6 +244,53 @@
         .mini-grid .date-cell { padding: 2px 0; border-radius: 50%; }
         .mini-grid .date-cell.meeting-date { background-color: var(--primary); color: white; font-weight: bold; }
 
+        /* Area Form */
+        .form-area-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .form-group input {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            background: rgba(248, 250, 252, 0.9);
+        }
+        .form-group input:focus {
+            border-color: var(--primary);
+        }
+        .btn-submit-form {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            width: fit-content;
+        }
+        .btn-submit-form:hover {
+            background-color: var(--primary-hover);
+        }
+
         /* Area Unggah Berkas */
         .upload-area {
             border: 2px dashed var(--accent); padding: 12px; text-align: center;
@@ -260,8 +308,20 @@
         /* Daftar Berkas */
         .file-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
         .file-item { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(203, 213, 225, 0.6); border-left: 4px solid var(--primary); }
-        .file-item a { color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.8rem; }
-        .file-item a:hover { color: var(--primary); text-decoration: underline; }
+        
+        /* Tautan file yang langsung membuka pratinjau di web */
+        .file-item a.file-link-preview { 
+            color: var(--text-main); 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 0.8rem; 
+            cursor: pointer; 
+        }
+        .file-item a.file-link-preview:hover { 
+            color: var(--primary); 
+            text-decoration: underline; 
+        }
+
         .file-actions { display: flex; gap: 6px; align-items: center; }
         .btn-preview { background: var(--accent); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
         .btn-delete-cross { background: #ef4444; color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; }
@@ -324,7 +384,7 @@
             backdrop-filter: blur(10px);
             border-top: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 10px 20px;
+            padding: 8px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -342,7 +402,7 @@
 
         .footer-running marquee {
             font-weight: 800;
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             letter-spacing: 0.5px;
         }
 
@@ -357,15 +417,15 @@
         /* Tombol Informasi Sistem Bawah Kiri */
         .btn-info-fixed {
             position: fixed;
-            bottom: 60px;
+            bottom: 50px;
             left: 20px;
             z-index: 1000;
             background-color: rgba(255, 255, 255, 0.7);
             color: var(--text-main);
             border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
             font-weight: 600;
             cursor: pointer;
             backdrop-filter: blur(4px);
@@ -379,63 +439,21 @@
         }
 
         /* Responsif untuk Handphone / Layar Kecil */
-        @media screen and (max-width: 992px) {
-            .mobile-menu-toggle {
-                display: block;
-            }
-
+        @media screen and (max-width: 1150px) {
+            .mobile-menu-toggle { display: block; }
             .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(15px);
-                flex-direction: column;
-                align-items: stretch;
-                padding: 15px 20px;
-                gap: 10px;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-                border-bottom: 1px solid var(--border);
+                display: none; position: absolute; top: 100%; left: 0; width: 100%;
+                background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px);
+                flex-direction: column; align-items: stretch; padding: 15px 20px; gap: 10px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border);
             }
-
-            .nav-links.show {
-                display: flex;
-            }
-
-            .nav-btn {
-                width: 100%;
-                justify-content: flex-start;
-                padding: 10px 14px;
-                background: rgba(255, 255, 255, 0.8);
-            }
-
-            .nav-dropdown {
-                width: 100%;
-            }
-
-            .nav-dropdown-content {
-                position: static;
-                width: 100%;
-                box-shadow: none;
-                border: none;
-                background: rgba(241, 245, 249, 0.7);
-                margin-top: 5px;
-                display: none;
-            }
-
-            .nav-dropdown.active-dropdown .nav-dropdown-content {
-                display: block;
-            }
-
-            .full-year-calendar {
-                grid-template-columns: repeat(1, 1fr);
-            }
-
-            .main-container {
-                padding: 0 10px;
-            }
+            .nav-links.show { display: flex; }
+            .nav-btn { width: 100%; justify-content: flex-start; padding: 8px 12px; font-size: 0.85rem; background: rgba(255, 255, 255, 0.8); }
+            .nav-dropdown { width: 100%; }
+            .nav-dropdown-content { position: static; width: 100%; box-shadow: none; border: none; background: rgba(241, 245, 249, 0.7); margin-top: 5px; display: none; }
+            .nav-dropdown.active-dropdown .nav-dropdown-content { display: block; }
+            .full-year-calendar { grid-template-columns: repeat(1, 1fr); }
+            .main-container { padding: 0 10px; }
         }
     </style>
 </head>
@@ -455,23 +473,39 @@
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
 
             <ul class="nav-links" id="navLinksContainer">
-                <!-- DROPDOWN 1: Laporan Bulanan (Dengan Password) -->
                 <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
                     <button class="nav-btn" style="width: 100%; justify-content: space-between;">📁 Laporan Bulanan <span>▾</span></button>
                     <div class="nav-dropdown-content" id="dropLaporanBulanan"></div>
                 </li>
 
-                <!-- DROPDOWN 2: PPT Lokmin (Dengan Password) -->
                 <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
                     <button class="nav-btn" style="width: 100%; justify-content: space-between;">📊 PPT Lokmin <span>▾</span></button>
                     <div class="nav-dropdown-content" id="dropPPT"></div>
                 </li>
 
-                <li><button class="nav-btn" onclick="selectMenu('jadwal', 'all', 'Jadwal Rapat', 'Kalender 1 Tahun (2026)'); closeMobileMenu();">📅 Jadwal Rapat</button></li>
-                <li><button class="nav-btn" onclick="selectMenu('dokrapat', 'all', 'Dokumentasi Rapat', 'Semua Data'); closeMobileMenu();">📋 Dokumentasi</button></li>
+                <li><button class="nav-btn" onclick="selectMenu('jadwal', 'all', 'Jadwal Rapat', 'Kalender 1 Tahun (2026)'); closeMobileMenu();">📅 Jadwal</button></li>
                 <li><button class="nav-btn" onclick="selectMenu('gallery', 'all', 'Gallery Dokumentasi', 'Semua Foto'); closeMobileMenu();">🖼️ Gallery</button></li>
                 
-                <li><button class="nav-btn" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data'); closeMobileMenu();">📚 Informasi dan Edukasi</button></li>
+                <!-- DROPDOWN: Inventaris (Meminta Password) -->
+                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">📦 Inventaris <span>▾</span></button>
+                    <div class="nav-dropdown-content">
+                        <a onclick="verifyAndSelectMenu('inventaris', 'obhp', 'Inventaris', 'OBHP Ruang Tindakan & Gawat Darurat')">OBHP Ruang Tindakan & Gawat Darurat</a>
+                        <a onclick="verifyAndSelectMenu('inventaris', 'bmhp', 'Inventaris', 'BMHP Ruang Tindakan & Gawat Darurat')">BMHP Ruang Tindakan & Gawat Darurat</a>
+                    </div>
+                </li>
+
+                <!-- DROPDOWN: Rujukan -->
+                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">🚑 Rujukan <span>▾</span></button>
+                    <div class="nav-dropdown-content">
+                        <a onclick="selectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal'); closeMobileMenu();">Rujukan Internal</a>
+                        <a onclick="selectMenu('rujukan', 'eksternal', 'Rujukan', 'Rujukan Eksternal'); closeMobileMenu();">Rujukan Eksternal</a>
+                        <a onclick="selectMenu('rujukan', 'upkdk', 'Rujukan', 'Rujukan UPKDK'); closeMobileMenu();">Rujukan UPKDK</a>
+                    </div>
+                </li>
+
+                <li><button class="nav-btn" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data'); closeMobileMenu();">📚 Edukasi</button></li>
             </ul>
         </div>
     </header>
@@ -488,14 +522,29 @@
             </div>
             
             <div class="card-body">
+                <!-- Area Kalender -->
                 <div id="calendarDisplayArea" style="display: none;">
                     <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
                 </div>
 
+                <!-- Area Form Rujukan (Hanya URL) -->
+                <div id="formDisplayArea" style="display: none;">
+                    <div class="form-area-container">
+                        <h3 style="color: var(--primary);" id="formTitleLabel">Form Data</h3>
+                        <div class="form-group">
+                            <label>Kode URL Form / Berkas Pendukung (Link):</label>
+                            <input type="url" placeholder="https://contoh.com/berkas">
+                        </div>
+                        <button class="btn-submit-form" type="button" onclick="alert('Data berhasil disimpan secara lokal (Simulasi).')">Simpan Data Rujukan</button>
+                    </div>
+                </div>
+
+                <!-- Area Slideshow -->
                 <div id="slideshowDisplayArea">
                     <div class="slideshow-container" id="slideshowContainerImages"></div>
                 </div>
 
+                <!-- Area Unggah Berkas & List File -->
                 <div class="upload-area" id="uploadAreaContainer" onclick="triggerUpload()">
                     <button class="btn-upload" type="button">Pilih Berkas</button>
                     <input type="file" id="dynamicFileInput" class="file-input-hidden" multiple onchange="handleFiles(this)">
@@ -552,13 +601,12 @@
         </div>
     </div>
 
-    <!-- Modal Input Password Kustom (Tersembunyi Menjadi Titik-Titik) -->
+    <!-- Modal Input Password Kustom -->
     <div id="passwordModal">
         <div class="password-modal-box">
             <div class="password-modal-header" id="passModalTitle">Autentikasi Password</div>
             <div class="password-modal-body">
                 <p id="passModalDesc">Masukkan password untuk mengakses menu ini:</p>
-                <!-- Menggunakan type="password" agar ketikan otomatis disembunyikan -->
                 <input type="password" id="passwordInputBox" placeholder="Ketik password..." onkeydown="handlePassKeydown(event)">
             </div>
             <div class="password-modal-footer">
@@ -575,7 +623,6 @@
         <div class="footer-clock" id="liveClock">-</div>
     </footer>
 
-    <!-- JavaScript Logika Aplikasi dengan Integrasi Supabase -->
     <script>
         // INISIALISASI SUPABASE & NAMA BUCKET STORAGE
         const SUPABASE_URL = 'https://nrqdqysorzakicxorfoh.supabase.co';
@@ -593,7 +640,6 @@
 
         let passwordCallback = null;
 
-        // FUNGSI MODAL PASSWORD KUSTOM
         function showPasswordPrompt(title, description, callback) {
             document.getElementById('passModalTitle').innerText = title;
             document.getElementById('passModalDesc').innerText = description;
@@ -623,7 +669,6 @@
             }
         }
 
-        // FUNGSI UNTUK CEK PASSWORD SAAT MEMBUKA INFO SISTEM
         function checkPasswordAndOpenInfo() {
             showPasswordPrompt("Informasi Sistem", "Masukkan password untuk melihat Informasi Sistem:", (success, pwd) => {
                 if(success) {
@@ -636,7 +681,6 @@
             });
         }
 
-        // FUNGSI CEK PASSWORD KHUSUS LAPORAN BULANAN & PPT LOKMIN
         function verifyAndSelectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             showPasswordPrompt("Autentikasi Akses", `Masukkan password untuk mengakses ${mainTitle} - ${subTitle}:`, (success, pwd) => {
                 if(success) {
@@ -650,7 +694,6 @@
             });
         }
 
-        // FUNGSI UNTUK MENGUNGGAH BERKAS
         function triggerUpload() { 
             document.getElementById('dynamicFileInput').click();
         }
@@ -668,7 +711,7 @@
         }
 
         function toggleDropdown(element, event) {
-            if (window.innerWidth <= 992) {
+            if (window.innerWidth <= 1150) {
                 event.stopPropagation();
                 document.querySelectorAll('.nav-dropdown').forEach(drop => {
                     if (drop !== element) drop.classList.remove('active-dropdown');
@@ -767,24 +810,29 @@
             const uploadArea = document.getElementById('uploadAreaContainer');
             const slideshowArea = document.getElementById('slideshowDisplayArea');
             const fileListArea = document.getElementById('fileListContainerArea');
+            const formArea = document.getElementById('formDisplayArea');
 
             if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
+
+            calArea.style.display = 'none';
+            uploadArea.style.display = 'none';
+            slideshowArea.style.display = 'none';
+            fileListArea.style.display = 'none';
+            formArea.style.display = 'none';
 
             if (categoryCode === 'jadwal') {
                 calArea.style.display = 'block';
                 renderFullYearCalendar();
-                uploadArea.style.display = 'none';
-                slideshowArea.style.display = 'none';
-                fileListArea.style.display = 'none';
-            } else if (categoryCode === 'dokrapat' || categoryCode === 'gallery') {
-                calArea.style.display = 'none';
+            } else if (categoryCode === 'gallery') {
                 uploadArea.style.display = 'block';
                 slideshowArea.style.display = 'flex';
-                fileListArea.style.display = 'none';
-            } else {
-                calArea.style.display = 'none';
+            } else if (categoryCode === 'rujukan') {
+                formArea.style.display = 'block';
+                document.getElementById('formTitleLabel').innerText = "Form " + subTitle;
                 uploadArea.style.display = 'block';
-                slideshowArea.style.display = 'none';
+                fileListArea.style.display = 'block';
+            } else {
+                uploadArea.style.display = 'block';
                 fileListArea.style.display = 'block';
             }
 
@@ -833,7 +881,7 @@
 
                     if (insertError) throw insertError;
 
-                    if (categoryCode === 'dokrapat' || categoryCode === 'gallery') {
+                    if (categoryCode === 'gallery') {
                         loadFilesForCurrentMenu(categoryCode);
                     } else if (insertData && insertData.length > 0) {
                         renderFileItem(insertData[0]); 
@@ -856,7 +904,7 @@
 
                 if (error) throw error;
 
-                if (categoryCode === 'dokrapat' || categoryCode === 'gallery') {
+                if (categoryCode === 'gallery') {
                     let imageDocs = matchedDocs.filter(data => data.fileType.includes('image/') || data.fileName.match(/\.(jpg|jpeg|png|gif)$/i));
                     renderSlideshowImages(imageDocs);
                 } else {
@@ -874,10 +922,12 @@
             const fileURL = data.fileUrl;
             let fileSize = (data.fileSize / 1024).toFixed(1) + ' KB';
             if (data.fileSize > 1024 * 1024) fileSize = (data.fileSize / (1024 * 1024)).toFixed(1) + ' MB';
+            
+            // Ketika judul file diklik, langsung membuka pratinjau di dalam web tanpa mendownload
             li.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; max-width:60%;">
                     <span>📄</span>
-                    <a href="${fileURL}" target="_blank" title="Unduh File" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${data.fileName}</a>
+                    <a class="file-link-preview" onclick="openPreview('${fileURL}', '${data.fileName}', '${data.fileType}')" title="Buka Pratinjau Dokumen" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${data.fileName}</a>
                 </div>
                 <div class="file-actions">
                     <small style="color:var(--text-muted);">(${fileSize})</small>
@@ -942,7 +992,7 @@
 
             setTimeout(() => {
                 if (type.includes('pdf') || name.toLowerCase().endsWith('.pdf')) {
-                    modalBody.innerHTML = `<embed src="${url}" type="application/pdf">`;
+                    modalBody.innerHTML = `<embed src="${url}" type="application/pdf" width="100%" height="100%">`;
                 } else if (name.match(/\.(xlsx|xls|csv)$/i)) {
                     modalBody.innerHTML = '<div style="padding:40px; text-align:center;">Membaca struktur tabel Excel...</div>';
                     fetch(url).then(res => res.arrayBuffer()).then(ab => {
@@ -955,13 +1005,8 @@
                 } else if (type.includes('image/') || name.match(/\.(jpg|jpeg|png|gif)$/i)) {
                     modalBody.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; width:100%; height:100%; padding:20px;"><img src="${url}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;"></div>`;
                 } else {
-                    modalBody.innerHTML = `
-                        <div style="padding: 80px; text-align: center;">
-                            <span style="font-size:4rem; margin-bottom:20px; display:block;">📂</span>
-                            <h2 style="margin-bottom: 15px; color:var(--primary);">Pratinjau Penuh Tidak Tersedia</h2>
-                            <p style="margin-bottom: 25px;">Format file ini tidak dapat dibuka langsung di dalam web.<br>Silakan unduh untuk membukanya secara manual.</p>
-                            <a href="${url}" download="${name}" class="btn-upload" style="text-decoration: none; display: inline-block;">Unduh File Sekarang</a>
-                        </div>`;
+                    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+                    modalBody.innerHTML = `<iframe src="${viewerUrl}" style="width:100%; height:100%; border:none;" title="Pratinjau Dokumen"></iframe>`;
                 }
             }, 300);
         }
