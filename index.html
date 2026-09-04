@@ -100,17 +100,17 @@
             gap: 4px;
             list-style: none;
             align-items: center;
-            flex-wrap: nowrap; /* Memastikan tetap dalam 1 baris */
+            flex-wrap: nowrap;
         }
 
         .nav-btn {
             background-color: rgba(255, 255, 255, 0.5); 
             color: var(--text-main); 
             border: 1px solid rgba(255, 255, 255, 0.6); 
-            font-size: 0.75rem; /* Ukuran font diperkecil */
+            font-size: 0.75rem; 
             font-weight: 600;
             cursor: pointer; 
-            padding: 4px 8px; /* Padding diperkecil */
+            padding: 4px 8px; 
             border-radius: 6px;
             transition: all 0.2s ease-in-out; 
             display: inline-flex;
@@ -309,7 +309,6 @@
         .file-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
         .file-item { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(203, 213, 225, 0.6); border-left: 4px solid var(--primary); }
         
-        /* Tautan file yang langsung membuka pratinjau di web */
         .file-item a.file-link-preview { 
             color: var(--text-main); 
             text-decoration: none; 
@@ -358,7 +357,7 @@
         .badge-active { background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
         .btn-close-info { background: transparent; border: none; color: white; font-size: 1rem; cursor: pointer; }
 
-        /* Modal Password Kustom agar Aman & Tersembunyi (Titik-titik) */
+        /* Modal Password Kustom */
         #passwordModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); z-index: 3000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .password-modal-box { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); width: 350px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.25); animation: fadeIn 0.2s ease-out; border: 1px solid rgba(255, 255, 255, 0.6); }
         .password-modal-header { background: var(--primary); color: white; padding: 12px 20px; font-weight: 700; font-size: 0.95rem; }
@@ -490,8 +489,7 @@
                 <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
                     <button class="nav-btn" style="width: 100%; justify-content: space-between;">📦 Inventaris <span>▾</span></button>
                     <div class="nav-dropdown-content">
-                        <a onclick="verifyAndSelectMenu('inventaris', 'obhp', 'Inventaris', 'OBHP Ruang Tindakan & Gawat Darurat')">OBHP Ruang Tindakan & Gawat Darurat</a>
-                        <a onclick="verifyAndSelectMenu('inventaris', 'bmhp', 'Inventaris', 'BMHP Ruang Tindakan & Gawat Darurat')">BMHP Ruang Tindakan & Gawat Darurat</a>
+                        <a onclick="verifyAndSelectMenu('inventaris', 'obhp_bmhp', 'Inventaris', 'OBHP & BMHP Ruang tindakan dan gawat darurat')">OBHP & BMHP Ruang tindakan dan gawat darurat</a>
                     </div>
                 </li>
 
@@ -506,6 +504,9 @@
                 </li>
 
                 <li><button class="nav-btn" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data'); closeMobileMenu();">📚 Edukasi</button></li>
+                
+                <!-- TAMBAHAN: Menu Pengaturan Ganti Password -->
+                <li><button class="nav-btn" onclick="bukaPengaturanPassword(); closeMobileMenu();">⚙️ Pengaturan</button></li>
             </ul>
         </div>
     </header>
@@ -527,15 +528,40 @@
                     <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
                 </div>
 
-                <!-- Area Form Rujukan (Hanya URL) -->
+                <!-- Area Form Tautan / Link (Untuk Rujukan & Inventaris) -->
                 <div id="formDisplayArea" style="display: none;">
                     <div class="form-area-container">
-                        <h3 style="color: var(--primary);" id="formTitleLabel">Form Data</h3>
+                        <h3 style="color: var(--primary);" id="formTitleLabel">Form Data Tautan</h3>
+                        
+                        <!-- Kolom Link 1 -->
                         <div class="form-group">
-                            <label>Kode URL Form / Berkas Pendukung (Link):</label>
-                            <input type="url" placeholder="https://contoh.com/berkas">
+                            <label>Link 1:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="inputUrlRujukan1" placeholder="https://..." style="flex-grow: 1;">
+                                <button class="btn-submit-form" type="button" id="btnBukaRujukan1" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan(1)">Buka Link 1</button>
+                            </div>
                         </div>
-                        <button class="btn-submit-form" type="button" onclick="alert('Data berhasil disimpan secara lokal (Simulasi).')">Simpan Data Rujukan</button>
+
+                        <!-- Kolom Link 2 -->
+                        <div class="form-group">
+                            <label>Link 2:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="inputUrlRujukan2" placeholder="https://..." style="flex-grow: 1;">
+                                <button class="btn-submit-form" type="button" id="btnBukaRujukan2" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan(2)">Buka Link 2</button>
+                            </div>
+                        </div>
+
+                        <!-- Kolom Link 3 -->
+                        <div class="form-group">
+                            <label>Link 3:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="url" id="inputUrlRujukan3" placeholder="https://..." style="flex-grow: 1;">
+                                <button class="btn-submit-form" type="button" id="btnBukaRujukan3" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan(3)">Buka Link 3</button>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Simpan Semua -->
+                        <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 10px; width: 100%;">Simpan Semua Tautan</button>
                     </div>
                 </div>
 
@@ -567,7 +593,10 @@
         <div class="modal-content-full">
             <div class="modal-header-full">
                 <h3 id="modalTitle">Pratinjau Dokumen</h3>
-                <button class="btn-close-back" onclick="closeModal()">← Kembali / Tutup</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-close-back" onclick="toggleModalFullscreen()" style="background-color: var(--accent);">⛶ Layar Penuh</button>
+                    <button class="btn-close-back" onclick="closeModal()">← Kembali / Tutup</button>
+                </div>
             </div>
             <div class="modal-body-full" id="modalBody"></div>
         </div>
@@ -639,6 +668,7 @@
         };
 
         let passwordCallback = null;
+        let systemPassword = localStorage.getItem('app_system_password') || 'admin';
 
         function showPasswordPrompt(title, description, callback) {
             document.getElementById('passModalTitle').innerText = title;
@@ -672,7 +702,7 @@
         function checkPasswordAndOpenInfo() {
             showPasswordPrompt("Informasi Sistem", "Masukkan password untuk melihat Informasi Sistem:", (success, pwd) => {
                 if(success) {
-                    if(pwd === "admin") {
+                    if(pwd === systemPassword) {
                         openInfoModal();
                     } else if(pwd !== "") {
                         alert("Password yang Anda masukkan salah!");
@@ -684,7 +714,7 @@
         function verifyAndSelectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             showPasswordPrompt("Autentikasi Akses", `Masukkan password untuk mengakses ${mainTitle} - ${subTitle}:`, (success, pwd) => {
                 if(success) {
-                    if (pwd === "admin") {
+                    if (pwd === systemPassword) {
                         selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle);
                         closeMobileMenu();
                     } else if (pwd !== "") {
@@ -692,6 +722,58 @@
                     }
                 }
             });
+        }
+
+        function bukaPengaturanPassword() {
+            const passwordLama = prompt("Masukkan password sistem saat ini:");
+            if (passwordLama === null) return;
+            
+            if (passwordLama === systemPassword) {
+                const passwordBaru = prompt("Masukkan password baru:");
+                if (passwordBaru && passwordBaru.trim() !== "") {
+                    systemPassword = passwordBaru;
+                    localStorage.setItem('app_system_password', systemPassword);
+                    alert("Berhasil! Password sistem telah diubah.");
+                } else {
+                    alert("Gagal. Password baru tidak boleh kosong.");
+                }
+            } else {
+                alert("Akses ditolak! Password lama yang Anda masukkan salah.");
+            }
+        }
+
+        function simpanUrlRujukan() {
+            for (let i = 1; i <= 3; i++) {
+                const urlInput = document.getElementById('inputUrlRujukan' + i).value;
+                localStorage.setItem('url_rujukan_' + currentMenuId + '_' + i, urlInput);
+            }
+            alert("Semua tautan berhasil disimpan!");
+            muatUrlRujukan();
+        }
+
+        function muatUrlRujukan() {
+            for (let i = 1; i <= 3; i++) {
+                const urlTersimpan = localStorage.getItem('url_rujukan_' + currentMenuId + '_' + i);
+                const inputField = document.getElementById('inputUrlRujukan' + i);
+                const btnBuka = document.getElementById('btnBukaRujukan' + i);
+                
+                if (urlTersimpan && urlTersimpan.trim() !== "") {
+                    inputField.value = urlTersimpan;
+                    btnBuka.style.display = 'block';
+                } else {
+                    inputField.value = '';
+                    btnBuka.style.display = 'none';
+                }
+            }
+        }
+
+        function bukaUrlRujukan(index) {
+            const urlTersimpan = localStorage.getItem('url_rujukan_' + currentMenuId + '_' + index);
+            if (urlTersimpan && urlTersimpan.trim() !== "") {
+                window.open(urlTersimpan, '_blank');
+            } else {
+                alert("Tautan kosong. Silakan isi dan simpan terlebih dahulu!");
+            }
         }
 
         function triggerUpload() { 
@@ -826,11 +908,12 @@
             } else if (categoryCode === 'gallery') {
                 uploadArea.style.display = 'block';
                 slideshowArea.style.display = 'flex';
-            } else if (categoryCode === 'rujukan') {
+            } else if (categoryCode === 'rujukan' || categoryCode === 'inventaris') {
                 formArea.style.display = 'block';
-                document.getElementById('formTitleLabel').innerText = "Form " + subTitle;
+                document.getElementById('formTitleLabel').innerText = "Tautan - " + subTitle;
                 uploadArea.style.display = 'block';
                 fileListArea.style.display = 'block';
+                muatUrlRujukan();
             } else {
                 uploadArea.style.display = 'block';
                 fileListArea.style.display = 'block';
@@ -923,7 +1006,6 @@
             let fileSize = (data.fileSize / 1024).toFixed(1) + ' KB';
             if (data.fileSize > 1024 * 1024) fileSize = (data.fileSize / (1024 * 1024)).toFixed(1) + ' MB';
             
-            // Ketika judul file diklik, langsung membuka pratinjau di dalam web tanpa mendownload
             li.innerHTML = `
                 <div style="display:flex; align-items:center; gap:8px; max-width:60%;">
                     <span>📄</span>
@@ -1011,10 +1093,36 @@
             }, 300);
         }
 
+        function toggleModalFullscreen() {
+            const elem = document.getElementById('previewModal');
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
         function closeModal() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            }
             document.getElementById('previewModal').style.display = 'none';
             document.getElementById('modalBody').innerHTML = ''; 
         }
     </script>
 </body>
 </html>
+
+
