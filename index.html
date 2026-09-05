@@ -6,6 +6,8 @@
     <title>UPTD Puskesmas Lanjut - Integrasi Layanan Primer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Library html2pdf.js dari Kirim wa.html -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --primary: #047857;
@@ -124,14 +126,12 @@
             border-color: var(--primary);
         }
 
-        /* Animasi Berkedip untuk Tombol Pelayanan Ambulance & Darurat */
         @keyframes blink-warning {
             0% { background-color: rgba(239, 68, 68, 0.95); color: white; border-color: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
             50% { background-color: rgba(255, 255, 255, 0.95); color: #ef4444; border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.8); }
             100% { background-color: rgba(239, 68, 68, 0.95); color: white; border-color: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
         }
         
-        /* Tombol Pelayanan Menggantikan Tombol Darurat (Berwarna Merah di Kanan Bawah) */
         .btn-ambulance-fixed {
             position: fixed;
             bottom: 50px;
@@ -157,107 +157,26 @@
             border-color: #dc2626;
         }
 
-        .nav-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .nav-dropdown-content {
-            display: none;
-            position: absolute;
-            top: 110%;
-            left: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            min-width: 170px;
-            box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
-            border-radius: 8px;
-            z-index: 1000;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            animation: fadeInDrop 0.2s ease-in-out;
-        }
-
-        @keyframes fadeInDrop {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .nav-dropdown-content a {
-            color: var(--text-main);
-            padding: 8px 12px;
-            text-decoration: none;
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-            border-bottom: 1px solid rgba(241, 245, 249, 0.6);
-        }
-
+        .nav-dropdown { position: relative; display: inline-block; }
+        .nav-dropdown-content { display: none; position: absolute; top: 110%; left: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); min-width: 170px; box-shadow: 0px 10px 25px rgba(0,0,0,0.15); border-radius: 8px; z-index: 1000; border: 1px solid var(--border); overflow: hidden; animation: fadeInDrop 0.2s ease-in-out; }
+        @keyframes fadeInDrop { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-dropdown-content a { color: var(--text-main); padding: 8px 12px; text-decoration: none; display: block; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: background 0.2s, color 0.2s; border-bottom: 1px solid rgba(241, 245, 249, 0.6); }
         .nav-dropdown-content a:last-child { border-bottom: none; }
         .nav-dropdown-content a:hover { background-color: rgba(4, 120, 87, 0.15); color: var(--primary); }
         .nav-dropdown:hover .nav-dropdown-content { display: block; }
 
-        .mobile-menu-toggle {
-            display: none;
-            background: rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            font-size: 1.15rem;
-            padding: 4px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--primary);
-        }
+        .mobile-menu-toggle { display: none; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.8); font-size: 1.15rem; padding: 4px 8px; border-radius: 6px; cursor: pointer; color: var(--primary); }
 
-        .main-container {
-            flex-grow: 1;
-            max-width: 1350px;
-            width: 100%;
-            margin: 10px auto;
-            padding: 0 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            overflow: hidden;
-        }
+        .main-container { flex-grow: 1; max-width: 1350px; width: 100%; margin: 10px auto; padding: 0 20px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
 
-        .workspace-card {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 16px;
-            width: 100%;
-            max-height: calc(100vh - 140px);
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            animation: fadeIn 0.3s ease-out;
-            overflow: hidden;
-        }
+        .workspace-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; width: 100%; max-height: calc(100vh - 140px); display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.15); animation: fadeIn 0.3s ease-out; overflow: hidden; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card-header {
-            padding: 12px 20px;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-            background: rgba(248, 250, 252, 0.6);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+        .card-header { padding: 12px 20px; border-bottom: 1px solid rgba(226, 232, 240, 0.6); background: rgba(248, 250, 252, 0.6); display: flex; justify-content: space-between; align-items: center; }
         .card-header h2 { font-size: 1.1rem; color: var(--primary); }
         .card-header p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
 
-        .btn-close-card {
-            background: #ef4444; color: white; border: none; padding: 5px 12px;
-            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem;
-            transition: background 0.2s;
-        }
+        .btn-close-card { background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: background 0.2s; }
         .btn-close-card:hover { background: #dc2626; }
 
         .card-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; max-height: calc(100vh - 200px); }
@@ -270,20 +189,11 @@
         .mini-grid .date-cell { padding: 2px 0; border-radius: 50%; }
         .mini-grid .date-cell.meeting-date { background-color: var(--primary); color: white; font-weight: bold; }
 
-        .form-area-container {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .form-area-container { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); padding: 20px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
         .form-group { display: flex; flex-direction: column; gap: 5px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
-        .form-group input { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; background: rgba(248, 250, 252, 0.9); }
-        .form-group input:focus { border-color: var(--primary); }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; background: rgba(248, 250, 252, 0.9); }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
         .btn-submit-form { background-color: var(--primary); color: white; padding: 10px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; width: fit-content; }
         .btn-submit-form:hover { background-color: var(--primary-hover); }
 
@@ -292,14 +202,11 @@
         .btn-darurat-main:hover { background-color: #dc2626; }
         
         .waktu-darurat { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; font-weight: 600; }
-        
         .form-kontak { display: none; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; text-align: left; }
         .form-kontak label { font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; display: block; }
         .form-kontak input { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
-        
         .btn-simpan-darurat { background-color: #4CAF50; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
         .btn-simpan-darurat:hover { background-color: #388E3C; }
-
         .kontak-info-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
         .kontak-info-details span { display: block; font-size: 0.85rem; color: var(--text-muted); }
         .kontak-info-details strong { font-size: 1rem; color: var(--text-main); }
@@ -366,6 +273,23 @@
         .btn-info-fixed { position: fixed; bottom: 10px; left: 20px; z-index: 1000; background-color: rgba(255, 255, 255, 0.7); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.6); padding: 6px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: all 0.2s; }
         .btn-info-fixed:hover { background-color: var(--primary); color: white; border-color: var(--primary); }
 
+        /* Styles tambahan untuk Formulir Rujukan UPKDK dari Kirim wa.html */
+        .rujukan-form-container { width: 100%; background: #ffffff; padding: 25px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin: 0 auto; max-width: 650px;}
+        .rujukan-form-container .header-form { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; }
+        .rujukan-form-container .header-form h2 { margin: 0 0 5px 0; color: #2c3e50; font-size: 20px; font-weight: 700; }
+        .rujukan-form-container .header-form h3 { margin: 0; color: #16a085; font-size: 14px; letter-spacing: 0.5px; }
+        .rujukan-form-container .info-note { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 15px; font-size: 13px; color: #1e40af; border-radius: 0 6px 6px 0; margin-bottom: 20px; line-height: 1.5; }
+        .rujukan-form-container textarea { resize: vertical; height: 75px; }
+        .rujukan-form-container .checkbox-container { background: #f8fafc; border: 1px solid #cbd5e1; padding: 12px 15px; border-radius: 6px; }
+        .rujukan-form-container .checkbox-item { margin-bottom: 8px; display: flex; align-items: center; }
+        .rujukan-form-container .btn-container { display: flex; gap: 12px; margin-top: 30px; }
+        .rujukan-form-container button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .rujukan-form-container .btn-reset { background-color: #64748b; color: white; flex: 0.7; }
+        .rujukan-form-container .btn-download { background-color: #2563eb; color: white; }
+        .rujukan-form-container .btn-whatsapp { background-color: #25d366; color: white; }
+        .pdf-wrapper { position: absolute; left: -9999px; top: -9999px; width: 800px; }
+        #pdfContent { background-color: white; padding: 30px; font-family: Arial, sans-serif; color: #1e293b; }
+
         @media screen and (max-width: 1150px) {
             .mobile-menu-toggle { display: block; }
             .nav-links { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); flex-direction: column; align-items: stretch; padding: 15px 20px; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
@@ -419,7 +343,8 @@
                     <div class="nav-dropdown-content">
                         <a onclick="selectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal'); closeMobileMenu();">Rujukan Internal</a>
                         <a onclick="selectMenu('rujukan', 'eksternal', 'Rujukan', 'Rujukan Eksternal'); closeMobileMenu();">Rujukan Eksternal</a>
-                        <a onclick="selectMenu('rujukan', 'upkdk', 'Rujukan', 'Rujukan UPKDK'); closeMobileMenu();">Rujukan UPKDK</a>
+                        <!-- Navigasi UPKDK disesuaikan pemanggilan kodenya -->
+                        <a onclick="selectMenu('rujukan_upkdk', 'upkdk', 'Rujukan', 'Rujukan UPKDK'); closeMobileMenu();">Rujukan UPKDK</a>
                     </div>
                 </li>
 
@@ -439,7 +364,6 @@
         </div>
     </header>
 
-    <!-- Tombol navigasi tunggal menggantikan tombol gawat darurat -->
     <button class="btn-ambulance-fixed" onclick="selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan')">
         🚨 Pelayanan Ambulance & Gawat Darurat
     </button>
@@ -488,6 +412,152 @@
                         <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
                     </div>
                 </div>
+
+                <!-- Area Formulir Rujukan UPKDK -->
+                <div id="rujukanUpkdkDisplayArea" style="display: none;">
+                    <div class="rujukan-form-container">
+                        <div class="header-form">
+                            <h2>FORMULIR RUJUKAN UPKD/K KE PUSKESMAS</h2>
+                            <h3>WILAYAH KERJA UPTD PUSKESMAS LANJUT</h3>
+                        </div>
+
+                        <div class="info-note">
+                            <strong>Info:</strong> Isi data rujukan dengan lengkap. Anda dapat mengunduh dokumen dalam bentuk PDF atau langsung mengirimkannya ke nomor WhatsApp tujuan.
+                        </div>
+
+                        <form id="rujukanForm">
+                            <div class="form-group">
+                                <label for="jenisPelayanan">Jenis Pelayanan:</label>
+                                <select id="jenisPelayanan" required>
+                                    <option value="">-- Pilih Jenis Pelayanan --</option>
+                                    <option value="PELAYANAN BAYI BALITA">Pelayanan Bayi Balita</option>
+                                    <option value="PELAYANAN REMAJA">Pelayanan Remaja</option>
+                                    <option value="PELAYANAN IBU HAMIL">Pelayanan Ibu Hamil</option>
+                                    <option value="PELAYANAN USIA PRODUKTIF/DEWASA">Pelayanan Usia Produktif/Dewasa</option>
+                                    <option value="PELAYANAN LANSIA">Pelayanan Lansia</option>
+                                    <option value="PELAYANAN GIGI DAN MULUT">Pelayanan Gigi dan Mulut</option>
+                                    <option value="PELAYANAN TINDAKAN DAN GAWAT DARURAT">Pelayanan Tindakan dan Gawat Darurat</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tujuanWA">Tujuan Rujukan (Nomor WhatsApp Tujuan):</label>
+                                <select id="tujuanWA" required>
+                                    <option value="">-- Pilih Klaster / Ruangan Tujuan --</option>
+                                    <option value="6281364195736">KLASTER 2 (Ibu, Anak, Remaja) Shely Marselyna</option>
+                                    <option value="6285264825962">KLASTER 3 (Usia Produktif & Lansia) - Andri Harta Kirana</option>
+                                    <option value="6285264444567">LINTAS KLASTER (Ruang Tindakan & Gawat Darurat) - Rendy Andrian</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="namaPasien">Nama Pasien:</label>
+                                <input type="text" id="namaPasien" required placeholder="Masukkan nama lengkap pasien">
+                            </div>
+
+                            <div style="display: flex; gap: 15px;">
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="umur">Umur:</label>
+                                    <input type="number" id="umur" required placeholder="Contoh: 35">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="kelamin">Jenis Kelamin:</label>
+                                    <select id="kelamin" required>
+                                        <option value="">Pilih</option>
+                                        <option value="Laki-laki">Laki-laki</option>
+                                        <option value="Perempuan">Perempuan</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="alamat">Alamat:</label>
+                                <textarea id="alamat" required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="hasilPemeriksaan">Hasil Pemeriksaan Sementara:</label>
+                                <textarea id="hasilPemeriksaan"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tindakanAwal">Tindakan Awal yang Telah Dilakukan:</label>
+                                <textarea id="tindakanAwal"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Alasan Rujukan:</label>
+                                <div class="checkbox-container">
+                                    <div class="checkbox-item"><input type="checkbox" name="alasan" value="Tindaklanjut Skrining"> Tindaklanjut Skrining</div>
+                                    <div class="checkbox-item"><input type="checkbox" name="alasan" value="Perlu perawatan khusus"> Perlu perawatan khusus</div>
+                                    <div class="checkbox-item"><input type="checkbox" name="alasan" value="Keterbatasan alat/obat"> Keterbatasan alat/obat</div>
+                                    <div class="checkbox-item"><input type="checkbox" name="alasan" id="cbLainnya" value="Lainnya" onchange="toggleLainnya()"> Lainnya</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="groupLainnya" style="display: none;">
+                                <label for="keteranganLainnya">Keterangan Alasan Lainnya:</label>
+                                <input type="text" id="keteranganLainnya" placeholder="Tuliskan alasan lainnya...">
+                            </div>
+
+                            <div style="display: flex; gap: 15px;">
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="tanggalRujukan">Tanggal Rujukan:</label>
+                                    <input type="date" id="tanggalRujukan" required>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="petugas">Petugas Pengirim:</label>
+                                    <input type="text" id="petugas" placeholder="Nama petugas pengirim" required>
+                                </div>
+                            </div>
+
+                            <div class="btn-container">
+                                <button type="button" class="btn-reset" onclick="resetFormRujukan()">Isi Data Baru</button>
+                                <button type="button" class="btn-download" onclick="unduhPDF()">Unduh PDF</button>
+                                <button type="button" class="btn-whatsapp" onclick="kirimWhatsApp()">Kirim ke WhatsApp</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Template PDF Tersembunyi Rujukan -->
+                <div class="pdf-wrapper">
+                    <div id="pdfContent">
+                        <h2 style="text-align:center; font-size: 24px; margin-bottom: 5px;">FORMULIR RUJUKAN UPKD/K KE PUSKESMAS</h2>
+                        <h3 style="text-align:center; font-size: 18px; margin-top: 0; color: #475569;">WILAYAH KERJA UPTD PUSKESMAS LANJUT</h3>
+                        <hr style="border: 1px solid #1e293b; margin-bottom: 25px;">
+                        
+                        <h4 style="background-color: #f1f5f9; padding: 10px; font-size: 16px; border-left: 4px solid #2563eb; margin-bottom: 15px;">A. LAYANAN & TUJUAN RUJUKAN</h4>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 14px;">
+                            <tr><th style="border: 1px solid #cbd5e1; padding: 10px; text-align: left; width: 35%; background-color: #f8fafc;">Jenis Pelayanan</th><td style="border: 1px solid #cbd5e1; padding: 10px; font-weight: bold; color: #1e40af;" id="pdfJenisPelayanan"></td></tr>
+                            <tr><th style="border: 1px solid #cbd5e1; padding: 10px; text-align: left; background-color: #f8fafc;">Tujuan Rujukan (No. WA)</th><td style="border: 1px solid #cbd5e1; padding: 10px;" id="pdfTujuan"></td></tr>
+                        </table>
+
+                        <h4 style="background-color: #f1f5f9; padding: 10px; font-size: 16px; border-left: 4px solid #2563eb; margin-bottom: 15px;">B. DATA PASIEN</h4>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 14px;">
+                            <tr><th style="border: 1px solid #cbd5e1; padding: 10px; text-align: left; width: 35%; background-color: #f8fafc;">Nama Pasien</th><td style="border: 1px solid #cbd5e1; padding: 10px;" id="pdfNama"></td></tr>
+                            <tr><th style="border: 1px solid #cbd5e1; padding: 10px; text-align: left; background-color: #f8fafc;">Umur</th><td style="border: 1px solid #cbd5e1; padding: 10px;" id="pdfUmur"></td></tr>
+                            <tr><th style="border: 1px solid #cbd5e1; padding: 10px; text-align: left; background-color: #f8fafc;">Jenis Kelamin</th><td style="border: 1px solid #cbd5e1; padding: 10px;" id="pdfKelamin"></td></tr>
+                            <tr><th style="border: 1px solid #cbd5e1; padding: 10px; text-align: left; background-color: #f8fafc;">Alamat</th><td style="border: 1px solid #cbd5e1; padding: 10px;" id="pdfAlamat"></td></tr>
+                        </table>
+
+                        <h4 style="background-color: #f1f5f9; padding: 10px; font-size: 16px; border-left: 4px solid #2563eb; margin-bottom: 15px;">C. PEMERIKSAAN & PENANGANAN</h4>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 14px;">
+                            <tr><th style="border: 1px solid #cbd5e1; padding: 10px; text-align: left; width: 35%; background-color: #f8fafc;">Hasil Pemeriksaan</th><td style="border: 1px solid #cbd5e1; padding: 10px;" id="pdfHasil"></td></tr>
+                            <tr><th style="border: 1px solid #cbd5e1; padding: 10px; text-align: left; background-color: #f8fafc;">Tindakan Awal</th><td style="border: 1px solid #cbd5e1; padding: 10px;" id="pdfTindakan"></td></tr>
+                            <tr><th style="border: 1px solid #cbd5e1; padding: 10px; text-align: left; background-color: #f8fafc;">Alasan Rujukan</th><td style="border: 1px solid #cbd5e1; padding: 10px;" id="pdfAlasan"></td></tr>
+                        </table>
+                        
+                        <div style="margin-top: 40px; text-align: right; font-size: 14px;">
+                            <div style="display: inline-block; text-align: center; width: 250px;">
+                                <p id="pdfTanggal" style="margin: 0 0 5px 0;">Tanggal: </p>
+                                <p style="margin: 0 0 60px 0;">Petugas Pengirim,</p>
+                                <p style="margin: 0; font-weight: bold; text-decoration: underline;" id="pdfPetugas"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Akhir Area Rujukan -->
 
                 <div id="ambulanceDisplayArea" style="display: none; justify-content: center; align-items: center; width: 100%;">
                     <div class="darurat-container" style="max-width: 500px;">
@@ -883,6 +953,7 @@
             const formArea = document.getElementById('formDisplayArea');
             const formSkriningArea = document.getElementById('formSkriningArea');
             const ambulanceArea = document.getElementById('ambulanceDisplayArea');
+            const rujukanUpkdkArea = document.getElementById('rujukanUpkdkDisplayArea');
 
             if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
 
@@ -893,6 +964,7 @@
             formArea.style.display = 'none';
             formSkriningArea.style.display = 'none';
             ambulanceArea.style.display = 'none';
+            rujukanUpkdkArea.style.display = 'none';
 
             if (categoryCode === 'jadwal') {
                 calArea.style.display = 'block';
@@ -900,6 +972,9 @@
             } else if (categoryCode === 'gallery') {
                 uploadArea.style.display = 'block';
                 slideshowArea.style.display = 'flex';
+            } else if (categoryCode === 'rujukan_upkdk') {
+                rujukanUpkdkArea.style.display = 'block';
+                document.getElementById('tanggalRujukan').valueAsDate = new Date();
             } else if (categoryCode === 'rujukan' || categoryCode === 'inventaris') {
                 formArea.style.display = 'block';
                 document.getElementById('formTitleLabel').innerText = "Tautan - " + subTitle;
@@ -920,7 +995,7 @@
             document.getElementById('dynamicFileList').innerHTML = '';
             document.getElementById('slideshowContainerImages').innerHTML = '';
             
-            if(categoryCode !== 'ambulance') {
+            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk') {
                 loadFilesForCurrentMenu(categoryCode);
             }
         }
@@ -984,7 +1059,7 @@
             const categoryCode = currentMenuId.split("-")[0];
             const uploadArea = document.getElementById('uploadAreaContainer');
             
-            if (categoryCode === 'rujukan' || categoryCode === 'inventaris' || categoryCode === 'skrining' || categoryCode === 'ambulance') {
+            if (categoryCode === 'rujukan' || categoryCode === 'rujukan_upkdk' || categoryCode === 'inventaris' || categoryCode === 'skrining' || categoryCode === 'ambulance') {
                 uploadArea.style.display = 'none';
                 return;
             }
@@ -1141,7 +1216,6 @@
                 alert("Data Petugas Ambulance berhasil disimpan!");
             };
 
-            // Logika konversi foto unggahan ke base64 agar dapat disimpan di local storage
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
@@ -1251,7 +1325,143 @@
             
             window.open(`https://wa.me/${formattedNomor}?text=${pesan}`, '_blank');
         }
+
+        // ==========================================
+        // FITUR FORMULIR RUJUKAN UPKD/K
+        // ==========================================
+
+        function toggleLainnya() {
+            const cbLainnya = document.getElementById('cbLainnya');
+            const groupLainnya = document.getElementById('groupLainnya');
+            if (cbLainnya.checked) {
+                groupLainnya.style.display = 'block';
+            } else {
+                groupLainnya.style.display = 'none';
+                document.getElementById('keteranganLainnya').value = '';
+            }
+        }
+
+        function populatePDFData() {
+            const jenisPelayanan = document.getElementById('jenisPelayanan').value;
+            const tujuanSelect = document.getElementById('tujuanWA');
+            const tujuanText = tujuanSelect.options[tujuanSelect.selectedIndex].text;
+            const nama = document.getElementById('namaPasien').value.trim();
+            const umur = document.getElementById('umur').value.trim();
+            const kelamin = document.getElementById('kelamin').value;
+            const alamat = document.getElementById('alamat').value.trim();
+            const tanggal = document.getElementById('tanggalRujukan').value;
+            const petugas = document.getElementById('petugas').value.trim();
+
+            if (!jenisPelayanan || !tujuanSelect.value || !nama || !umur || !kelamin || !alamat || !tanggal || !petugas) {
+                alert('Mohon lengkapi seluruh kolom formulir termasuk jenis pelayanan, tujuan rujukan, dan petugas pengirim!');
+                return false;
+            }
+
+            document.getElementById('pdfJenisPelayanan').innerText = jenisPelayanan;
+            document.getElementById('pdfTujuan').innerText = tujuanText;
+            document.getElementById('pdfNama').innerText = nama;
+            document.getElementById('pdfUmur').innerText = umur + " Tahun";
+            document.getElementById('pdfKelamin').innerText = kelamin;
+            document.getElementById('pdfAlamat').innerText = alamat;
+            document.getElementById('pdfHasil').innerText = document.getElementById('hasilPemeriksaan').value || '-';
+            document.getElementById('pdfTindakan').innerText = document.getElementById('tindakanAwal').value || '-';
+            
+            let alasanList = [];
+            document.querySelectorAll('input[name="alasan"]:checked').forEach(c => {
+                if (c.value === 'Lainnya') {
+                    const ketLain = document.getElementById('keteranganLainnya').value.trim();
+                    if (ketLain) {
+                        alasanList.push('Lainnya: ' + ketLain);
+                    } else {
+                        alasanList.push('Lainnya');
+                    }
+                } else {
+                    alasanList.push(c.value);
+                }
+            });
+            document.getElementById('pdfAlasan').innerText = alasanList.join(', ') || '-';
+            
+            document.getElementById('pdfTanggal').innerText = "Tanggal: " + tanggal;
+            document.getElementById('pdfPetugas').innerText = petugas;
+
+            return true;
+        }
+
+        function unduhPDF() {
+            if (!populatePDFData()) return;
+
+            const element = document.getElementById('pdfContent');
+            const nama = document.getElementById('namaPasien').value.trim();
+
+            const opt = {
+                margin:       [15, 15, 15, 15],
+                filename:     'Rujukan_' + nama.replace(/\s+/g, '_') + '.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().catch(err => {
+                console.error('Error saat men-generate PDF:', err);
+                alert('Terjadi kesalahan saat membuat PDF.');
+            });
+        }
+
+        function kirimWhatsApp() {
+            if (!populatePDFData()) return;
+
+            const nomorWhatsApp = document.getElementById('tujuanWA').value;
+            const jenisPelayanan = document.getElementById('jenisPelayanan').value;
+            const nama = document.getElementById('namaPasien').value.trim();
+            const umur = document.getElementById('umur').value.trim();
+            const kelamin = document.getElementById('kelamin').value;
+            const alamat = document.getElementById('alamat').value.trim();
+            const hasilPemeriksaan = document.getElementById('hasilPemeriksaan').value.trim() || '-';
+            const tindakanAwal = document.getElementById('tindakanAwal').value.trim() || '-';
+            const tanggal = document.getElementById('tanggalRujukan').value;
+            const petugas = document.getElementById('petugas').value.trim();
+
+            let alasanList = [];
+            document.querySelectorAll('input[name="alasan"]:checked').forEach(c => {
+                if (c.value === 'Lainnya') {
+                    const ketLain = document.getElementById('keteranganLainnya').value.trim();
+                    alasanList.push(ketLain ? 'Lainnya: ' + ketLain : 'Lainnya');
+                } else {
+                    alasanList.push(c.value);
+                }
+            });
+            const alasanRujukan = alasanList.join(', ') || '-';
+
+            const pesan = `*FORMULIR RUJUKAN UPKD/K KE PUSKESMAS*` +
+                          `\n*WILAYAH KERJA UPTD PUSKESMAS LANJUT*` +
+                          `\n----------------------------------------` +
+                          `\n\n*A. LAYANAN & TUJUAN*` +
+                          `\n- Jenis Pelayanan: ${jenisPelayanan}` +
+                          `\n\n*B. DATA PASIEN*` +
+                          `\n- Nama: ${nama}` +
+                          `\n- Umur: ${umur} Tahun` +
+                          `\n- Jenis Kelamin: ${kelamin}` +
+                          `\n- Alamat: ${alamat}` +
+                          `\n\n*C. PEMERIKSAAN & PENANGANAN*` +
+                          `\n- Hasil Pemeriksaan: ${hasilPemeriksaan}` +
+                          `\n- Tindakan Awal: ${tindakanAwal}` +
+                          `\n- Alasan Rujukan: ${alasanRujukan}` +
+                          `\n\n*D. KETERANGAN PENGIRIM*` +
+                          `\n- Tanggal: ${tanggal}` +
+                          `\n- Petugas Pengirim: ${petugas}` +
+                          `\n\n_(Formulir ini dikirim secara digital melalui sistem rujukan Puskesmas)_`;
+
+            const urlWhatsApp = `https://wa.me/${nomorWhatsApp}?text=${encodeURIComponent(pesan)}`;
+
+            window.open(urlWhatsApp, '_blank');
+        }
+
+        function resetFormRujukan() {
+            document.getElementById('rujukanForm').reset();
+            document.getElementById('groupLainnya').style.display = 'none';
+            document.getElementById('tanggalRujukan').valueAsDate = new Date();
+        }
+
     </script>
 </body>
 </html>
-
