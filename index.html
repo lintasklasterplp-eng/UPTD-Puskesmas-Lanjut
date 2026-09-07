@@ -1194,7 +1194,7 @@
             });
         }
 
-        function simpanPetugasAmbulance() {
+        async function simpanPetugasAmbulance() {
             const nama = document.getElementById('input-nama-petugas').value;
             const hp = document.getElementById('input-hp-petugas').value;
             const fileInput = document.getElementById('input-foto-petugas');
@@ -1204,38 +1204,85 @@
                 return;
             }
 
-            const selesaikanSimpan = () => {
-                localStorage.setItem('ambulance_petugas_nama', nama);
-                localStorage.setItem('ambulance_petugas_hp', hp);
-                
-                document.getElementById('nama-petugas-tampil').innerText = nama;
-                document.getElementById('hp-petugas-tampil').innerText = hp;
-                
-                document.getElementById('form-edit-petugas').style.display = 'none';
-                document.getElementById('viewPetugasAmbulance').style.display = 'block';
-                alert("Data Petugas Ambulance berhasil disimpan!");
+            const simpanKeDB = async (fotoBase64) => {
+                try {
+                    // Menyimpan ke tabel "Petugas Ambulance" di Supabase
+                    const { data, error } = await supabaseClient
+                        .from('Petugas Ambulance')
+                        .upsert([{ id: 1, nama: nama, no_hp: hp, foto: fotoBase64 }])
+                        .select();
+
+                    if (error) throw error;
+
+                    // Update Cache Local
+                    localStorage.setItem('ambulance_petugas_nama', nama);
+                    localStorage.setItem('ambulance_petugas_hp', hp);
+                    if (fotoBase64) localStorage.setItem('ambulance_petugas_foto', fotoBase64);
+                    
+                    document.getElementById('nama-petugas-tampil').innerText = nama;
+                    document.getElementById('hp-petugas-tampil').innerText = hp;
+                    
+                    document.getElementById('form-edit-petugas').style.display = 'none';
+                    document.getElementById('viewPetugasAmbulance').style.display = 'block';
+                    alert("Data Petugas Ambulance berhasil disimpan ke Database Supabase!");
+                } catch (error) {
+                    console.error("Error menyimpan data petugas:", error);
+                    alert("Terjadi kesalahan saat menyimpan ke database.");
+                }
             };
 
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    localStorage.setItem('ambulance_petugas_foto', e.target.result);
+                    const fotoBase64 = e.target.result;
                     const imgTampil = document.getElementById('foto-petugas-tampil');
-                    imgTampil.src = e.target.result;
+                    imgTampil.src = fotoBase64;
                     imgTampil.style.display = 'block';
-                    selesaikanSimpan();
+                    simpanKeDB(fotoBase64);
                 };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
-                selesaikanSimpan();
+                const fotoLama = localStorage.getItem('ambulance_petugas_foto') || null;
+                simpanKeDB(fotoLama);
             }
         }
 
-        function muatDataPetugasAmbulance() {
-            const nama = localStorage.getItem('ambulance_petugas_nama') || "Belum diatur";
-            const hp = localStorage.getItem('ambulance_petugas_hp') || "Belum diatur";
-            const foto = localStorage.getItem('ambulance_petugas_foto');
-            
+        async function muatDataPetugasAmbulance() {
+            try {
+                // Mengambil data dari tabel "Petugas Ambulance" di Supabase
+                const { data, error } = await supabaseClient
+                    .from('Petugas Ambulance')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+
+                let nama, hp, foto;
+
+                if (data && !error) {
+                    nama = data.nama || "Belum diatur";
+                    hp = data.no_hp || "Belum diatur";
+                    foto = data.foto || "";
+                    
+                    // Update cache local agar tetap cepat dimuat
+                    localStorage.setItem('ambulance_petugas_nama', nama);
+                    localStorage.setItem('ambulance_petugas_hp', hp);
+                    if(foto) localStorage.setItem('ambulance_petugas_foto', foto);
+                } else {
+                    throw error || new Error("Data tidak ditemukan");
+                }
+                
+                tampilkanDataPetugas(nama, hp, foto);
+
+            } catch (error) {
+                console.warn("Gagal fetch DB, memuat dari local cache:", error);
+                const nama = localStorage.getItem('ambulance_petugas_nama') || "Belum diatur";
+                const hp = localStorage.getItem('ambulance_petugas_hp') || "Belum diatur";
+                const foto = localStorage.getItem('ambulance_petugas_foto');
+                tampilkanDataPetugas(nama, hp, foto);
+            }
+        }
+
+        function tampilkanDataPetugas(nama, hp, foto) {
             document.getElementById('nama-petugas-tampil').innerText = nama;
             document.getElementById('hp-petugas-tampil').innerText = hp;
             
