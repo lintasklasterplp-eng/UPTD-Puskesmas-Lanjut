@@ -421,7 +421,7 @@
                         </div>
 
                         <div class="info-note">
-                            <strong>Info:</strong> Isi data rujukan dengan lengkap. Anda dapat mengunduh dokumen dalam bentuk PDF atau langsung mengirimkannya ke nomor WhatsApp tujuan.
+                            <strong>Info:</strong> Isi data rujukan dengan lengkap. Anda dapat mengunduh dokumen dalam bentuk PDF atau langsung mengirimkannya ke nomor WhatsApp tujuan.[cite: 4]
                         </div>
 
                         <form id="rujukanForm">
@@ -1205,7 +1205,7 @@
 
             const simpanKeDB = async (fotoBase64) => {
                 try {
-                    // Menyimpan ke tabel "Petugas Ambulance" di Supabase
+                    // Menyimpan ke tabel "Petugas Ambulance" di Supabase[cite: 4]
                     const { data, error } = await supabaseClient
                         .from('Petugas Ambulance')
                         .upsert([{ id: 1, nama: nama, no_hp: hp, foto: fotoBase64 }])
@@ -1223,7 +1223,7 @@
                     
                     document.getElementById('form-edit-petugas').style.display = 'none';
                     document.getElementById('viewPetugasAmbulance').style.display = 'block';
-                    alert("Data Petugas Ambulance berhasil disimpan ke Database Supabase!");
+                    alert("Data Petugas Ambulance berhasil disimpan ke Database Supabase!");[cite: 4]
                 } catch (error) {
                     console.error("Error menyimpan data petugas:", error);
                     alert("Terjadi kesalahan saat menyimpan ke database.");
@@ -1248,7 +1248,7 @@
 
         async function muatDataPetugasAmbulance() {
             try {
-                // Mengambil data dari tabel "Petugas Ambulance" di Supabase
+                // Mengambil data dari tabel "Petugas Ambulance" di Supabase[cite: 4]
                 const { data, error } = await supabaseClient
                     .from('Petugas Ambulance')
                     .select('*')
@@ -1258,11 +1258,11 @@
                 let nama, hp, foto;
 
                 if (data && !error) {
-                    nama = data.nama || "Belum diatur";
-                    hp = data.no_hp || "Belum diatur";
+                    nama = data.nama || "ROBY";
+                    hp = data.no_hp || "081275052068";
                     foto = data.foto || "";
                     
-                    // Update cache local agar tetap cepat dimuat
+                    // Update cache local agar tetap cepat dimuat[cite: 4]
                     localStorage.setItem('ambulance_petugas_nama', nama);
                     localStorage.setItem('ambulance_petugas_hp', hp);
                     if(foto) localStorage.setItem('ambulance_petugas_foto', foto);
@@ -1274,8 +1274,8 @@
 
             } catch (error) {
                 console.warn("Gagal fetch DB, memuat dari local cache:", error);
-                const nama = localStorage.getItem('ambulance_petugas_nama') || "Belum diatur";
-                const hp = localStorage.getItem('ambulance_petugas_hp') || "Belum diatur";
+                const nama = localStorage.getItem('ambulance_petugas_nama') || "ROBY";
+                const hp = localStorage.getItem('ambulance_petugas_hp') || "081275052068";
                 const foto = localStorage.getItem('ambulance_petugas_foto');
                 tampilkanDataPetugas(nama, hp, foto);
             }
@@ -1293,8 +1293,8 @@
                 imgTampil.style.display = 'none';
             }
             
-            document.getElementById('input-nama-petugas').value = nama !== "Belum diatur" ? nama : "";
-            document.getElementById('input-hp-petugas').value = hp !== "Belum diatur" ? hp : "";
+            document.getElementById('input-nama-petugas').value = (nama && nama !== "Belum diatur") ? nama : "ROBY";
+            document.getElementById('input-hp-petugas').value = (hp && hp !== "Belum diatur") ? hp : "081275052068";
             
             document.getElementById('form-edit-petugas').style.display = 'none';
             document.getElementById('viewPetugasAmbulance').style.display = 'block';
@@ -1316,26 +1316,26 @@
                         const lon = position.coords.longitude;
                         linkMapsPasien = `https://www.google.com/maps?q=${lat},${lon}`;
                         inputLokasi.value = `Titik GPS berhasil direkam`;
-                        alert("Lokasi Anda berhasil didapatkan!");
+                        alert("Lokasi Anda berhasil didapatkan!");[cite: 4]
                     },
                     (error) => {
                         inputLokasi.value = "Gagal mengambil lokasi";
-                        alert("Gagal mendapatkan lokasi. Pastikan izin GPS / Lokasi (Location) diaktifkan pada browser/HP Anda.");
+                        alert("Gagal mendapatkan lokasi. Pastikan izin GPS / Lokasi (Location) diaktifkan pada browser/HP Anda.");[cite: 4]
                     },
                     { enableHighAccuracy: true } 
                 );
             } else {
                 inputLokasi.value = "GPS tidak didukung";
-                alert("Fitur lokasi tidak didukung oleh browser ini.");
+                alert("Fitur lokasi tidak didukung oleh browser ini.");[cite: 4]
             }
         }
 
         function kirimPermintaanAmbulance() {
-            const namaPetugas = localStorage.getItem('ambulance_petugas_nama');
-            const hpPetugas = localStorage.getItem('ambulance_petugas_hp');
+            const namaPetugas = localStorage.getItem('ambulance_petugas_nama') || "ROBY";
+            const hpPetugas = localStorage.getItem('ambulance_petugas_hp') || "081275052068";
             
-            if (!namaPetugas || !hpPetugas || namaPetugas === "Belum diatur") {
-                alert("Data Petugas Ambulance sistem belum diatur. Klik 'Edit Petugas' terlebih dahulu.");
+            if (!namaPetugas || !hpPetugas) {
+                alert("Data Petugas Ambulance sistem belum diatur.");[cite: 4]
                 return;
             }
 
@@ -1343,7 +1343,7 @@
             const hpPasien = document.getElementById('input-hp-pasien').value;
             
             if (!namaPasien || !hpPasien) {
-                alert("Harap lengkapi Nama Pasien dan Nomor HP Pasien!");
+                alert("Harap lengkapi Nama Pasien dan Nomor HP Pasien!");[cite: 4]
                 return;
             }
 
@@ -1367,7 +1367,7 @@
             } else {
                 pesan += `📍 Titik Jemput GPS: (Titik lokasi tidak direkam sistem)%0A`;
             }
-            pesan += `%0AMohon untuk segera merespon panggilan ini. Terima kasih.`;
+            pesan += `%0AMohon untuk segera merespon panggilan ini. Terima kasih.`;[cite: 4]
             
             window.open(`https://wa.me/${formattedNomor}?text=${pesan}`, '_blank');
         }
@@ -1399,7 +1399,7 @@
             const petugas = document.getElementById('petugas').value.trim();
 
             if (!jenisPelayanan || !tujuanSelect.value || !nama || !umur || !kelamin || !alamat || !tanggal || !petugas) {
-                alert('Mohon lengkapi seluruh kolom formulir termasuk jenis pelayanan, tujuan rujukan, dan petugas pengirim!');
+                alert('Mohon lengkapi seluruh kolom formulir termasuk jenis pelayanan, tujuan rujukan, dan petugas pengirim!');[cite: 4]
                 return false;
             }
 
@@ -1449,7 +1449,7 @@
 
             html2pdf().set(opt).from(element).save().catch(err => {
                 console.error('Error saat men-generate PDF:', err);
-                alert('Terjadi kesalahan saat membuat PDF.');
+                alert('Terjadi kesalahan saat membuat PDF.');[cite: 4]
             });
         }
 
@@ -1495,7 +1495,7 @@
                           `\n\n*D. KETERANGAN PENGIRIM*` +
                           `\n- Tanggal: ${tanggal}` +
                           `\n- Petugas Pengirim: ${petugas}` +
-                          `\n\n_(Formulir ini dikirim secara digital melalui sistem rujukan Puskesmas)_`;
+                          `\n\n_(Formulir ini dikirim secara digital melalui sistem rujukan Puskesmas)_`;[cite: 4]
 
             const urlWhatsApp = `https://wa.me/${nomorWhatsApp}?text=${encodeURIComponent(pesan)}`;
 
