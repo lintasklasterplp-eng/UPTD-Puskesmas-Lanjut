@@ -7,7 +7,7 @@
     <!-- Pustaka Eksternal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --primary: #047857;
@@ -287,6 +287,27 @@
         .rujukan-form-container .btn-download { background-color: #dc2626; color: white; }
         .rujukan-form-container .btn-whatsapp { background-color: #16a34a; color: white; }
         
+        /* Styles Form Rujukan Internal SBAR */
+        .sbar-container { max-width: 850px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .sbar-header { text-align: center; border-bottom: 2px solid #047857; padding-bottom: 12px; margin-bottom: 20px; }
+        .sbar-header h2 { margin: 0; color: #047857; font-size: 20px; text-transform: uppercase; font-weight: 700; }
+        .sbar-header h3 { margin: 6px 0 0 0; font-size: 14px; color: var(--text-main); font-weight: 600; }
+        .sbar-row { display: flex; gap: 15px; margin-bottom: 12px; }
+        .sbar-col { flex: 1; }
+        .sbar-col-2 { flex: 2; }
+        .sbar-form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .sbar-form-group label { font-size: 12px; font-weight: bold; color: var(--primary); margin-bottom: 4px; }
+        .sbar-container input, .sbar-container select, .sbar-container textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; background-color: rgba(248, 250, 252, 0.9); }
+        .sbar-container textarea { resize: vertical; min-height: 85px; }
+        .sbar-section-header { background-color: var(--primary); color: #ffffff; padding: 6px 10px; font-weight: bold; border-radius: 4px; margin-top: 18px; margin-bottom: 10px; font-size: 13px; letter-spacing: 0.5px; }
+        .sbar-btn-group { display: flex; gap: 12px; margin-top: 25px; }
+        .sbar-btn { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
+        .sbar-btn-wa { background-color: #16a34a; color: white; }
+        .sbar-btn-wa:hover { background-color: #15803d; }
+        .sbar-btn-pdf { background-color: #dc2626; color: white; }
+        .sbar-btn-pdf:hover { background-color: #b91c1c; }
+        .sbar-btn-reset { background-color: #64748b; color: white; flex: 0.4; }
+
         .pdf-wrapper { position: absolute; left: -9999px; top: -9999px; width: 800px; }
 
         @media screen and (max-width: 1150px) {
@@ -299,6 +320,8 @@
             .nav-dropdown.active-dropdown .nav-dropdown-content { display: block; }
             .full-year-calendar { grid-template-columns: repeat(1, 1fr); }
             .main-container { padding: 0 10px; }
+            .sbar-row { flex-direction: column; gap: 0; }
+            .sbar-btn-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -340,7 +363,7 @@
                 <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
                     <button class="nav-btn" style="width: 100%; justify-content: space-between;">🚑 Rujukan <span>▾</span></button>
                     <div class="nav-dropdown-content">
-                        <a onclick="selectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal'); closeMobileMenu();">Rujukan Internal</a>
+                        <a onclick="verifyAndSelectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal')">Rujukan Internal</a>
                         <a onclick="selectMenu('rujukan', 'eksternal', 'Rujukan', 'Rujukan Eksternal'); closeMobileMenu();">Rujukan Eksternal</a>
                         <a onclick="selectMenu('rujukan_upkdk', 'upkdk', 'Rujukan', 'Rujukan UPKDK'); closeMobileMenu();">Rujukan UPKDK</a>
                     </div>
@@ -408,6 +431,131 @@
                             </div>
                         </div>
                         <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+                    </div>
+                </div>
+
+                <!-- Area Formulir Rujukan Internal SBAR -->
+                <div id="rujukanInternalDisplayArea" style="display: none;">
+                    <div class="sbar-container" id="sbarFormContainer">
+                        <form id="sbarForm">
+                            <div class="sbar-header">
+                                <h2>UPTD PUSKESMAS LANJUT</h2>
+                                <h3>FORM RUJUKAN INTERNAL / SBAR</h3>
+                            </div>
+
+                            <div class="sbar-row">
+                                <div class="sbar-col sbar-form-group">
+                                    <label for="tgl_rujukan">Tanggal Rujukan (Otomatis)</label>
+                                    <input type="date" id="tgl_rujukan">
+                                </div>
+                                <div class="sbar-col sbar-form-group">
+                                    <label for="jam_rujukan">Jam Rujukan (Otomatis)</label>
+                                    <input type="time" id="jam_rujukan">
+                                </div>
+                            </div>
+
+                            <div class="sbar-row">
+                                <div class="sbar-col sbar-form-group">
+                                    <label for="rujukan_dari">Rujukan Dari (Klaster/Ruangan)</label>
+                                    <select id="rujukan_dari">
+                                        <option value="">-- Pilih Klaster / Ruangan Pengirim --</option>
+                                        <option value="Klaster 2 (MTBS/MTBM)">Klaster 2 (MTBS/MTBM)</option>
+                                        <option value="Klaster 2 (Ibu Hamil)">Klaster 2 (Ibu Hamil)</option>
+                                        <option value="Klaster 3 (Usia Produktif)">Klaster 3 (Usia Produktif)</option>
+                                        <option value="Klaster 3 (Lansia)">Klaster 3 (Lansia)</option>
+                                        <option value="Lintas Klaster (Ruang Pemeriksan Khusus)">Lintas Klaster (Ruang Pemeriksan Khusus)</option>
+                                        <option value="Lintas Klaster (Ruang Pelayanan Gigi & Mulut)">Lintas Klaster (Ruang Pelayanan Gigi & Mulut)</option>
+                                        <option value="Lintas Klaster (Ruang Tindakan & Gawat Darurat)">Lintas Klaster (Ruang Tindakan & Gawat Darurat)</option>
+                                    </select>
+                                </div>
+                                <div class="sbar-col sbar-form-group">
+                                    <label for="tujuan_rujukan">Tujuan Rujukan (Klaster/Ruangan)</label>
+                                    <select id="tujuan_rujukan">
+                                        <option value="">-- Pilih Klaster / Ruangan Tujuan --</option>
+                                        <option value="Klaster 2 (MTBS/MTBM)">Klaster 2 (MTBS/MTBM)</option>
+                                        <option value="Klaster 2 (Ibu Hamil)">Klaster 2 (Ibu Hamil)</option>
+                                        <option value="Klaster 3 (Usia Produktif)">Klaster 3 (Usia Produktif)</option>
+                                        <option value="Klaster 3 (Lansia)">Klaster 3 (Lansia)</option>
+                                        <option value="Lintas Klaster (Ruang Pemeriksan Khusus)">Lintas Klaster (Ruang Pemeriksan Khusus)</option>
+                                        <option value="Lintas Klaster (Ruang Pelayanan Gigi & Mulut)">Lintas Klaster (Ruang Pelayanan Gigi & Mulut)</option>
+                                        <option value="Lintas Klaster (Ruang Tindakan & Gawat Darurat)">Lintas Klaster (Ruang Tindakan & Gawat Darurat)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="sbar-row">
+                                <div class="sbar-col sbar-form-group">
+                                    <label for="dokter_pengirim">Dokter Pengirim</label>
+                                    <select id="dokter_pengirim">
+                                        <option value="">-- Pilih Dokter Pengirim --</option>
+                                        <option value="dr. Kartika Eka Dwi Putri">dr. Kartika Eka Dwi Putri</option>
+                                        <option value="dr. Shinta Annisa">dr. Shinta Annisa</option>
+                                        <option value="drg. Rotua Fitri">drg. Rotua Fitri</option>
+                                    </select>
+                                </div>
+                                <div class="sbar-col sbar-form-group">
+                                    <label for="perawat_bidan">Perawat / Bidan</label>
+                                    <select id="perawat_bidan">
+                                        <option value="">-- Pilih Perawat / Bidan --</option>
+                                        <option value="Shely Marselyna, A.Md.Keb">Shely Marselyna, A.Md.Keb</option>
+                                        <option value="Ismanefy, A.Md.Keb">Ismanefy, A.Md.Keb</option>
+                                        <option value="Nasha Baiti, A.Md.Keb">Nasha Baiti, A.Md.Keb</option>
+                                        <option value="Nidya Suarni, A.Md.Keb">Nidya Suarni, A.Md.Keb</option>
+                                        <option value="Ns. Dini Noviadi, S.Kep">Ns. Dini Noviadi, S.Kep</option>
+                                        <option value="Andri Harta Kirana, A.Md.Kep">Andri Harta Kirana, A.Md.Kep</option>
+                                        <option value="Mia Astri Ana, A.Md.Keb">Mia Astri Ana, A.Md.Keb</option>
+                                        <option value="Samira Wulandari, A.Md.Keb">Samira Wulandari, A.Md.Keb</option>
+                                        <option value="Maylinda, A.Md.Keb">Maylinda, A.Md.Keb</option>
+                                        <option value="Rendy Andrian, A.Md.Kep">Rendy Andrian, A.Md.Kep</option>
+                                        <option value="Wahyu Dharmawan, A.Md.Kep">Wahyu Dharmawan, A.Md.Kep</option>
+                                        <option value="M. Khalqi Hilmi, A.Md.Kep">M. Khalqi Hilmi, A.Md.Kep</option>
+                                        <option value="Yudi Andika, A.Md.Kep">Yudi Andika, A.Md.Kep</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="sbar-row">
+                                <div class="sbar-col-2 sbar-form-group">
+                                    <label for="nama_pasien">Nama Pasien</label>
+                                    <input type="text" id="nama_pasien" placeholder="Nama lengkap pasien">
+                                </div>
+                                <div class="sbar-col sbar-form-group">
+                                    <label for="tgl_lahir_umur">Tgl Lahir / Umur</label>
+                                    <input type="text" id="tgl_lahir_umur" placeholder="dd/mm/yyyy (umur)">
+                                </div>
+                            </div>
+
+                            <div class="sbar-form-group">
+                                <label for="sbar_alamat">Alamat Pasien</label>
+                                <input type="text" id="sbar_alamat" placeholder="Alamat lengkap pasien">
+                            </div>
+
+                            <div class="sbar-section-header">SITUATION (S)</div>
+                            <div class="sbar-form-group">
+                                <textarea id="situation" placeholder="Tuliskan situasi pasien saat ini, keluhan utama, dan riwayat penyakit..."></textarea>
+                            </div>
+
+                            <div class="sbar-section-header">BACKGROUND (B)</div>
+                            <div class="sbar-form-group">
+                                <textarea id="background" placeholder="Tuliskan latar belakang medis pasien, hasil pemeriksaan fisik, dan TTV..."></textarea>
+                            </div>
+
+                            <div class="sbar-section-header">ASSESSMENT (A)</div>
+                            <div class="sbar-form-group">
+                                <textarea id="assessment" placeholder="Tuliskan diagnosa / assessment klinis..."></textarea>
+                            </div>
+
+                            <div class="sbar-section-header">RECOMMENDATION (R)</div>
+                            <div class="sbar-form-group">
+                                <textarea id="recommendation" placeholder="Tuliskan rekomendasi tindakan, instruksi penanganan, atau obat yang diberikan..."></textarea>
+                            </div>
+
+                            <div class="sbar-btn-group" id="sbarActionButtons">
+                                <button type="button" class="sbar-btn sbar-btn-pdf" onclick="unduhPDFInternal()">📄 Unduh PDF</button>
+                                <button type="button" class="sbar-btn sbar-btn-wa" onclick="kirimWhatsAppInternal()">📲 Kirim via WhatsApp</button>
+                                <button type="reset" class="sbar-btn sbar-btn-reset">🔄 Reset</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -960,6 +1108,7 @@
             const formSkriningArea = document.getElementById('formSkriningArea');
             const ambulanceArea = document.getElementById('ambulanceDisplayArea');
             const rujukanUpkdkArea = document.getElementById('rujukanUpkdkDisplayArea');
+            const rujukanInternalArea = document.getElementById('rujukanInternalDisplayArea');
 
             if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
 
@@ -971,6 +1120,7 @@
             formSkriningArea.style.display = 'none';
             ambulanceArea.style.display = 'none';
             rujukanUpkdkArea.style.display = 'none';
+            rujukanInternalArea.style.display = 'none';
 
             if (categoryCode === 'jadwal') {
                 calArea.style.display = 'block';
@@ -981,6 +1131,9 @@
             } else if (categoryCode === 'rujukan_upkdk') {
                 rujukanUpkdkArea.style.display = 'block';
                 document.getElementById('tanggalRujukan').valueAsDate = new Date();
+            } else if (categoryCode === 'rujukan' && periodIdentifier === 'internal') {
+                rujukanInternalArea.style.display = 'block';
+                initRujukanInternalDateTime();
             } else if (categoryCode === 'rujukan' || categoryCode === 'inventaris') {
                 formArea.style.display = 'block';
                 document.getElementById('formTitleLabel').innerText = "Tautan - " + subTitle;
@@ -1001,7 +1154,7 @@
             document.getElementById('dynamicFileList').innerHTML = '';
             document.getElementById('slideshowContainerImages').innerHTML = '';
             
-            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk') {
+            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
                 loadFilesForCurrentMenu(categoryCode);
             }
         }
@@ -1063,6 +1216,7 @@
 
         function checkUploadAreaVisibility() {
             const categoryCode = currentMenuId.split("-")[0];
+            const periodIdentifier = currentMenuId.split("-")[1];
             const uploadArea = document.getElementById('uploadAreaContainer');
             
             if (categoryCode === 'rujukan' || categoryCode === 'rujukan_upkdk' || categoryCode === 'inventaris' || categoryCode === 'skrining' || categoryCode === 'ambulance') {
@@ -1179,6 +1333,75 @@
             if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
             document.getElementById('previewModal').style.display = 'none';
             document.getElementById('modalBody').innerHTML = ''; 
+        }
+
+        // ==========================================
+        // FITUR RUJUKAN INTERNAL / SBAR
+        // ==========================================
+        function initRujukanInternalDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('tgl_rujukan').value = `${year}-${month}-${day}`;
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('jam_rujukan').value = `${hours}:${minutes}`;
+        }
+
+        function getSbarVal(id) {
+            return document.getElementById(id).value.trim() || '-';
+        }
+
+        function unduhPDFInternal() {
+            const btnGroup = document.getElementById('sbarActionButtons');
+            btnGroup.style.display = 'none';
+
+            const element = document.getElementById('sbarFormContainer');
+            const opt = {
+                margin:       10,
+                filename:     `Form_Rujukan_SBAR_${getSbarVal('nama_pasien').replace(/ /g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            return html2pdf().set(opt).from(element).save().then(() => {
+                btnGroup.style.display = 'flex';
+            });
+        }
+
+        function kirimWhatsAppInternal() {
+            unduhPDFInternal();
+
+            const targetNo = "6285264444567";
+
+            let pesan = `*UPTD PUSKESMAS LANJUT*\n`;
+            pesan += `*FORM RUJUKAN INTERNAL / SBAR*\n`;
+            pesan += `===============================\n\n`;
+            pesan += `📅 *Tanggal:* ${getSbarVal('tgl_rujukan')} | *Jam:* ${getSbarVal('jam_rujukan')}\n`;
+            pesan += `📍 *Dari:* ${getSbarVal('rujukan_dari')}\n`;
+            pesan += `🎯 *Tujuan:* ${getSbarVal('tujuan_rujukan')}\n`;
+            pesan += `👨‍⚕️ *Dokter Pengirim:* ${getSbarVal('dokter_pengirim')}\n`;
+            pesan += `👩‍⚕️ *Perawat/Bidan:* ${getSbarVal('perawat_bidan')}\n\n`;
+
+            pesan += `👤 *DATA PASIEN*\n`;
+            pesan += `• Nama: ${getSbarVal('nama_pasien')}\n`;
+            pesan += `• Tgl Lahir/Umur: ${getSbarVal('tgl_lahir_umur')}\n`;
+            pesan += `• Alamat: ${getSbarVal('sbar_alamat')}\n\n`;
+
+            pesan += `🔴 *S (SITUATION)*:\n${getSbarVal('situation')}\n\n`;
+            pesan += `🟡 *B (BACKGROUND)*:\n${getSbarVal('background')}\n\n`;
+            pesan += `🔵 *A (ASSESSMENT)*:\n${getSbarVal('assessment')}\n\n`;
+            pesan += `🟢 *R (RECOMMENDATION)*:\n${getSbarVal('recommendation')}\n\n`;
+            pesan += `_Catatan: Berkas PDF utuh dari form ini telah terunduh. Silakan lampirkan (attach) berkas PDF tersebut ke pesan ini._`;
+
+            const urlWA = `https://api.whatsapp.com/send?phone=${targetNo}&text=${encodeURIComponent(pesan)}`;
+
+            setTimeout(() => {
+                window.open(urlWA, '_blank');
+            }, 1200);
         }
 
         // ==========================================
