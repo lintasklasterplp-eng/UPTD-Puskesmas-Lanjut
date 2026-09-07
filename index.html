@@ -343,6 +343,7 @@
                     <div class="nav-dropdown-content">
                         <a onclick="selectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal'); closeMobileMenu();">Rujukan Internal</a>
                         <a onclick="selectMenu('rujukan', 'eksternal', 'Rujukan', 'Rujukan Eksternal'); closeMobileMenu();">Rujukan Eksternal</a>
+                        <!-- Navigasi UPKDK disesuaikan pemanggilan kodenya -->
                         <a onclick="selectMenu('rujukan_upkdk', 'upkdk', 'Rujukan', 'Rujukan UPKDK'); closeMobileMenu();">Rujukan UPKDK</a>
                     </div>
                 </li>
@@ -421,7 +422,7 @@
                         </div>
 
                         <div class="info-note">
-                            <strong>Info:</strong> Isi data rujukan dengan lengkap. Anda dapat mengunduh dokumen dalam bentuk PDF atau langsung mengirimkannya ke nomor WhatsApp tujuan.[cite: 4]
+                            <strong>Info:</strong> Isi data rujukan dengan lengkap. Anda dapat mengunduh dokumen dalam bentuk PDF atau langsung mengirimkannya ke nomor WhatsApp tujuan.
                         </div>
 
                         <form id="rujukanForm">
@@ -1193,7 +1194,7 @@
             });
         }
 
-        async function simpanPetugasAmbulance() {
+        function simpanPetugasAmbulance() {
             const nama = document.getElementById('input-nama-petugas').value;
             const hp = document.getElementById('input-hp-petugas').value;
             const fileInput = document.getElementById('input-foto-petugas');
@@ -1203,85 +1204,38 @@
                 return;
             }
 
-            const simpanKeDB = async (fotoBase64) => {
-                try {
-                    // Menyimpan ke tabel "Petugas Ambulance" di Supabase[cite: 4]
-                    const { data, error } = await supabaseClient
-                        .from('Petugas Ambulance')
-                        .upsert([{ id: 1, nama: nama, no_hp: hp, foto: fotoBase64 }])
-                        .select();
-
-                    if (error) throw error;
-
-                    // Update Cache Local
-                    localStorage.setItem('ambulance_petugas_nama', nama);
-                    localStorage.setItem('ambulance_petugas_hp', hp);
-                    if (fotoBase64) localStorage.setItem('ambulance_petugas_foto', fotoBase64);
-                    
-                    document.getElementById('nama-petugas-tampil').innerText = nama;
-                    document.getElementById('hp-petugas-tampil').innerText = hp;
-                    
-                    document.getElementById('form-edit-petugas').style.display = 'none';
-                    document.getElementById('viewPetugasAmbulance').style.display = 'block';
-                    alert("Data Petugas Ambulance berhasil disimpan ke Database Supabase!");[cite: 4]
-                } catch (error) {
-                    console.error("Error menyimpan data petugas:", error);
-                    alert("Terjadi kesalahan saat menyimpan ke database.");
-                }
+            const selesaikanSimpan = () => {
+                localStorage.setItem('ambulance_petugas_nama', nama);
+                localStorage.setItem('ambulance_petugas_hp', hp);
+                
+                document.getElementById('nama-petugas-tampil').innerText = nama;
+                document.getElementById('hp-petugas-tampil').innerText = hp;
+                
+                document.getElementById('form-edit-petugas').style.display = 'none';
+                document.getElementById('viewPetugasAmbulance').style.display = 'block';
+                alert("Data Petugas Ambulance berhasil disimpan!");
             };
 
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const fotoBase64 = e.target.result;
+                    localStorage.setItem('ambulance_petugas_foto', e.target.result);
                     const imgTampil = document.getElementById('foto-petugas-tampil');
-                    imgTampil.src = fotoBase64;
+                    imgTampil.src = e.target.result;
                     imgTampil.style.display = 'block';
-                    simpanKeDB(fotoBase64);
+                    selesaikanSimpan();
                 };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
-                const fotoLama = localStorage.getItem('ambulance_petugas_foto') || null;
-                simpanKeDB(fotoLama);
+                selesaikanSimpan();
             }
         }
 
-        async function muatDataPetugasAmbulance() {
-            try {
-                // Mengambil data dari tabel "Petugas Ambulance" di Supabase[cite: 4]
-                const { data, error } = await supabaseClient
-                    .from('Petugas Ambulance')
-                    .select('*')
-                    .eq('id', 1)
-                    .single();
-
-                let nama, hp, foto;
-
-                if (data && !error) {
-                    nama = data.nama || "ROBY";
-                    hp = data.no_hp || "081275052068";
-                    foto = data.foto || "";
-                    
-                    // Update cache local agar tetap cepat dimuat[cite: 4]
-                    localStorage.setItem('ambulance_petugas_nama', nama);
-                    localStorage.setItem('ambulance_petugas_hp', hp);
-                    if(foto) localStorage.setItem('ambulance_petugas_foto', foto);
-                } else {
-                    throw error || new Error("Data tidak ditemukan");
-                }
-                
-                tampilkanDataPetugas(nama, hp, foto);
-
-            } catch (error) {
-                console.warn("Gagal fetch DB, memuat dari local cache:", error);
-                const nama = localStorage.getItem('ambulance_petugas_nama') || "ROBY";
-                const hp = localStorage.getItem('ambulance_petugas_hp') || "081275052068";
-                const foto = localStorage.getItem('ambulance_petugas_foto');
-                tampilkanDataPetugas(nama, hp, foto);
-            }
-        }
-
-        function tampilkanDataPetugas(nama, hp, foto) {
+        function muatDataPetugasAmbulance() {
+            const nama = localStorage.getItem('ambulance_petugas_nama') || "Belum diatur";
+            const hp = localStorage.getItem('ambulance_petugas_hp') || "Belum diatur";
+            const foto = localStorage.getItem('ambulance_petugas_foto');
+            
             document.getElementById('nama-petugas-tampil').innerText = nama;
             document.getElementById('hp-petugas-tampil').innerText = hp;
             
@@ -1293,8 +1247,8 @@
                 imgTampil.style.display = 'none';
             }
             
-            document.getElementById('input-nama-petugas').value = (nama && nama !== "Belum diatur") ? nama : "ROBY";
-            document.getElementById('input-hp-petugas').value = (hp && hp !== "Belum diatur") ? hp : "081275052068";
+            document.getElementById('input-nama-petugas').value = nama !== "Belum diatur" ? nama : "";
+            document.getElementById('input-hp-petugas').value = hp !== "Belum diatur" ? hp : "";
             
             document.getElementById('form-edit-petugas').style.display = 'none';
             document.getElementById('viewPetugasAmbulance').style.display = 'block';
@@ -1316,26 +1270,26 @@
                         const lon = position.coords.longitude;
                         linkMapsPasien = `https://www.google.com/maps?q=${lat},${lon}`;
                         inputLokasi.value = `Titik GPS berhasil direkam`;
-                        alert("Lokasi Anda berhasil didapatkan!");[cite: 4]
+                        alert("Lokasi Anda berhasil didapatkan!");
                     },
                     (error) => {
                         inputLokasi.value = "Gagal mengambil lokasi";
-                        alert("Gagal mendapatkan lokasi. Pastikan izin GPS / Lokasi (Location) diaktifkan pada browser/HP Anda.");[cite: 4]
+                        alert("Gagal mendapatkan lokasi. Pastikan izin GPS / Lokasi (Location) diaktifkan pada browser/HP Anda.");
                     },
                     { enableHighAccuracy: true } 
                 );
             } else {
                 inputLokasi.value = "GPS tidak didukung";
-                alert("Fitur lokasi tidak didukung oleh browser ini.");[cite: 4]
+                alert("Fitur lokasi tidak didukung oleh browser ini.");
             }
         }
 
         function kirimPermintaanAmbulance() {
-            const namaPetugas = localStorage.getItem('ambulance_petugas_nama') || "ROBY";
-            const hpPetugas = localStorage.getItem('ambulance_petugas_hp') || "081275052068";
+            const namaPetugas = localStorage.getItem('ambulance_petugas_nama');
+            const hpPetugas = localStorage.getItem('ambulance_petugas_hp');
             
-            if (!namaPetugas || !hpPetugas) {
-                alert("Data Petugas Ambulance sistem belum diatur.");[cite: 4]
+            if (!namaPetugas || !hpPetugas || namaPetugas === "Belum diatur") {
+                alert("Data Petugas Ambulance sistem belum diatur. Klik 'Edit Petugas' terlebih dahulu.");
                 return;
             }
 
@@ -1343,7 +1297,7 @@
             const hpPasien = document.getElementById('input-hp-pasien').value;
             
             if (!namaPasien || !hpPasien) {
-                alert("Harap lengkapi Nama Pasien dan Nomor HP Pasien!");[cite: 4]
+                alert("Harap lengkapi Nama Pasien dan Nomor HP Pasien!");
                 return;
             }
 
@@ -1367,7 +1321,7 @@
             } else {
                 pesan += `📍 Titik Jemput GPS: (Titik lokasi tidak direkam sistem)%0A`;
             }
-            pesan += `%0AMohon untuk segera merespon panggilan ini. Terima kasih.`;[cite: 4]
+            pesan += `%0AMohon untuk segera merespon panggilan ini. Terima kasih.`;
             
             window.open(`https://wa.me/${formattedNomor}?text=${pesan}`, '_blank');
         }
@@ -1399,7 +1353,7 @@
             const petugas = document.getElementById('petugas').value.trim();
 
             if (!jenisPelayanan || !tujuanSelect.value || !nama || !umur || !kelamin || !alamat || !tanggal || !petugas) {
-                alert('Mohon lengkapi seluruh kolom formulir termasuk jenis pelayanan, tujuan rujukan, dan petugas pengirim!');[cite: 4]
+                alert('Mohon lengkapi seluruh kolom formulir termasuk jenis pelayanan, tujuan rujukan, dan petugas pengirim!');
                 return false;
             }
 
@@ -1449,7 +1403,7 @@
 
             html2pdf().set(opt).from(element).save().catch(err => {
                 console.error('Error saat men-generate PDF:', err);
-                alert('Terjadi kesalahan saat membuat PDF.');[cite: 4]
+                alert('Terjadi kesalahan saat membuat PDF.');
             });
         }
 
@@ -1495,7 +1449,7 @@
                           `\n\n*D. KETERANGAN PENGIRIM*` +
                           `\n- Tanggal: ${tanggal}` +
                           `\n- Petugas Pengirim: ${petugas}` +
-                          `\n\n_(Formulir ini dikirim secara digital melalui sistem rujukan Puskesmas)_`;[cite: 4]
+                          `\n\n_(Formulir ini dikirim secara digital melalui sistem rujukan Puskesmas)_`;
 
             const urlWhatsApp = `https://wa.me/${nomorWhatsApp}?text=${encodeURIComponent(pesan)}`;
 
