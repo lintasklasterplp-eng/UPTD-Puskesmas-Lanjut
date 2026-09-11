@@ -63,7 +63,7 @@
         }
 
         .navbar {
-            padding: 10px 25px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -73,13 +73,14 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             text-decoration: none;
+            max-width: calc(100% - 50px);
         }
 
         .logo-img {
-            width: 38px;
-            height: 38px;
+            width: 35px;
+            height: 35px;
             object-fit: cover;
             border-radius: 50%;
             border: 2px solid var(--primary);
@@ -90,17 +91,21 @@
         .logo-text-wrapper {
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         .logo-text {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 800;
             color: var(--primary);
             line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .logo-subtext {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 600;
             color: var(--text-muted);
         }
@@ -114,21 +119,22 @@
             background: rgba(4, 120, 87, 0.1);
             border: 1px solid rgba(4, 120, 87, 0.3);
             color: var(--primary);
-            font-size: 1.25rem;
-            padding: 8px 12px;
+            font-size: 1.15rem;
+            padding: 6px 10px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .btn-hamburger:hover {
             background: rgba(4, 120, 87, 0.2);
         }
 
-        /* Dropdown Menu Utama dari Tombol Garis 3 */
+        /* Dropdown Menu Utama dari Tombol Garis 3 (Mobile Friendly) */
         .hamburger-dropdown {
             display: none;
             position: absolute;
@@ -137,12 +143,13 @@
             background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-            min-width: 260px;
+            width: 280px;
+            max-width: calc(100vw - 30px);
             z-index: 1100;
             border: 1px solid var(--border);
             padding: 8px;
             animation: fadeInDrop 0.2s ease-in-out;
-            max-height: 75vh;
+            max-height: 70vh;
             overflow-y: auto;
         }
 
@@ -164,7 +171,7 @@
             font-size: 0.8rem; 
             font-weight: 600;
             cursor: pointer; 
-            padding: 8px 12px; 
+            padding: 10px 12px; 
             border-radius: 6px;
             transition: all 0.2s ease-in-out; 
             display: flex;
@@ -202,7 +209,7 @@
         
         .nav-dropdown-content a { 
             color: var(--text-main); 
-            padding: 8px 12px; 
+            padding: 10px 12px; 
             text-decoration: none; 
             display: block; 
             font-size: 0.75rem; 
@@ -227,8 +234,8 @@
             flex-grow: 1; 
             max-width: 1350px; 
             width: 100%; 
-            margin: 20px auto; 
-            padding: 0 25px; 
+            margin: 15px auto; 
+            padding: 0 15px; 
             display: flex; 
             flex-direction: column; 
             justify-content: flex-start;
@@ -240,23 +247,25 @@
             100% { background-color: rgba(239, 68, 68, 0.95); color: white; border-color: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
         }
         
+        /* Tombol Ambulance & Darurat di Sudut Kiri Bawah (Dioptimalkan untuk HP) */
         .btn-ambulance-fixed {
             position: fixed;
             bottom: 45px;
-            left: 25px; /* Dipindahkan ke sudut kiri bawah */
+            left: 15px;
             z-index: 1000;
             animation: blink-warning 1.5s infinite;
             font-weight: bold;
-            padding: 8px 14px;
+            padding: 8px 12px;
             border-radius: 6px;
             border: 2px solid #ef4444;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             backdrop-filter: blur(4px);
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         .btn-ambulance-fixed:hover {
             animation: none;
@@ -268,14 +277,14 @@
         .workspace-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; width: 100%; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-out; overflow: hidden; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card-header { padding: 15px 25px; border-bottom: 1px solid rgba(226, 232, 240, 0.8); background: rgba(248, 250, 252, 0.7); display: flex; justify-content: space-between; align-items: center; }
-        .card-header h2 { font-size: 1.2rem; color: var(--primary); }
-        .card-header p { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+        .card-header { padding: 12px 15px; border-bottom: 1px solid rgba(226, 232, 240, 0.8); background: rgba(248, 250, 252, 0.7); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h2 { font-size: 1.05rem; color: var(--primary); }
+        .card-header p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
 
-        .btn-close-card { background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: background 0.2s; }
+        .btn-close-card { background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: background 0.2s; }
         .btn-close-card:hover { background: #dc2626; }
 
-        .card-body { padding: 25px; display: flex; flex-direction: column; gap: 20px; }
+        .card-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
 
         .glass-panel {
             background: rgba(255, 255, 255, 0.95);
@@ -283,7 +292,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .table-container::-webkit-scrollbar {
-            height: 8px;
+            height: 6px;
         }
         .table-container::-webkit-scrollbar-thumb {
             background-color: #cbd5e1;
@@ -297,142 +306,175 @@
             animation: highContrastPulse 1.2s infinite ease-in-out;
         }
 
-        .full-year-calendar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .mini-month-card { background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
-        .mini-month-card h4 { font-size: 0.9rem; color: var(--primary); text-align: center; margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
-        .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); font-size: 0.7rem; text-align: center; gap: 4px; }
-        .mini-grid .day-name { font-weight: bold; color: var(--text-muted); margin-bottom: 4px; }
-        .mini-grid .date-cell { padding: 4px 0; border-radius: 50%; }
+        .full-year-calendar { display: grid; grid-template-columns: repeat(1, 1fr); gap: 12px; }
+        @media (min-width: 640px) {
+            .full-year-calendar { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .full-year-calendar { grid-template-columns: repeat(4, 1fr); }
+        }
+        .mini-month-card { background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+        .mini-month-card h4 { font-size: 0.85rem; color: var(--primary); text-align: center; margin-bottom: 6px; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+        .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); font-size: 0.65rem; text-align: center; gap: 3px; }
+        .mini-grid .day-name { font-weight: bold; color: var(--text-muted); margin-bottom: 2px; }
+        .mini-grid .date-cell { padding: 3px 0; border-radius: 50%; }
         .mini-grid .date-cell.meeting-date { background-color: var(--primary); color: white; font-weight: bold; }
 
-        .form-area-container { background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 10px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
-        .form-group input, .form-group select, .form-group textarea { padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; background: #f8fafc; }
+        .form-area-container { background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 10px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--primary); }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; outline: none; background: #f8fafc; width: 100%; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
-        .btn-submit-form { background-color: var(--primary); color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-submit-form { background-color: var(--primary); color: white; padding: 10px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
         .btn-submit-form:hover { background-color: var(--primary-hover); }
 
-        .darurat-container { max-width: 450px; width: 100%; margin: auto; text-align: center; background: #fff; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .btn-darurat-main { background-color: #ef4444; color: white; padding: 14px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .darurat-container { max-width: 100%; width: 100%; margin: auto; text-align: center; background: #fff; padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .btn-darurat-main { background-color: #ef4444; color: white; padding: 12px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; width: 100%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-darurat-main:hover { background-color: #dc2626; }
         
-        .form-kontak { display: none; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; text-align: left; }
-        .form-kontak label { font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; display: block; }
-        .form-kontak input { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
-        .btn-simpan-darurat { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
+        .form-kontak { display: none; background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 12px; text-align: left; }
+        .form-kontak label { font-size: 0.8rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; display: block; }
+        .form-kontak input { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; }
+        .btn-simpan-darurat { background-color: #4CAF50; color: white; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 0.85rem; }
         .btn-simpan-darurat:hover { background-color: #388E3C; }
-        .kontak-info-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: left; }
-        .kontak-info-details span { display: block; font-size: 0.85rem; color: var(--text-muted); }
-        .kontak-info-details strong { font-size: 1.1rem; color: var(--text-main); }
-        .btn-edit-kontak { background: #f59e0b; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .kontak-info-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: left; }
+        .kontak-info-details span { display: block; font-size: 0.8rem; color: var(--text-muted); }
+        .kontak-info-details strong { font-size: 1rem; color: var(--text-main); }
+        .btn-edit-kontak { background: #f59e0b; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn-edit-kontak:hover { background: #d97706; }
 
-        .upload-area { border: 2px dashed var(--accent); padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; background-color: rgba(248, 250, 252, 0.8); }
+        .upload-area { border: 2px dashed var(--accent); padding: 15px; text-align: center; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; background-color: rgba(248, 250, 252, 0.8); }
         .upload-area:hover { background-color: rgba(14, 165, 233, 0.1); border-color: var(--primary); }
-        .btn-upload { background-color: var(--primary); color: white; padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+        .btn-upload { background-color: var(--primary); color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
         .file-input-hidden { display: none; }
 
-        .file-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .file-item { background: #fff; padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .file-item a.file-link-preview { color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+        .file-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .file-item { background: #fff; padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); border-left: 4px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .file-item a.file-link-preview { color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
         .file-item a.file-link-preview:hover { color: var(--primary); text-decoration: underline; }
-        .file-actions { display: flex; gap: 10px; align-items: center; }
-        .btn-preview { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem; }
-        .btn-delete-cross { background: #ef4444; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
+        .file-actions { display: flex; gap: 8px; align-items: center; }
+        .btn-preview { background: var(--accent); color: white; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
+        .btn-delete-cross { background: #ef4444; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; }
 
-        #slideshowDisplayArea { display: none; width: 100%; height: 400px; flex-direction: column; justify-content: center; align-items: center; position: relative; background: #0f172a; border-radius: 12px; overflow: hidden; }
+        #slideshowDisplayArea { display: none; width: 100%; height: 300px; flex-direction: column; justify-content: center; align-items: center; position: relative; background: #0f172a; border-radius: 12px; overflow: hidden; }
         .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
         .slide-img { max-width: 100%; max-height: 100%; object-fit: contain; position: absolute; opacity: 0; transition: opacity 1s ease-in-out; }
         .slide-img.active { opacity: 1; }
 
-        #previewModal, #infoModal, #passwordModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+        #previewModal, #infoModal, #passwordModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 10px; backdrop-filter: blur(5px); }
         .modal-content-full { background: #fff; width: 100%; height: 100%; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header-full { padding: 15px 25px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
-        .btn-close-back { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+        .modal-header-full { padding: 12px 15px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .btn-close-back { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
         .modal-body-full { flex-grow: 1; background: #f1f5f9; overflow: auto; position: relative; }
         .modal-body-full iframe, .modal-body-full embed { width: 100%; height: 100%; border: none; }
-        .excel-table-container { padding: 30px; background: white; min-height: 100%; }
-        .excel-table-container table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
-        .excel-table-container th, .excel-table-container td { border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; }
+        .excel-table-container { padding: 15px; background: white; min-height: 100%; }
+        .excel-table-container table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+        .excel-table-container th, .excel-table-container td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; }
         .excel-table-container th { background-color: #f8fafc; color: var(--primary); position: sticky; top: 0; }
 
-        .info-modal-box { background: #fff; width: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease-out; }
-        .info-modal-header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1rem; }
-        .info-modal-body { padding: 25px; display: flex; flex-direction: column; gap: 12px; }
-        .info-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; }
+        .info-modal-box { background: #fff; width: 100%; max-width: 380px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease-out; }
+        .info-modal-header { background: var(--primary); color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.95rem; }
+        .info-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .info-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; }
         .info-item:last-child { border-bottom: none; }
         .info-label { color: var(--text-muted); font-weight: 600; }
         .info-value { font-weight: 700; color: var(--text-main); }
-        .badge-active { background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; }
-        .btn-close-info { background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
+        .badge-active { background: #d1fae5; color: #065f46; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; }
+        .btn-close-info { background: transparent; border: none; color: white; font-size: 1.1rem; cursor: pointer; }
 
-        .password-modal-box { background: #fff; width: 380px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease-out; }
-        .password-modal-header { background: var(--primary); color: white; padding: 15px 20px; font-weight: 700; font-size: 1rem; }
-        .password-modal-body { padding: 25px; display: flex; flex-direction: column; gap: 15px; }
-        .password-modal-body p { font-size: 0.9rem; color: var(--text-main); }
-        .password-modal-body input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; outline: none; }
+        .password-modal-box { background: #fff; width: 100%; max-width: 350px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease-out; }
+        .password-modal-header { background: var(--primary); color: white; padding: 12px 15px; font-weight: 700; font-size: 0.95rem; }
+        .password-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .password-modal-body p { font-size: 0.85rem; color: var(--text-main); }
+        .password-modal-body input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; outline: none; }
         .password-modal-body input:focus { border-color: var(--primary); }
-        .password-modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 0 25px 25px 25px; }
-        .btn-pass-cancel { background: #e2e8f0; color: var(--text-main); border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
-        .btn-pass-submit { background: var(--primary); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+        .password-modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 0 20px 20px 20px; }
+        .btn-pass-cancel { background: #e2e8f0; color: var(--text-main); border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+        .btn-pass-submit { background: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
 
-        #homeViewContainer { text-align: center; padding: 60px 20px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        #homeViewContainer { text-align: center; padding: 40px 15px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        /* Footer & Running Text Dikecilkan */
+        /* Footer & Running Text Dioptimalkan agar selalu muncul responsif di HP */
         footer { 
-            background: rgba(4, 120, 87, 0.88); 
+            background: rgba(4, 120, 87, 0.95); 
             backdrop-filter: blur(10px); 
             color: white; 
-            padding: 6px 15px; 
+            padding: 6px 12px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            font-size: 0.75rem; 
+            font-size: 0.7rem; 
             box-shadow: 0 -4px 10px rgba(0,0,0,0.05); 
             margin-top: auto; 
             height: 35px;
+            width: 100%;
+            z-index: 999;
         }
-        .footer-running { flex-grow: 1; overflow: hidden; margin: 0 15px; }
-        .footer-running marquee { font-weight: 700; font-size: 0.85rem; letter-spacing: 0.3px; }
-        .footer-clock { font-weight: 600; background: rgba(0, 0, 0, 0.2); padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; }
+        .footer-running { 
+            flex-grow: 1; 
+            overflow: hidden; 
+            margin: 0 10px; 
+            white-space: nowrap;
+        }
+        .footer-running marquee { 
+            font-weight: 700; 
+            font-size: 0.75rem; 
+            letter-spacing: 0.3px; 
+        }
+        .footer-clock { 
+            font-weight: 600; 
+            background: rgba(0, 0, 0, 0.2); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-size: 0.65rem; 
+            white-space: nowrap;
+        }
         
         .btn-info-fixed { background-color: rgba(14, 165, 233, 0.1); color: var(--accent); border: 1px solid rgba(14, 165, 233, 0.3); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
         .btn-info-fixed:hover { background-color: rgba(14, 165, 233, 0.2); }
 
-        .rujukan-form-container { width: 100%; background: #ffffff; padding: 25px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin: 0 auto; max-width: 650px;}
-        .rujukan-form-container .header-form { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; }
-        .rujukan-form-container .header-form h2 { margin: 0 0 5px 0; color: #047857; font-size: 20px; font-weight: 700; }
-        .rujukan-form-container .header-form h3 { margin: 0; color: #16a085; font-size: 14px; letter-spacing: 0.5px; }
-        .rujukan-form-container .info-note { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 15px; font-size: 13px; color: #1e40af; border-radius: 0 6px 6px 0; margin-bottom: 20px; line-height: 1.5; }
-        .rujukan-form-container textarea { resize: vertical; height: 75px; }
-        .rujukan-form-container .checkbox-container { background: #f8fafc; border: 1px solid #cbd5e1; padding: 12px 15px; border-radius: 6px; }
-        .rujukan-form-container .checkbox-item { margin-bottom: 8px; display: flex; align-items: center; }
-        .rujukan-form-container .btn-container { display: flex; gap: 12px; margin-top: 30px; }
-        .rujukan-form-container button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
-        .rujukan-form-container .btn-reset { background-color: #64748b; color: white; flex: 0.7; }
+        .rujukan-form-container { width: 100%; background: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin: 0 auto; max-width: 650px;}
+        .rujukan-form-container .header-form { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 12px; }
+        .rujukan-form-container .header-form h2 { margin: 0 0 5px 0; color: #047857; font-size: 17px; font-weight: 700; }
+        .rujukan-form-container .header-form h3 { margin: 0; color: #16a085; font-size: 12px; letter-spacing: 0.5px; }
+        .rujukan-form-container .info-note { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px 12px; font-size: 12px; color: #1e40af; border-radius: 0 6px 6px 0; margin-bottom: 15px; line-height: 1.4; }
+        .rujukan-form-container textarea { resize: vertical; height: 70px; }
+        .rujukan-form-container .checkbox-container { background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 6px; }
+        .rujukan-form-container .checkbox-item { margin-bottom: 6px; display: flex; align-items: center; font-size: 0.85rem; }
+        .rujukan-form-container .btn-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        @media (min-width: 640px) {
+            .rujukan-form-container .btn-container { flex-direction: row; }
+        }
+        .rujukan-form-container button { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .rujukan-form-container .btn-reset { background-color: #64748b; color: white; }
         .rujukan-form-container .btn-download { background-color: #dc2626; color: white; }
         .rujukan-form-container .btn-whatsapp { background-color: #16a34a; color: white; }
         
-        .sbar-container { max-width: 850px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        .sbar-header { text-align: center; border-bottom: 2px solid #047857; padding-bottom: 12px; margin-bottom: 20px; }
-        .sbar-header h2 { margin: 0; color: #047857; font-size: 20px; text-transform: uppercase; font-weight: 700; }
-        .sbar-header h3 { margin: 6px 0 0 0; font-size: 14px; color: var(--text-main); font-weight: 600; }
-        .sbar-row { display: flex; gap: 15px; margin-bottom: 12px; }
+        .sbar-container { max-width: 850px; margin: 0 auto; background: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .sbar-header { text-align: center; border-bottom: 2px solid #047857; padding-bottom: 10px; margin-bottom: 15px; }
+        .sbar-header h2 { margin: 0; color: #047857; font-size: 17px; text-transform: uppercase; font-weight: 700; }
+        .sbar-header h3 { margin: 4px 0 0 0; font-size: 12px; color: var(--text-main); font-weight: 600; }
+        .sbar-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+        @media (min-width: 640px) {
+            .sbar-row { flex-direction: row; }
+        }
         .sbar-col { flex: 1; }
         .sbar-col-2 { flex: 2; }
-        .sbar-form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
-        .sbar-form-group label { font-size: 12px; font-weight: bold; color: var(--primary); margin-bottom: 4px; }
-        .sbar-container input, .sbar-container select, .sbar-container textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; background-color: rgba(248, 250, 252, 0.9); }
-        .sbar-container textarea { resize: vertical; min-height: 85px; }
-        .sbar-section-header { background-color: var(--primary); color: #ffffff; padding: 6px 10px; font-weight: bold; border-radius: 4px; margin-top: 18px; margin-bottom: 10px; font-size: 13px; letter-spacing: 0.5px; }
-        .sbar-btn-group { display: flex; gap: 12px; margin-top: 25px; }
-        .sbar-btn { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
+        .sbar-form-group { display: flex; flex-direction: column; margin-bottom: 8px; }
+        .sbar-form-group label { font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 3px; }
+        .sbar-container input, .sbar-container select, .sbar-container textarea { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; background-color: rgba(248, 250, 252, 0.9); }
+        .sbar-container textarea { resize: vertical; min-height: 75px; }
+        .sbar-section-header { background-color: var(--primary); color: #ffffff; padding: 5px 8px; font-weight: bold; border-radius: 4px; margin-top: 15px; margin-bottom: 8px; font-size: 12px; letter-spacing: 0.5px; }
+        .sbar-btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        @media (min-width: 640px) {
+            .sbar-btn-group { flex-direction: row; }
+        }
+        .sbar-btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
         .sbar-btn-wa { background-color: #16a34a; color: white; }
         .sbar-btn-wa:hover { background-color: #15803d; }
         .sbar-btn-pdf { background-color: #dc2626; color: white; }
         .sbar-btn-pdf:hover { background-color: #b91c1c; }
-        .sbar-btn-reset { background-color: #64748b; color: white; flex: 0.4; }
+        .sbar-btn-reset { background-color: #64748b; color: white; }
         .pdf-wrapper { position: absolute; left: -9999px; top: -9999px; width: 800px; }
     </style>
 </head>
@@ -508,7 +550,7 @@
     </header>
 
     <div class="content-wrapper">
-        <!-- Tombol Ambulance & Darurat dipindahkan ke sudut kiri bawah -->
+        <!-- Tombol Ambulance & Darurat di Sudut Kiri Bawah -->
         <button class="btn-ambulance-fixed" onclick="selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan')">
             🚨 Ambulance & Darurat
         </button>
@@ -534,13 +576,13 @@
                             
                             <div class="form-group">
                                 <label>Link:</label>
-                                <div style="display: flex; gap: 10px;">
+                                <div style="display: flex; gap: 8px;">
                                     <input type="url" id="inputUrlRujukan1" placeholder="https://..." style="flex-grow: 1;">
-                                    <button class="btn-submit-form" type="button" id="btnBukaRujukan1" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan()">Buka Link</button>
+                                    <button class="btn-submit-form" type="button" id="btnBukaRujukan1" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan()">Buka</button>
                                 </div>
                             </div>
 
-                            <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+                            <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 5px; width: 100%;">Simpan Tautan</button>
                         </div>
                     </div>
 
@@ -549,12 +591,12 @@
                             <h3 style="color: var(--primary);" id="formSkriningTitleLabel">Form Skrining</h3>
                             <div class="form-group">
                                 <label>Link:</label>
-                                <div style="display: flex; gap: 10px;">
+                                <div style="display: flex; gap: 8px;">
                                     <input type="url" id="inputUrlSkrining" placeholder="https://..." style="flex-grow: 1;">
-                                    <button class="btn-submit-form" type="button" id="btnBukaSkrining" style="background-color: var(--accent); display: none;" onclick="bukaUrlSkrining()">Buka Link</button>
+                                    <button class="btn-submit-form" type="button" id="btnBukaSkrining" style="background-color: var(--accent); display: none;" onclick="bukaUrlSkrining()">Buka</button>
                                 </div>
                             </div>
-                            <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+                            <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 5px; width: 100%;">Simpan Tautan</button>
                         </div>
                     </div>
 
@@ -655,12 +697,12 @@
 
                                 <div class="sbar-section-header">SITUATION (S)</div>
                                 <div class="sbar-form-group">
-                                    <textarea id="situation" placeholder="Tuliskan situasi pasien saat ini, keluhan utama, dan riwayat penyakit..."></textarea>
+                                    <textarea id="situation" placeholder="Tuliskan situasi pasien saat ini..."></textarea>
                                 </div>
 
                                 <div class="sbar-section-header">BACKGROUND (B)</div>
                                 <div class="sbar-form-group">
-                                    <textarea id="background" placeholder="Tuliskan latar belakang medis pasien, hasil pemeriksaan fisik, dan TTV..."></textarea>
+                                    <textarea id="background" placeholder="Tuliskan latar belakang medis pasien..."></textarea>
                                 </div>
 
                                 <div class="sbar-section-header">ASSESSMENT (A)</div>
@@ -670,12 +712,12 @@
 
                                 <div class="sbar-section-header">RECOMMENDATION (R)</div>
                                 <div class="sbar-form-group">
-                                    <textarea id="recommendation" placeholder="Tuliskan rekomendasi tindakan, instruksi penanganan, atau obat yang diberikan..."></textarea>
+                                    <textarea id="recommendation" placeholder="Tuliskan rekomendasi tindakan..."></textarea>
                                 </div>
 
                                 <div class="sbar-btn-group" id="sbarActionButtons">
                                     <button type="button" class="sbar-btn sbar-btn-pdf" onclick="unduhPDFInternal()">📄 Unduh PDF</button>
-                                    <button type="button" class="sbar-btn sbar-btn-wa" onclick="kirimWhatsAppInternal()">📲 Kirim via WhatsApp</button>
+                                    <button type="button" class="sbar-btn sbar-btn-wa" onclick="kirimWhatsAppInternal()">📲 Kirim WA</button>
                                     <button type="reset" class="sbar-btn sbar-btn-reset">🔄 Reset</button>
                                 </div>
                             </form>
@@ -690,7 +732,7 @@
                             </div>
 
                             <div class="info-note">
-                                <strong>Info:</strong> Isi data rujukan dengan lengkap. Anda dapat mengunduh dokumen dalam bentuk PDF atau langsung mengirimkannya ke nomor WhatsApp tujuan.
+                                <strong>Info:</strong> Isi data rujukan dengan lengkap. Unduh PDF atau kirim langsung ke WhatsApp.
                             </div>
 
                             <form id="rujukanForm">
@@ -724,7 +766,7 @@
                                     <input type="text" id="namaPasien" required placeholder="Masukkan nama lengkap pasien">
                                 </div>
 
-                                <div style="display: flex; gap: 15px;">
+                                <div class="sbar-row" style="margin-bottom: 0;">
                                     <div class="form-group" style="flex: 1;">
                                         <label for="umur">Umur (Tahun):</label>
                                         <input type="number" id="umur" required placeholder="Contoh: 35">
@@ -746,7 +788,7 @@
 
                                 <div class="form-group">
                                     <label for="hasilPemeriksaan">Hasil Pemeriksaan Sementara:</label>
-                                    <textarea id="hasilPemeriksaan" placeholder="Misal: TD: 165/100, Keluhan..."></textarea>
+                                    <textarea id="hasilPemeriksaan" placeholder="Misal: TD: 165/100..."></textarea>
                                 </div>
 
                                 <div class="form-group">
@@ -769,19 +811,19 @@
                                     <input type="text" id="keteranganLainnya" placeholder="Tuliskan alasan lainnya...">
                                 </div>
 
-                                <div style="display: flex; gap: 15px;">
+                                <div class="sbar-row" style="margin-bottom: 0;">
                                     <div class="form-group" style="flex: 1;">
                                         <label for="tanggalRujukan">Tanggal Rujukan:</label>
                                         <input type="date" id="tanggalRujukan" required>
                                     </div>
                                     <div class="form-group" style="flex: 1;">
                                         <label for="petugas">Petugas Pengirim:</label>
-                                        <input type="text" id="petugas" placeholder="Nama petugas pengirim" required>
+                                        <input type="text" id="petugas" placeholder="Nama petugas" required>
                                     </div>
                                 </div>
 
                                 <div class="btn-container">
-                                    <button type="button" class="btn-reset" onclick="resetFormRujukan()">Reset Form</button>
+                                    <button type="button" class="btn-reset" onclick="resetFormRujukan()">Reset</button>
                                     <button type="button" class="btn-download" onclick="unduhPDF()">Unduh PDF</button>
                                     <button type="button" class="btn-whatsapp" onclick="kirimWhatsApp()">Kirim WA</button>
                                 </div>
@@ -845,16 +887,16 @@
                     </div>
 
                     <div id="ambulanceDisplayArea" style="display: none; justify-content: center; align-items: center; width: 100%;">
-                        <div class="darurat-container" style="max-width: 500px;">
-                            <h3 style="color: #ef4444; margin-bottom: 15px;">Pelayanan Ambulance & Gawat Darurat</h3>
-                            <div class="kontak-info-box" style="display: flex; flex-direction: column; gap: 10px; text-align: left;">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <h4 style="margin: 0; color: var(--text-main);">Info Petugas Ambulance</h4>
-                                    <button class="btn-edit-kontak" onclick="verifikasiEditPetugas()">✏️ Edit Petugas</button>
+                        <div class="darurat-container">
+                            <h3 style="color: #ef4444; margin-bottom: 12px; font-size: 1.1rem;">Pelayanan Ambulance & Gawat Darurat</h3>
+                            <div class="kontak-info-box">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <h4 style="margin: 0; color: var(--text-main); font-size: 0.9rem;">Info Petugas Ambulance</h4>
+                                    <button class="btn-edit-kontak" onclick="verifikasiEditPetugas()">✏️ Edit</button>
                                 </div>
                                 <div id="viewPetugasAmbulance">
-                                    <div style="text-align: center; margin-bottom: 15px;">
-                                        <img id="foto-petugas-tampil" src="" alt="Foto Petugas" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #ef4444; display: none; margin: 0 auto;">
+                                    <div style="text-align: center; margin-bottom: 10px;">
+                                        <img id="foto-petugas-tampil" src="" alt="Foto Petugas" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #ef4444; display: none; margin: 0 auto;">
                                     </div>
                                     <div class="kontak-info-details">
                                         <span>Nama Petugas:</span>
@@ -862,61 +904,61 @@
                                         <span style="margin-top: 4px;">No HP: <span id="hp-petugas-tampil">-</span></span>
                                     </div>
                                 </div>
-                                <div class="form-kontak" id="form-edit-petugas" style="display: none; margin-bottom: 0;">
+                                <div class="form-kontak" id="form-edit-petugas">
                                     <label>Foto Petugas:</label>
-                                    <input type="file" id="input-foto-petugas" accept="image/*" style="background: white; border: 1px dashed #ccc; padding: 10px; cursor: pointer;">
-                                    <label>Nama Petugas Ambulance:</label>
+                                    <input type="file" id="input-foto-petugas" accept="image/*" style="background: white; border: 1px dashed #ccc; padding: 8px; cursor: pointer;">
+                                    <label>Nama Petugas:</label>
                                     <input type="text" id="input-nama-petugas" placeholder="Masukkan nama petugas">
-                                    <label>No Handphone Petugas:</label>
+                                    <label>No HP Petugas:</label>
                                     <input type="tel" id="input-hp-petugas" placeholder="Mis: 08123456789">
-                                    <button class="btn-simpan-darurat" style="background-color: #ef4444;" onclick="simpanPetugasAmbulance()">Simpan Data Petugas</button>
+                                    <button class="btn-simpan-darurat" style="background-color: #ef4444;" onclick="simpanPetugasAmbulance()">Simpan Data</button>
                                 </div>
                             </div>
-                            <div class="form-area-container" style="text-align: left; margin-top: 15px;">
-                                <h4 style="margin-bottom: 10px; color: var(--text-main);">Data Pasien</h4>
+                            <div class="form-area-container" style="text-align: left; padding: 12px;">
+                                <h4 style="margin-bottom: 8px; color: var(--text-main); font-size: 0.9rem;">Data Pasien</h4>
                                 <div class="form-group">
                                     <label>Nama Pasien / Keluarga:</label>
                                     <input type="text" id="input-nama-pasien" placeholder="Masukkan nama pemesan">
                                 </div>
                                 <div class="form-group">
-                                    <label>Nomor HP yang bisa dihubungi:</label>
-                                    <input type="tel" id="input-hp-pasien" placeholder="Masukkan nomor HP pasien">
+                                    <label>Nomor HP:</label>
+                                    <input type="tel" id="input-hp-pasien" placeholder="Masukkan nomor HP">
                                 </div>
                                 <div class="form-group">
-                                    <label>Lokasi Jemput (Otomatis GPS):</label>
-                                    <div style="display: flex; gap: 8px;">
-                                        <input type="text" id="input-lokasi-pasien" placeholder="Klik tombol ambil GPS ->" readonly style="flex-grow: 1; background: #e2e8f0; font-size: 0.8rem;">
-                                        <button type="button" class="btn-submit-form" onclick="dapatkanLokasiPasien()" style="background-color: #f59e0b; padding: 8px; font-size: 0.8rem;">📍 Ambil GPS</button>
+                                    <label>Lokasi Jemput (GPS):</label>
+                                    <div style="display: flex; gap: 6px;">
+                                        <input type="text" id="input-lokasi-pasien" placeholder="Klik ambil GPS ->" readonly style="flex-grow: 1; background: #e2e8f0; font-size: 0.75rem;">
+                                        <button type="button" class="btn-submit-form" onclick="dapatkanLokasiPasien()" style="background-color: #f59e0b; padding: 8px 10px; font-size: 0.75rem;">📍 GPS</button>
                                     </div>
                                 </div>
-                                <button class="btn-darurat-main" style="background-color: #ef4444; margin-top: 15px; margin-bottom: 0;" onclick="kirimPermintaanAmbulance()">
-                                    🚨 Pesan & Kirim ke WA Petugas
+                                <button class="btn-darurat-main" style="background-color: #ef4444; margin-top: 10px;" onclick="kirimPermintaanAmbulance()">
+                                    🚨 Pesan & Kirim WA
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Dashboard PWS Display Area -->
-                    <div id="pwsDisplayArea" style="display: none; flex-direction: column; gap: 20px; width: 100%;">
-                        <div class="glass-panel rounded-xl shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="p-3 bg-blue-100 text-blue-600 rounded-lg">
-                                    <i class="fa-regular fa-calendar-days text-xl"></i>
+                    <div id="pwsDisplayArea" style="display: none; flex-direction: column; gap: 15px; width: 100%;">
+                        <div class="glass-panel rounded-xl shadow-sm p-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+                            <div class="flex items-center space-x-2">
+                                <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                                    <i class="fa-regular fa-calendar-days text-base"></i>
                                 </div>
                                 <div>
-                                    <h2 class="text-base font-bold text-gray-800">Periode Pelaporan PWS</h2>
-                                    <p class="text-xs text-gray-500">Pilih rentang waktu untuk pelaporan mingguan.</p>
+                                    <h2 class="text-sm font-bold text-gray-800">Periode Pelaporan PWS</h2>
+                                    <p class="text-[11px] text-gray-500">Pilih rentang waktu pelaporan mingguan.</p>
                                 </div>
                             </div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <select id="filter-minggu" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium bg-white">
+                            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                                <select id="filter-minggu" class="border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-medium bg-white flex-1 sm:flex-none">
                                     <option value="1">Minggu ke-1</option>
                                     <option value="2" selected>Minggu ke-2</option>
                                     <option value="3">Minggu ke-3</option>
                                     <option value="4">Minggu ke-4</option>
                                     <option value="5">Minggu ke-5</option>
                                 </select>
-                                <select id="filter-bulan" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium bg-white">
+                                <select id="filter-bulan" class="border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-medium bg-white flex-1 sm:flex-none">
                                     <option value="1">Januari</option>
                                     <option value="2">Februari</option>
                                     <option value="3">Maret</option>
@@ -930,197 +972,198 @@
                                     <option value="11">November</option>
                                     <option value="12">Desember</option>
                                 </select>
-                                <select id="filter-tahun" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium bg-white">
+                                <select id="filter-tahun" class="border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-medium bg-white flex-1 sm:flex-none">
                                     <option value="2025">2025</option>
                                     <option value="2026" selected>2026</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div id="notification" class="hidden p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 shadow-sm border border-green-200 fade-in" role="alert">
-                            <i class="fa-solid fa-check-circle mr-2"></i><span class="font-bold">Berhasil!</span> <span id="notification-text">Data telah diperbarui.</span>
+                        <div id="notification" class="hidden p-3 text-xs text-green-800 rounded-lg bg-green-50 shadow-sm border border-green-200 fade-in" role="alert">
+                            <i class="fa-solid fa-check-circle mr-1"></i><span class="font-bold">Berhasil!</span> <span id="notification-text">Data telah diperbarui.</span>
                         </div>
 
                         <!-- Grid 10 Penyakit PWS -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                             <!-- Diare -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-blue-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">Diare</p>
-                                    <i class="fa-solid fa-droplet text-blue-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-blue-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">Diare</p>
+                                    <i class="fa-solid fa-droplet text-blue-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-diare-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-diare-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-diare-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-diare-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-diare-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-diare-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-diare-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-diare-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                             <!-- Hipertensi -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-red-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">Hipertensi</p>
-                                    <i class="fa-solid fa-heart-pulse text-red-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-red-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">Hipertensi</p>
+                                    <i class="fa-solid fa-heart-pulse text-red-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-hipertensi-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-hipertensi-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-hipertensi-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-hipertensi-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-hipertensi-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-hipertensi-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-hipertensi-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-hipertensi-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                             <!-- Stroke -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-purple-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">Stroke</p>
-                                    <i class="fa-solid fa-brain text-purple-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-purple-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">Stroke</p>
+                                    <i class="fa-solid fa-brain text-purple-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-stroke-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-stroke-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-stroke-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-stroke-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-stroke-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-stroke-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-stroke-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-stroke-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                             <!-- TB Paru -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-orange-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">TB Paru</p>
-                                    <i class="fa-solid fa-lungs text-orange-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-orange-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">TB Paru</p>
+                                    <i class="fa-solid fa-lungs text-orange-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-tb-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-tb-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-tb-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-tb-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-tb-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-tb-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-tb-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-tb-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                             <!-- Diabetes Mellitus -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-yellow-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">Diabetes</p>
-                                    <i class="fa-solid fa-cubes-stacked text-yellow-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-yellow-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">Diabetes</p>
+                                    <i class="fa-solid fa-cubes-stacked text-yellow-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-dm-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-dm-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-dm-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-dm-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-dm-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-dm-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-dm-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-dm-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                             <!-- Dengue -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-green-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">Dengue</p>
-                                    <i class="fa-solid fa-mosquito text-green-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-green-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">Dengue</p>
+                                    <i class="fa-solid fa-mosquito text-green-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-dengue-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-dengue-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-dengue-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-dengue-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-dengue-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-dengue-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-dengue-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-dengue-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                             <!-- Ibu Hamil -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-pink-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">Ibu Hamil</p>
-                                    <i class="fa-solid fa-person-pregnant text-pink-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-pink-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">Ibu Hamil</p>
+                                    <i class="fa-solid fa-person-pregnant text-pink-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-ibuhamil-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-ibuhamil-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-ibuhamil-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-ibuhamil-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-ibuhamil-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-ibuhamil-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-ibuhamil-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-ibuhamil-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                             <!-- Stunting -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-teal-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">Stunting</p>
-                                    <i class="fa-solid fa-child text-teal-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-teal-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">Stunting</p>
+                                    <i class="fa-solid fa-child text-teal-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-stunting-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-stunting-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-stunting-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-stunting-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-stunting-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-stunting-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-stunting-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-stunting-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                             <!-- ODGJ -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-indigo-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">ODGJ</p>
-                                    <i class="fa-solid fa-users text-indigo-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-indigo-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">ODGJ</p>
+                                    <i class="fa-solid fa-users text-indigo-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-odgj-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-odgj-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-odgj-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-odgj-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-odgj-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-odgj-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-odgj-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-odgj-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                             <!-- Malaria -->
-                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-lime-500 hover:shadow-md transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <p class="text-sm font-bold text-gray-700 uppercase">Malaria</p>
-                                    <i class="fa-solid fa-mosquito text-lime-400 text-lg"></i>
+                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-lime-500">
+                                <div class="flex justify-between items-start mb-1.5">
+                                    <p class="text-xs font-bold text-gray-700 uppercase">Malaria</p>
+                                    <i class="fa-solid fa-mosquito text-lime-400 text-sm"></i>
                                 </div>
-                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
-                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-malaria-k" class="text-sm font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-malaria-p" class="text-sm font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-malaria-s" class="text-sm font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-malaria-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
+                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-malaria-k" class="text-xs font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-malaria-p" class="text-xs font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-malaria-s" class="text-xs font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-malaria-m" class="text-xs font-bold text-gray-600">0</p></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Struktur Layout: Tabel PWS di Atas, Grafik Trend PWS Dipindahkan ke Bawah -->
-                        <div class="flex flex-col gap-6">
+                        <!-- Struktur Layout: Tabel PWS di Atas, Grafik Trend PWS di Bawah -->
+                        <div class="flex flex-col gap-4">
                             <!-- Tabel PWS -->
                             <div class="glass-panel rounded-xl shadow-sm overflow-hidden flex flex-col">
-                                <div class="px-6 py-4 border-b border-gray-200 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                                    <h3 class="text-lg font-semibold text-gray-800"><i class="fa-solid fa-map-location-dot mr-2 text-blue-600"></i> Distribusi Kasus per Wilayah (Desa)</h3>
-                                    <div class="text-[11px] sm:text-xs text-gray-500 flex flex-wrap gap-3">
-                                        <span><span class="font-bold text-red-600">K</span> = Kasus</span>
-                                        <span><span class="font-bold text-yellow-600">P</span> = Pantau</span>
-                                        <span><span class="font-bold text-green-600">S</span> = Sembuh</span>
-                                        <span><span class="font-bold text-gray-600">M</span> = Meninggal</span>
+                                <div class="px-4 py-3 border-b border-gray-200 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                    <h3 class="text-sm font-semibold text-gray-800"><i class="fa-solid fa-map-location-dot mr-1 text-blue-600"></i> Distribusi Kasus per Wilayah (Desa)</h3>
+                                    <div class="text-[10px] text-gray-500 flex flex-wrap gap-2">
+                                        <span><span class="font-bold text-red-600">K</span>=Kasus</span>
+                                        <span><span class="font-bold text-yellow-600">P</span>=Pantau</span>
+                                        <span><span class="font-bold text-green-600">S</span>=Sembuh</span>
+                                        <span><span class="font-bold text-gray-600">M</span>=Mati</span>
                                     </div>
                                 </div>
                                 <div class="table-container overflow-x-auto overflow-y-visible flex-grow">
-                                    <table class="min-w-full divide-y divide-gray-300">
+                                    <table class="min-w-full divide-y divide-gray-300 text-xs">
                                         <thead class="bg-gray-100">
                                             <tr>
-                                                <th rowspan="2" class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider sticky left-0 bg-gray-100 z-10 shadow-[1px_0_0_0_#cbd5e1]">Nama Desa</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Diare</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Hipertensi</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Stroke</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">TB Paru</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">DM</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Dengue</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Ibu Hamil</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Stunting</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">ODGJ</th>
-                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Malaria</th>
-                                                <th colspan="4" class="px-2 py-2 border-l-2 border-gray-400 bg-blue-200 text-center text-[11px] font-bold text-gray-800 uppercase tracking-wider" title="Total Akumulasi Seluruh Penyakit">Total PWS</th>
-                                                <th rowspan="2" class="px-4 py-3 border-l border-gray-300 text-center text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[90px]">Aksi</th>
+                                                <th rowspan="2" class="px-3 py-2 text-left font-bold text-gray-700 uppercase tracking-wider sticky left-0 bg-gray-100 z-10 shadow-[1px_0_0_0_#cbd5e1]">Nama Desa</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Diare</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Hipertensi</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Stroke</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">TB Paru</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">DM</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Dengue</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Ibu Hamil</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Stunting</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">ODGJ</th>
+                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Malaria</th>
+                                                <th colspan="4" class="px-1 py-1 border-l-2 border-gray-400 bg-blue-200 text-center font-bold text-gray-800">Total PWS</th>
+                                                <th rowspan="2" class="px-3 py-2 border-l border-gray-300 text-center font-bold text-gray-700 min-w-[70px]">Aksi</th>
                                             </tr>
-                                            <tr class="bg-gray-50 border-t border-gray-200">
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-700 border-l-2 border-gray-400 bg-blue-100">K</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-900 bg-yellow-300 border border-yellow-400">P</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-green-700 bg-blue-100">S</th>
-                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-gray-800 bg-blue-100">M</th>
+                                            <tr class="bg-gray-50 border-t border-gray-200 text-[9px]">
+                                                <!-- Diulang untuk setiap penyakit (K, P, S, M) -->
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
+                                                <th class="px-0.5 py-1 text-center text-red-700 border-l-2 bg-blue-100">K</th>
+                                                <th class="px-0.5 py-1 text-center text-yellow-900 bg-yellow-300">P</th>
+                                                <th class="px-0.5 py-1 text-center text-green-700 bg-blue-100">S</th>
+                                                <th class="px-0.5 py-1 text-center text-gray-800 bg-blue-100">M</th>
                                             </tr>
                                         </thead>
                                         <tbody id="table-body" class="bg-white divide-y divide-gray-200"></tbody>
@@ -1128,11 +1171,11 @@
                                 </div>
                             </div>
 
-                            <!-- Grafik Trend PWS Dipindahkan ke Bawah -->
-                            <div class="glass-panel rounded-xl shadow-sm p-6 flex flex-col w-full">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2"><i class="fa-solid fa-chart-column mr-2 text-blue-600"></i> Akumulasi Penyakit</h3>
-                                <p class="text-xs text-gray-500 mb-4">Perbandingan antara kasus, pemantauan, sembuh, dan meninggal seluruh wilayah.</p>
-                                <div class="relative w-full" style="height: 350px;">
+                            <!-- Grafik Trend PWS di Bawah -->
+                            <div class="glass-panel rounded-xl shadow-sm p-4 flex flex-col w-full">
+                                <h3 class="text-sm font-semibold text-gray-800 mb-2 border-b pb-1.5"><i class="fa-solid fa-chart-column mr-1 text-blue-600"></i> Akumulasi Penyakit</h3>
+                                <p class="text-[11px] text-gray-500 mb-3">Perbandingan kasus, pemantauan, sembuh, dan meninggal seluruh wilayah.</p>
+                                <div class="relative w-full" style="height: 280px;">
                                     <canvas id="trendChart"></canvas>
                                 </div>
                             </div>
@@ -1148,12 +1191,12 @@
                             <h3 style="color: var(--primary);" id="formTitleLabel">Form Data Tautan</h3>
                             <div class="form-group">
                                 <label>Link:</label>
-                                <div style="display: flex; gap: 10px;">
+                                <div style="display: flex; gap: 8px;">
                                     <input type="url" id="inputUrlRujukan1" placeholder="https://..." style="flex-grow: 1;">
-                                    <button class="btn-submit-form" type="button" id="btnBukaRujukan1" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan()">Buka Link</button>
+                                    <button class="btn-submit-form" type="button" id="btnBukaRujukan1" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan()">Buka</button>
                                 </div>
                             </div>
-                            <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+                            <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 5px; width: 100%;">Simpan Tautan</button>
                         </div>
                     </div>
 
@@ -1162,12 +1205,12 @@
                             <h3 style="color: var(--primary);" id="formSkriningTitleLabel">Form Skrining</h3>
                             <div class="form-group">
                                 <label>Link:</label>
-                                <div style="display: flex; gap: 10px;">
+                                <div style="display: flex; gap: 8px;">
                                     <input type="url" id="inputUrlSkrining" placeholder="https://..." style="flex-grow: 1;">
-                                    <button class="btn-submit-form" type="button" id="btnBukaSkrining" style="background-color: var(--accent); display: none;" onclick="bukaUrlSkrining()">Buka Link</button>
+                                    <button class="btn-submit-form" type="button" id="btnBukaSkrining" style="background-color: var(--accent); display: none;" onclick="bukaUrlSkrining()">Buka</button>
                                 </div>
                             </div>
-                            <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+                            <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 5px; width: 100%;">Simpan Tautan</button>
                         </div>
                     </div>
 
@@ -1189,9 +1232,10 @@
             <div id="homeViewContainer"></div>
         </div>
         
+        <!-- Footer dengan Running Text Responsif Selalu Tampil di Handphone -->
         <footer>
             <div class="footer-running">
-                <marquee scrollamount="5">LINTAS KLASTER UPTD PUSKESMAS LANJUT</marquee>
+                <marquee scrollamount="4">LINTAS KLASTER UPTD PUSKESMAS LANJUT - MELAYANI DENGAN SEPENUH HATI</marquee>
             </div>
             <div class="footer-clock" id="liveClock">-</div>
         </footer>
@@ -1201,10 +1245,10 @@
     <div id="previewModal">
         <div class="modal-content-full">
             <div class="modal-header-full">
-                <h3 id="modalTitle">Pratinjau Dokumen</h3>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-close-back" onclick="toggleModalFullscreen()" style="background-color: var(--accent);">⛶ Layar Penuh</button>
-                    <button class="btn-close-back" onclick="closeModal()">← Kembali / Tutup</button>
+                <h3 id="modalTitle" style="font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;">Pratinjau Dokumen</h3>
+                <div style="display: flex; gap: 6px;">
+                    <button class="btn-close-back" onclick="toggleModalFullscreen()" style="background-color: var(--accent); padding: 5px 10px; font-size: 0.75rem;">⛶ Full</button>
+                    <button class="btn-close-back" onclick="closeModal()" style="padding: 5px 10px; font-size: 0.75rem;">✕ Tutup</button>
                 </div>
             </div>
             <div class="modal-body-full" id="modalBody"></div>
@@ -1219,7 +1263,7 @@
             </div>
             <div class="info-modal-body">
                 <div class="info-item"><span class="info-label">Total File</span><span class="info-value" id="statTotalFile">0</span></div>
-                <div class="info-item"><span class="info-label">Penyimpanan Terpakai</span><span class="info-value" id="statStorageSize">0 MB</span></div>
+                <div class="info-item"><span class="info-label">Penyimpanan</span><span class="info-value" id="statStorageSize">0 MB</span></div>
                 <div class="info-item"><span class="info-label">Status Sistem</span><span class="badge-active">Aktif (Supabase)</span></div>
                 <div class="info-item"><span class="info-label">Backup Otomatis</span><span class="badge-active">Aktif</span></div>
             </div>
@@ -1241,23 +1285,23 @@
     </div>
 
     <!-- Modal Login Edit PWS Desa -->
-    <div id="login-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-70 overflow-y-auto h-full w-full z-50 fade-in flex items-center justify-center backdrop-blur-sm">
-        <div class="relative p-6 border w-full max-w-sm shadow-2xl rounded-2xl bg-white">
-            <div class="mt-2">
-                <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-blue-100 border-4 border-white shadow-md transform -mt-10">
-                    <i class="fa-solid fa-lock text-blue-600 text-xl"></i>
+    <div id="login-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-70 overflow-y-auto h-full w-full z-50 fade-in flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="relative p-5 border w-full max-w-sm shadow-2xl rounded-2xl bg-white">
+            <div class="mt-1">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 border-4 border-white shadow-md transform -mt-9">
+                    <i class="fa-solid fa-lock text-blue-600 text-lg"></i>
                 </div>
-                <h3 class="text-lg leading-6 font-bold text-gray-900 text-center mt-4">Akses Edit Desa</h3>
-                <p class="text-sm text-gray-500 text-center mt-1 font-semibold text-blue-700" id="modal-desa-name">UPKDK Nama Desa</p>
-                <p class="text-xs text-gray-400 text-center mt-2">Silakan masukkan sandi khusus desa ini.</p>
+                <h3 class="text-base leading-6 font-bold text-gray-900 text-center mt-3">Akses Edit Desa</h3>
+                <p class="text-xs text-gray-500 text-center mt-1 font-semibold text-blue-700" id="modal-desa-name">UPKDK Nama Desa</p>
+                <p class="text-[11px] text-gray-400 text-center mt-1">Silakan masukkan sandi khusus desa ini.</p>
                 
-                <div class="mt-4">
-                    <input type="password" id="password-input" placeholder="Kata Sandi Desa..." class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-center text-lg tracking-widest">
-                    <p id="login-error" class="text-red-500 text-xs mt-2 hidden text-center font-medium"><i class="fa-solid fa-circle-exclamation"></i> Kata sandi salah!</p>
+                <div class="mt-3">
+                    <input type="password" id="password-input" placeholder="Kata Sandi Desa..." class="w-full px-3 py-2.5 rounded-lg border-2 border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-center text-base tracking-widest">
+                    <p id="login-error" class="text-red-500 text-xs mt-1.5 hidden text-center font-medium"><i class="fa-solid fa-circle-exclamation"></i> Kata sandi salah!</p>
                 </div>
-                <div class="mt-6 flex gap-3">
-                    <button onclick="closeLoginModal()" class="w-full px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-semibold transition">Batal</button>
-                    <button onclick="verifyPassword()" class="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition shadow-md">Buka Kunci</button>
+                <div class="mt-5 flex gap-2">
+                    <button onclick="closeLoginModal()" class="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-semibold transition text-xs">Batal</button>
+                    <button onclick="verifyPassword()" class="w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition shadow-md text-xs">Buka Kunci</button>
                 </div>
             </div>
         </div>
@@ -1417,10 +1461,8 @@
 
         function toggleDropdown(element, event) {
             event.stopPropagation();
-            const content = element.querySelector('.nav-dropdown-content');
             const isOpen = element.classList.contains('active-dropdown');
             
-            // Tutup semua dropdown lain dalam hamburger menu
             document.querySelectorAll('.hamburger-dropdown .nav-dropdown').forEach(drop => {
                 drop.classList.remove('active-dropdown');
             });
@@ -1442,9 +1484,9 @@
 
         function updateLiveClock() {
             const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
             const dateStr = now.toLocaleDateString('id-ID', options);
-            const timeStr = now.toLocaleTimeString('id-ID');
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             document.getElementById('liveClock').innerText = `${dateStr} | ${timeStr}`;
         }
         setInterval(updateLiveClock, 1000);
@@ -1663,13 +1705,13 @@
             if (data.fileSize > 1024 * 1024) fileSize = (data.fileSize / (1024 * 1024)).toFixed(1) + ' MB';
             
             li.innerHTML = `
-                <div style="display:flex; align-items:center; gap:8px; max-width:60%;">
+                <div style="display:flex; align-items:center; gap:6px; max-width:55%;">
                     <span>📄</span>
                     <a class="file-link-preview" onclick="openPreview('${data.fileUrl}', '${data.fileName}', '${data.fileType}')" title="Buka Pratinjau Dokumen" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${data.fileName}</a>
                 </div>
                 <div class="file-actions">
-                    <small style="color:var(--text-muted);">(${fileSize})</small>
-                    <button class="btn-preview" onclick="openPreview('${data.fileUrl}', '${data.fileName}', '${data.fileType}')">Tampilkan</button>
+                    <small style="color:var(--text-muted); font-size:0.7rem;">(${fileSize})</small>
+                    <button class="btn-preview" onclick="openPreview('${data.fileUrl}', '${data.fileName}', '${data.fileType}')">Lihat</button>
                     <button class="btn-delete-cross" onclick="deleteFile(${data.id}, '${data.fileUrl}', this.parentElement.parentElement)" title="Hapus File">✕</button>
                 </div>
             `;
@@ -1681,7 +1723,7 @@
             const container = document.getElementById('slideshowContainerImages');
             container.innerHTML = '';
             if (imageDocs.length === 0) {
-                container.innerHTML = `<div style="color: white; font-size: 0.9rem; font-weight: 600;">Belum ada foto/gambar yang diunggah.</div>`;
+                container.innerHTML = `<div style="color: white; font-size: 0.85rem; font-weight: 600;">Belum ada foto yang diunggah.</div>`;
                 return;
             }
             imageDocs.forEach((doc, index) => {
@@ -1717,24 +1759,24 @@
             const modal = document.getElementById('previewModal');
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
-            modalTitle.innerText = "Pratinjau Dokumen: " + name;
-            modalBody.innerHTML = '<div style="padding:60px; text-align:center; font-weight:bold; color:var(--primary); font-size:1.2rem;">Memuat pratinjau dokumen...</div>';
+            modalTitle.innerText = name;
+            modalBody.innerHTML = '<div style="padding:40px; text-align:center; font-weight:bold; color:var(--primary); font-size:1rem;">Memuat pratinjau dokumen...</div>';
             modal.style.display = 'flex';
 
             setTimeout(() => {
                 if (type.includes('pdf') || name.toLowerCase().endsWith('.pdf')) {
                     modalBody.innerHTML = `<embed src="${url}" type="application/pdf" width="100%" height="100%">`;
                 } else if (name.match(/\.(xlsx|xls|csv)$/i)) {
-                    modalBody.innerHTML = '<div style="padding:40px; text-align:center;">Membaca struktur tabel Excel...</div>';
+                    modalBody.innerHTML = '<div style="padding:30px; text-align:center;">Membaca struktur tabel Excel...</div>';
                     fetch(url).then(res => res.arrayBuffer()).then(ab => {
                             const workbook = XLSX.read(ab, { type: 'array' });
                             const htmlTable = XLSX.utils.sheet_to_html(workbook.Sheets[workbook.SheetNames[0]], { id: 'excel-table' });
-                            modalBody.innerHTML = `<div class="excel-table-container"><h4 style="margin-bottom:15px; color:var(--primary);">Lembar: ${workbook.SheetNames[0]}</h4>${htmlTable}</div>`;
+                            modalBody.innerHTML = `<div class="excel-table-container"><h4 style="margin-bottom:10px; color:var(--primary);">Lembar: ${workbook.SheetNames[0]}</h4>${htmlTable}</div>`;
                         }).catch(err => {
-                            modalBody.innerHTML = `<div style="padding:40px; text-align:center; color:red;">Gagal memuat Excel.</div>`;
+                            modalBody.innerHTML = `<div style="padding:30px; text-align:center; color:red;">Gagal memuat Excel.</div>`;
                         });
                 } else if (type.includes('image/') || name.match(/\.(jpg|jpeg|png|gif)$/i)) {
-                    modalBody.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; width:100%; height:100%; padding:20px;"><img src="${url}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;"></div>`;
+                    modalBody.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; width:100%; height:100%; padding:10px;"><img src="${url}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;"></div>`;
                 } else {
                     const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
                     modalBody.innerHTML = `<iframe src="${viewerUrl}" style="width:100%; height:100%; border:none;" title="Pratinjau Dokumen"></iframe>`;
@@ -1818,7 +1860,7 @@
             pesan += `🟡 *B (BACKGROUND)*:\n${getSbarVal('background')}\n\n`;
             pesan += `🔵 *A (ASSESSMENT)*:\n${getSbarVal('assessment')}\n\n`;
             pesan += `🟢 *R (RECOMMENDATION)*:\n${getSbarVal('recommendation')}\n\n`;
-            pesan += `_Catatan: Berkas PDF utuh dari form ini telah terunduh. Silakan lampirkan (attach) berkas PDF tersebut ke pesan ini._`;
+            pesan += `_Catatan: Berkas PDF utuh dari form ini telah terunduh._`;
 
             const urlWA = `https://api.whatsapp.com/send?phone=${targetNo}&text=${encodeURIComponent(pesan)}`;
 
@@ -1830,13 +1872,13 @@
         let linkMapsPasien = "";
 
         function verifikasiEditPetugas() {
-            showPasswordPrompt("Otorisasi Petugas", "Masukkan password (admin) untuk mengubah data petugas ambulance:", (success, pwd) => {
+            showPasswordPrompt("Otorisasi Petugas", "Masukkan password untuk mengubah data petugas ambulance:", (success, pwd) => {
                 if (success) {
                     if (pwd === 'admin' || pwd === systemPassword) {
                         document.getElementById('viewPetugasAmbulance').style.display = 'none';
                         document.getElementById('form-edit-petugas').style.display = 'block';
                     } else if (pwd !== "") {
-                        alert("Password salah! Anda tidak memiliki izin untuk mengedit petugas.");
+                        alert("Password salah!");
                     }
                 }
             });
@@ -1909,7 +1951,7 @@
 
         function dapatkanLokasiPasien() {
             const inputLokasi = document.getElementById('input-lokasi-pasien');
-            inputLokasi.value = "Sedang mencari koordinat...";
+            inputLokasi.value = "Mencari GPS...";
             
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -1917,18 +1959,18 @@
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
                         linkMapsPasien = `https://www.google.com/maps?q=${lat},${lon}`;
-                        inputLokasi.value = `Titik GPS berhasil direkam`;
-                        alert("Lokasi Anda berhasil didapatkan!");
+                        inputLokasi.value = `Koordinat GPS terekam`;
+                        alert("Lokasi Anda berhasil direkam!");
                     },
                     (error) => {
                         inputLokasi.value = "Gagal mengambil lokasi";
-                        alert("Gagal mendapatkan lokasi. Pastikan izin GPS / Lokasi (Location) diaktifkan pada browser/HP Anda.");
+                        alert("Gagal mendapatkan lokasi. Pastikan izin GPS aktif.");
                     },
                     { enableHighAccuracy: true } 
                 );
             } else {
                 inputLokasi.value = "GPS tidak didukung";
-                alert("Fitur lokasi tidak didukung oleh browser ini.");
+                alert("Fitur lokasi tidak didukung browser ini.");
             }
         }
 
@@ -1937,7 +1979,7 @@
             const hpPetugas = localStorage.getItem('ambulance_petugas_hp');
             
             if (!namaPetugas || !hpPetugas || namaPetugas === "Belum diatur") {
-                alert("Data Petugas Ambulance sistem belum diatur. Klik 'Edit Petugas' terlebih dahulu.");
+                alert("Data Petugas belum diatur. Klik 'Edit' terlebih dahulu.");
                 return;
             }
 
@@ -1945,14 +1987,8 @@
             const hpPasien = document.getElementById('input-hp-pasien').value;
             
             if (!namaPasien || !hpPasien) {
-                alert("Harap lengkapi Nama Pasien dan Nomor HP Pasien!");
+                alert("Harap lengkapi Nama dan No HP Pasien!");
                 return;
-            }
-
-            if (!linkMapsPasien) {
-                if(!confirm("Anda belum mengambil lokasi GPS. Lanjutkan pesanan tanpa melampirkan lokasi?")) {
-                    return;
-                }
             }
 
             let formattedNomor = hpPetugas.trim().replace(/[^0-9+]/g, '');
@@ -1960,16 +1996,16 @@
                 formattedNomor = '62' + formattedNomor.substring(1);
             }
 
-            let pesan = `🚨 *PANGGILAN AMBULANCE & GAWAT DARURAT* 🚨%0A%0AHalo Petugas Ambulance (*${namaPetugas}*),%0ASaya membutuhkan layanan ambulance / gawat darurat untuk segera menjemput.%0A%0A`;
+            let pesan = `🚨 *PANGGILAN AMBULANCE & GAWAT DARURAT* 🚨%0A%0AHalo Petugas (*${namaPetugas}*),%0ASaya membutuhkan layanan ambulance segera.%0A%0A`;
             pesan += `*-- DATA PASIEN --*%0A`;
             pesan += `👤 Nama: ${namaPasien}%0A`;
             pesan += `📞 No HP: ${hpPasien}%0A`;
             if (linkMapsPasien) {
-                pesan += `📍 Titik Jemput GPS: %0A${linkMapsPasien}%0A`;
+                pesan += `📍 Lokasi GPS: %0A${linkMapsPasien}%0A`;
             } else {
-                pesan += `📍 Titik Jemput GPS: (Titik lokasi tidak direkam sistem)%0A`;
+                pesan += `📍 Lokasi GPS: (Tidak direkam)%0A`;
             }
-            pesan += `%0AMohon untuk segera merespon panggilan ini. Terima kasih.`;
+            pesan += `%0AMohon segera merespon. Terima kasih.`;
             
             window.open(`https://wa.me/${formattedNomor}?text=${pesan}`, '_blank');
         }
@@ -1997,7 +2033,7 @@
             const petugas = document.getElementById('petugas').value.trim();
 
             if (!jenisPelayanan || !tujuanSelect.value || !nama || !umur || !kelamin || !alamat || !tanggal || !petugas) {
-                alert('Mohon lengkapi seluruh kolom formulir termasuk jenis pelayanan, tujuan rujukan, dan petugas pengirim!');
+                alert('Mohon lengkapi seluruh kolom formulir!');
                 return false;
             }
 
@@ -2014,11 +2050,7 @@
             document.querySelectorAll('input[name="alasan"]:checked').forEach(c => {
                 if (c.value === 'Lainnya') {
                     const ketLain = document.getElementById('keteranganLainnya').value.trim();
-                    if (ketLain) {
-                        alasanList.push('Lainnya: ' + ketLain);
-                    } else {
-                        alasanList.push('Lainnya');
-                    }
+                    alasanList.push(ketLain ? 'Lainnya: ' + ketLain : 'Lainnya');
                 } else {
                     alasanList.push(c.value);
                 }
@@ -2041,12 +2073,12 @@
                 margin:       [15, 15, 15, 15],
                 filename:     'Surat_Rujukan_' + nama.replace(/\s+/g, '_') + '.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: true },
+                html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().catch(err => {
-                console.error('Error saat men-generate PDF:', err);
+                console.error('Error:', err);
                 alert('Terjadi kesalahan saat membuat PDF.');
             });
         }
@@ -2092,8 +2124,7 @@
                           `\n- Alasan Rujukan: ${alasanRujukan}` +
                           `\n\n*D. KETERANGAN PENGIRIM*` +
                           `\n- Tanggal: ${tanggal}` +
-                          `\n- Petugas Pengirim: ${petugas}` +
-                          `\n\n_(Surat Rujukan ini dikirim secara digital melalui sistem)_`;
+                          `\n- Petugas Pengirim: ${petugas}`;
 
             const urlWhatsApp = `https://wa.me/${nomorWhatsApp}?text=${encodeURIComponent(pesan)}`;
             window.open(urlWhatsApp, '_blank');
@@ -2264,7 +2295,7 @@
                 const totals = getDesaTotals(item);
 
                 let html = `
-                    <td class="px-4 py-3 whitespace-nowrap text-xs font-bold text-gray-900 sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#cbd5e1]">${item.desa}</td>
+                    <td class="px-3 py-2.5 whitespace-nowrap text-xs font-bold text-gray-900 sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#cbd5e1]">${item.desa}</td>
                 `;
 
                 const diseases = [
@@ -2283,39 +2314,39 @@
                 diseases.forEach(dis => {
                     if (isEditing) {
                         html += `
-                            <td class="px-1 py-1 text-center border-l border-gray-200"><input type="number" min="0" id="input-${item.id}-${dis.key}-k" value="${dis.k}" oninput="handleLiveInput(${item.id}, '${dis.key}', 'k')" class="w-10 text-center text-xs border rounded p-0.5 focus:border-blue-500 font-bold text-red-600 bg-white"></td>
-                            <td class="px-1 py-1 text-center bg-yellow-50 font-bold text-yellow-600 text-xs" id="live-p-${item.id}-${dis.key}">${dis.p}</td>
-                            <td class="px-1 py-1 text-center"><input type="number" min="0" id="input-${item.id}-${dis.key}-s" value="${dis.s}" oninput="handleLiveInput(${item.id}, '${dis.key}', 's')" class="w-10 text-center text-xs border rounded p-0.5 focus:border-blue-500 font-bold text-green-600 bg-white"></td>
-                            <td class="px-1 py-1 text-center"><input type="number" min="0" id="input-${item.id}-${dis.key}-m" value="${dis.m}" oninput="handleLiveInput(${item.id}, '${dis.key}', 'm')" class="w-10 text-center text-xs border rounded p-0.5 focus:border-blue-500 font-bold text-gray-600 bg-white"></td>
+                            <td class="px-0.5 py-1 text-center border-l"><input type="number" min="0" id="input-${item.id}-${dis.key}-k" value="${dis.k}" oninput="handleLiveInput(${item.id}, '${dis.key}', 'k')" class="w-8 text-center text-[11px] border rounded p-0.5 font-bold text-red-600 bg-white"></td>
+                            <td class="px-0.5 py-1 text-center bg-yellow-50 font-bold text-yellow-600 text-[11px]" id="live-p-${item.id}-${dis.key}">${dis.p}</td>
+                            <td class="px-0.5 py-1 text-center"><input type="number" min="0" id="input-${item.id}-${dis.key}-s" value="${dis.s}" oninput="handleLiveInput(${item.id}, '${dis.key}', 's')" class="w-8 text-center text-[11px] border rounded p-0.5 font-bold text-green-600 bg-white"></td>
+                            <td class="px-0.5 py-1 text-center"><input type="number" min="0" id="input-${item.id}-${dis.key}-m" value="${dis.m}" oninput="handleLiveInput(${item.id}, '${dis.key}', 'm')" class="w-8 text-center text-[11px] border rounded p-0.5 font-bold text-gray-600 bg-white"></td>
                         `;
                     } else {
                         html += `
-                            <td class="px-1 py-1 text-center text-xs font-bold text-red-600 border-l border-gray-200">${dis.k}</td>
-                            <td class="px-1 py-1 text-center text-xs font-bold text-yellow-600 bg-yellow-50">${dis.p}</td>
-                            <td class="px-1 py-1 text-center text-xs font-bold text-green-600">${dis.s}</td>
-                            <td class="px-1 py-1 text-center text-xs font-bold text-gray-600">${dis.m}</td>
+                            <td class="px-0.5 py-1 text-center text-xs font-bold text-red-600 border-l">${dis.k}</td>
+                            <td class="px-0.5 py-1 text-center text-xs font-bold text-yellow-600 bg-yellow-50">${dis.p}</td>
+                            <td class="px-0.5 py-1 text-center text-xs font-bold text-green-600">${dis.s}</td>
+                            <td class="px-0.5 py-1 text-center text-xs font-bold text-gray-600">${dis.m}</td>
                         `;
                     }
                 });
 
                 html += `
-                    <td id="tot-k-${item.id}" class="px-1 py-1 text-center text-xs font-bold text-red-700 border-l-2 border-gray-400 bg-blue-50">${totals.k}</td>
-                    <td id="tot-p-${item.id}" class="px-1 py-1 text-center text-xs font-extrabold text-yellow-900 bg-yellow-300 border border-yellow-400 blinking-badge">${totals.p}</td>
-                    <td id="tot-s-${item.id}" class="px-1 py-1 text-center text-xs font-bold text-green-700 bg-blue-50">${totals.s}</td>
-                    <td id="tot-m-${item.id}" class="px-1 py-1 text-center text-xs font-bold text-gray-800 bg-blue-50">${totals.m}</td>
+                    <td id="tot-k-${item.id}" class="px-0.5 py-1 text-center text-xs font-bold text-red-700 border-l-2 border-gray-400 bg-blue-50">${totals.k}</td>
+                    <td id="tot-p-${item.id}" class="px-0.5 py-1 text-center text-xs font-extrabold text-yellow-900 bg-yellow-300 border border-yellow-400 blinking-badge">${totals.p}</td>
+                    <td id="tot-s-${item.id}" class="px-0.5 py-1 text-center text-xs font-bold text-green-700 bg-blue-50">${totals.s}</td>
+                    <td id="tot-m-${item.id}" class="px-0.5 py-1 text-center text-xs font-bold text-gray-800 bg-blue-50">${totals.m}</td>
                 `;
 
                 if (isEditing) {
                     html += `
-                        <td class="px-2 py-2 text-center border-l border-gray-200 whitespace-nowrap">
-                            <button onclick="saveRow(${item.id})" class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-xs font-semibold shadow mr-1 transition"><i class="fa-solid fa-check"></i></button>
-                            <button onclick="cancelEdit(${item.id})" class="bg-gray-400 hover:bg-gray-500 text-white px-2.5 py-1 rounded text-xs font-semibold shadow transition"><i class="fa-solid fa-xmark"></i></button>
+                        <td class="px-2 py-1 text-center border-l whitespace-nowrap">
+                            <button onclick="saveRow(${item.id})" class="bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold shadow mr-1"><i class="fa-solid fa-check"></i></button>
+                            <button onclick="cancelEdit(${item.id})" class="bg-gray-400 text-white px-2 py-1 rounded text-xs font-semibold shadow"><i class="fa-solid fa-xmark"></i></button>
                         </td>
                     `;
                 } else {
                     html += `
-                        <td class="px-2 py-2 text-center border-l border-gray-200 whitespace-nowrap">
-                            <button onclick="promptLogin(${item.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit</button>
+                        <td class="px-2 py-1 text-center border-l whitespace-nowrap">
+                            <button onclick="promptLogin(${item.id})" class="bg-blue-600 text-white px-2.5 py-1 rounded text-xs font-semibold shadow"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit</button>
                         </td>
                     `;
                 }
@@ -2397,11 +2428,11 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
                         },
                         scales: {
                             y: { beginAtZero: true, grid: { borderDash: [2, 2] } },
-                            x: { grid: { display: false } }
+                            x: { grid: { display: false }, ticks: { font: { size: 9 } } }
                         }
                     }
                 });
