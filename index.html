@@ -8,7 +8,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
         :root {
             --primary: #047857;
             --primary-hover: #065f46;
@@ -16,7 +25,7 @@
             --text-main: #1e293b;
             --text-muted: #64748b;
             --border: #cbd5e1;
-            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 0.3);
         }
 
@@ -24,14 +33,14 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
             color: var(--text-main);
             height: 100vh;
             width: 100vw;
-            overflow-x: hidden;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             background-color: #f1f5f9; 
@@ -41,39 +50,41 @@
             background-repeat: no-repeat;
         }
 
-        /* Header Transparan Kaca */
+        /* Top Header Utama */
         header {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--glass-border);
             z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
+            flex-shrink: 0;
+            position: relative;
         }
 
         .navbar {
-            max-width: 1450px;
-            margin: 0 auto;
-            padding: 8px 15px;
+            padding: 10px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
+            width: 100%;
         }
 
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             text-decoration: none;
         }
 
         .logo-img {
-            width: 34px;
-            height: 34px;
+            width: 38px;
+            height: 38px;
             object-fit: cover;
             border-radius: 50%;
             border: 2px solid var(--primary);
             background: white;
+            flex-shrink: 0;
         }
 
         .logo-text-wrapper {
@@ -82,10 +93,10 @@
         }
 
         .logo-text {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 800;
             color: var(--primary);
-            white-space: nowrap;
+            line-height: 1.1;
         }
 
         .logo-subtext {
@@ -94,36 +105,133 @@
             color: var(--text-muted);
         }
 
-        .nav-links {
+        /* Tombol Hamburger Garis 3 di Pojok Kanan Atas (Hanya Ikon Saja) */
+        .hamburger-menu-wrapper {
+            position: relative;
+        }
+
+        .btn-hamburger {
+            background: rgba(4, 120, 87, 0.1);
+            border: 1px solid rgba(4, 120, 87, 0.3);
+            color: var(--primary);
+            font-size: 1.25rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
-            gap: 4px;
-            list-style: none;
             align-items: center;
-            flex-wrap: nowrap;
+            justify-content: center;
+        }
+
+        .btn-hamburger:hover {
+            background: rgba(4, 120, 87, 0.2);
+        }
+
+        /* Dropdown Menu Utama dari Tombol Garis 3 */
+        .hamburger-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            min-width: 260px;
+            z-index: 1100;
+            border: 1px solid var(--border);
+            padding: 8px;
+            animation: fadeInDrop 0.2s ease-in-out;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+
+        .hamburger-dropdown.show {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        @keyframes fadeInDrop { 
+            from { opacity: 0; transform: translateY(-8px); } 
+            to { opacity: 1; transform: translateY(0); } 
         }
 
         .nav-btn {
-            background-color: rgba(255, 255, 255, 0.5); 
+            background-color: transparent; 
             color: var(--text-main); 
-            border: 1px solid rgba(255, 255, 255, 0.6); 
-            font-size: 0.75rem; 
+            border: 1px solid transparent; 
+            font-size: 0.8rem; 
             font-weight: 600;
             cursor: pointer; 
-            padding: 4px 8px; 
+            padding: 8px 12px; 
             border-radius: 6px;
             transition: all 0.2s ease-in-out; 
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 4px;
+            justify-content: space-between;
+            width: 100%;
+            text-align: left;
             text-decoration: none;
-            backdrop-filter: blur(4px);
-            white-space: nowrap;
         }
 
-        .nav-btn.active, .nav-btn:hover { 
-            background-color: var(--primary); 
-            color: white; 
-            border-color: var(--primary);
+        .nav-btn:hover, .nav-dropdown.active-dropdown > .nav-btn { 
+            background-color: rgba(4, 120, 87, 0.1); 
+            color: var(--primary); 
+        }
+
+        .nav-dropdown { 
+            position: relative; 
+            width: 100%; 
+        }
+        
+        .nav-dropdown-content { 
+            display: none; 
+            flex-direction: column;
+            background: #f8fafc; 
+            border-radius: 6px; 
+            margin-top: 2px;
+            overflow: hidden; 
+            border-left: 2px solid var(--primary);
+            margin-left: 6px;
+        }
+
+        .nav-dropdown.active-dropdown .nav-dropdown-content {
+            display: flex;
+        }
+        
+        .nav-dropdown-content a { 
+            color: var(--text-main); 
+            padding: 8px 12px; 
+            text-decoration: none; 
+            display: block; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background 0.2s, color 0.2s; 
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6); 
+        }
+        .nav-dropdown-content a:last-child { border-bottom: none; }
+        .nav-dropdown-content a:hover { background-color: rgba(4, 120, 87, 0.15); color: var(--primary); }
+
+        .content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .main-container { 
+            flex-grow: 1; 
+            max-width: 1350px; 
+            width: 100%; 
+            margin: 20px auto; 
+            padding: 0 25px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start;
         }
 
         @keyframes blink-warning {
@@ -134,16 +242,16 @@
         
         .btn-ambulance-fixed {
             position: fixed;
-            bottom: 50px;
-            right: 20px;
+            bottom: 45px;
+            left: 25px; /* Dipindahkan ke sudut kiri bawah */
             z-index: 1000;
             animation: blink-warning 1.5s infinite;
             font-weight: bold;
             padding: 8px 14px;
-            border-radius: 8px;
+            border-radius: 6px;
             border: 2px solid #ef4444;
             cursor: pointer;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             backdrop-filter: blur(4px);
             transition: all 0.2s;
             display: inline-flex;
@@ -157,122 +265,141 @@
             border-color: #dc2626;
         }
 
-        .nav-dropdown { position: relative; display: inline-block; }
-        .nav-dropdown-content { display: none; position: absolute; top: 110%; left: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); min-width: 170px; box-shadow: 0px 10px 25px rgba(0,0,0,0.15); border-radius: 8px; z-index: 1000; border: 1px solid var(--border); overflow: hidden; animation: fadeInDrop 0.2s ease-in-out; }
-        @keyframes fadeInDrop { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .nav-dropdown-content a { color: var(--text-main); padding: 8px 12px; text-decoration: none; display: block; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: background 0.2s, color 0.2s; border-bottom: 1px solid rgba(241, 245, 249, 0.6); }
-        .nav-dropdown-content a:last-child { border-bottom: none; }
-        .nav-dropdown-content a:hover { background-color: rgba(4, 120, 87, 0.15); color: var(--primary); }
-        .nav-dropdown:hover .nav-dropdown-content { display: block; }
-
-        .mobile-menu-toggle { display: none; background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.8); font-size: 1.15rem; padding: 4px 8px; border-radius: 6px; cursor: pointer; color: var(--primary); }
-
-        .main-container { flex-grow: 1; max-width: 1350px; width: 100%; margin: 10px auto; padding: 0 20px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
-
-        .workspace-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; width: 100%; max-height: calc(100vh - 140px); display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.15); animation: fadeIn 0.3s ease-out; overflow: hidden; }
+        .workspace-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 16px; width: 100%; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-out; overflow: hidden; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card-header { padding: 12px 20px; border-bottom: 1px solid rgba(226, 232, 240, 0.6); background: rgba(248, 250, 252, 0.6); display: flex; justify-content: space-between; align-items: center; }
-        .card-header h2 { font-size: 1.1rem; color: var(--primary); }
-        .card-header p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+        .card-header { padding: 15px 25px; border-bottom: 1px solid rgba(226, 232, 240, 0.8); background: rgba(248, 250, 252, 0.7); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h2 { font-size: 1.2rem; color: var(--primary); }
+        .card-header p { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
 
-        .btn-close-card { background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: background 0.2s; }
+        .btn-close-card { background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: background 0.2s; }
         .btn-close-card:hover { background: #dc2626; }
 
-        .card-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; max-height: calc(100vh - 200px); }
+        .card-body { padding: 25px; display: flex; flex-direction: column; gap: 20px; }
 
-        .full-year-calendar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .mini-month-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); border: 1px solid rgba(203, 213, 225, 0.6); border-radius: 8px; padding: 8px; }
-        .mini-month-card h4 { font-size: 0.8rem; color: var(--primary); text-align: center; margin-bottom: 4px; font-weight: 700; border-bottom: 1px solid rgba(226, 232, 240, 0.6); padding-bottom: 3px; }
-        .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); font-size: 0.6rem; text-align: center; gap: 2px; }
-        .mini-grid .day-name { font-weight: bold; color: var(--text-muted); margin-bottom: 2px; }
-        .mini-grid .date-cell { padding: 2px 0; border-radius: 50%; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+        @keyframes highContrastPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.06); }
+        }
+        .blinking-badge {
+            animation: highContrastPulse 1.2s infinite ease-in-out;
+        }
+
+        .full-year-calendar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .mini-month-card { background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+        .mini-month-card h4 { font-size: 0.9rem; color: var(--primary); text-align: center; margin-bottom: 8px; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); font-size: 0.7rem; text-align: center; gap: 4px; }
+        .mini-grid .day-name { font-weight: bold; color: var(--text-muted); margin-bottom: 4px; }
+        .mini-grid .date-cell { padding: 4px 0; border-radius: 50%; }
         .mini-grid .date-cell.meeting-date { background-color: var(--primary); color: white; font-weight: bold; }
 
-        .form-area-container { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); padding: 20px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-area-container { background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 10px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
-        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; background: rgba(248, 250, 252, 0.9); }
+        .form-group input, .form-group select, .form-group textarea { padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; background: #f8fafc; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
-        .btn-submit-form { background-color: var(--primary); color: white; padding: 10px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; width: fit-content; }
+        .btn-submit-form { background-color: var(--primary); color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-submit-form:hover { background-color: var(--primary-hover); }
 
-        .darurat-container { max-width: 420px; width: 100%; margin: auto; text-align: center; background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .btn-darurat-main { background-color: #ef4444; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-bottom: 15px; width: 100%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .darurat-container { max-width: 450px; width: 100%; margin: auto; text-align: center; background: #fff; padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .btn-darurat-main { background-color: #ef4444; color: white; padding: 14px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-darurat-main:hover { background-color: #dc2626; }
         
         .form-kontak { display: none; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; text-align: left; }
         .form-kontak label { font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; display: block; }
-        .form-kontak input { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
-        .btn-simpan-darurat { background-color: #4CAF50; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+        .form-kontak input { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
+        .btn-simpan-darurat { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
         .btn-simpan-darurat:hover { background-color: #388E3C; }
-        .kontak-info-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: left; display: flex; justify-content: space-between; align-items: center; }
+        .kontak-info-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: left; }
         .kontak-info-details span { display: block; font-size: 0.85rem; color: var(--text-muted); }
-        .kontak-info-details strong { font-size: 1rem; color: var(--text-main); }
-        .btn-edit-kontak { background: #f59e0b; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .kontak-info-details strong { font-size: 1.1rem; color: var(--text-main); }
+        .btn-edit-kontak { background: #f59e0b; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn-edit-kontak:hover { background: #d97706; }
 
-        .upload-area { border: 2px dashed var(--accent); padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; background-color: rgba(248, 250, 252, 0.6); backdrop-filter: blur(5px); }
+        .upload-area { border: 2px dashed var(--accent); padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; background-color: rgba(248, 250, 252, 0.8); }
         .upload-area:hover { background-color: rgba(14, 165, 233, 0.1); border-color: var(--primary); }
-        .btn-upload { background-color: var(--primary); color: white; padding: 6px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .btn-upload { background-color: var(--primary); color: white; padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
         .file-input-hidden { display: none; }
 
-        .file-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-        .file-item { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(203, 213, 225, 0.6); border-left: 4px solid var(--primary); }
-        .file-item a.file-link-preview { color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.8rem; cursor: pointer; }
+        .file-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .file-item { background: #fff; padding: 12px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .file-item a.file-link-preview { color: var(--text-main); text-decoration: none; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
         .file-item a.file-link-preview:hover { color: var(--primary); text-decoration: underline; }
-        .file-actions { display: flex; gap: 6px; align-items: center; }
-        .btn-preview { background: var(--accent); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
-        .btn-delete-cross { background: #ef4444; color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; }
+        .file-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-preview { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem; }
+        .btn-delete-cross { background: #ef4444; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; }
 
-        #slideshowDisplayArea { display: none; width: 100%; height: 300px; flex-direction: column; justify-content: center; align-items: center; position: relative; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); border-radius: 12px; overflow: hidden; }
+        #slideshowDisplayArea { display: none; width: 100%; height: 400px; flex-direction: column; justify-content: center; align-items: center; position: relative; background: #0f172a; border-radius: 12px; overflow: hidden; }
         .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
         .slide-img { max-width: 100%; max-height: 100%; object-fit: contain; position: absolute; opacity: 0; transition: opacity 1s ease-in-out; }
         .slide-img.active { opacity: 1; }
 
-        #previewModal, #infoModal, #passwordModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.75); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(8px); }
-        .modal-content-full { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); width: 100%; height: 100%; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
-        .modal-header-full { padding: 12px 25px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
-        .btn-close-back { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
-        .modal-body-full { flex-grow: 1; background: rgba(241, 245, 249, 0.7); overflow: auto; position: relative; }
+        #previewModal, #infoModal, #passwordModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-content-full { background: #fff; width: 100%; height: 100%; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-header-full { padding: 15px 25px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .btn-close-back { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+        .modal-body-full { flex-grow: 1; background: #f1f5f9; overflow: auto; position: relative; }
         .modal-body-full iframe, .modal-body-full embed { width: 100%; height: 100%; border: none; }
         .excel-table-container { padding: 30px; background: white; min-height: 100%; }
         .excel-table-container table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
         .excel-table-container th, .excel-table-container td { border: 1px solid #cbd5e1; padding: 10px 14px; text-align: left; }
         .excel-table-container th { background-color: #f8fafc; color: var(--primary); position: sticky; top: 0; }
 
-        .info-modal-box { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); width: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease-out; border: 1px solid rgba(255, 255, 255, 0.6); }
-        .info-modal-header { background: var(--primary); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.95rem; }
-        .info-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .info-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding: 6px 0; border-bottom: 1px dashed rgba(241, 245, 249, 0.8); }
+        .info-modal-box { background: #fff; width: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease-out; }
+        .info-modal-header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1rem; }
+        .info-modal-body { padding: 25px; display: flex; flex-direction: column; gap: 12px; }
+        .info-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; }
         .info-item:last-child { border-bottom: none; }
         .info-label { color: var(--text-muted); font-weight: 600; }
         .info-value { font-weight: 700; color: var(--text-main); }
-        .badge-active { background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
-        .btn-close-info { background: transparent; border: none; color: white; font-size: 1rem; cursor: pointer; }
+        .badge-active { background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; }
+        .btn-close-info { background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
 
-        #passwordModal { z-index: 3000; }
-        .password-modal-box { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); width: 350px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.25); animation: fadeIn 0.2s ease-out; border: 1px solid rgba(255, 255, 255, 0.6); }
-        .password-modal-header { background: var(--primary); color: white; padding: 12px 20px; font-weight: 700; font-size: 0.95rem; }
-        .password-modal-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .password-modal-body p { font-size: 0.85rem; color: var(--text-main); }
-        .password-modal-body input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; outline: none; }
+        .password-modal-box { background: #fff; width: 380px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeIn 0.2s ease-out; }
+        .password-modal-header { background: var(--primary); color: white; padding: 15px 20px; font-weight: 700; font-size: 1rem; }
+        .password-modal-body { padding: 25px; display: flex; flex-direction: column; gap: 15px; }
+        .password-modal-body p { font-size: 0.9rem; color: var(--text-main); }
+        .password-modal-body input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; outline: none; }
         .password-modal-body input:focus { border-color: var(--primary); }
-        .password-modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 0 20px 20px 20px; }
-        .btn-pass-cancel { background: #cbd5e1; color: var(--text-main); border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
-        .btn-pass-submit { background: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .password-modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 0 25px 25px 25px; }
+        .btn-pass-cancel { background: #e2e8f0; color: var(--text-main); border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+        .btn-pass-submit { background: var(--primary); color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
 
-        #homeViewContainer { text-align: center; padding: 40px 20px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        #homeViewContainer { text-align: center; padding: 60px 20px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        footer { background: rgba(4, 120, 87, 0.75); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 8px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); white-space: nowrap; overflow: hidden; }
-        .footer-running { flex-grow: 1; overflow: hidden; margin: 0 20px; }
-        .footer-running marquee { font-weight: 800; font-size: 1.15rem; letter-spacing: 0.5px; }
-        .footer-clock { font-weight: 600; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(4px); padding: 4px 10px; border-radius: 6px; }
+        /* Footer & Running Text Dikecilkan */
+        footer { 
+            background: rgba(4, 120, 87, 0.88); 
+            backdrop-filter: blur(10px); 
+            color: white; 
+            padding: 6px 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 0.75rem; 
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05); 
+            margin-top: auto; 
+            height: 35px;
+        }
+        .footer-running { flex-grow: 1; overflow: hidden; margin: 0 15px; }
+        .footer-running marquee { font-weight: 700; font-size: 0.85rem; letter-spacing: 0.3px; }
+        .footer-clock { font-weight: 600; background: rgba(0, 0, 0, 0.2); padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; }
         
-        .btn-info-fixed { position: fixed; bottom: 10px; left: 20px; z-index: 1000; background-color: rgba(255, 255, 255, 0.7); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.6); padding: 6px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: all 0.2s; }
-        .btn-info-fixed:hover { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .btn-info-fixed { background-color: rgba(14, 165, 233, 0.1); color: var(--accent); border: 1px solid rgba(14, 165, 233, 0.3); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+        .btn-info-fixed:hover { background-color: rgba(14, 165, 233, 0.2); }
 
-        /* Styles Formulir Rujukan UPKDK Web */
         .rujukan-form-container { width: 100%; background: #ffffff; padding: 25px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin: 0 auto; max-width: 650px;}
         .rujukan-form-container .header-form { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; }
         .rujukan-form-container .header-form h2 { margin: 0 0 5px 0; color: #047857; font-size: 20px; font-weight: 700; }
@@ -287,7 +414,6 @@
         .rujukan-form-container .btn-download { background-color: #dc2626; color: white; }
         .rujukan-form-container .btn-whatsapp { background-color: #16a34a; color: white; }
         
-        /* Styles Form Rujukan Internal SBAR */
         .sbar-container { max-width: 850px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         .sbar-header { text-align: center; border-bottom: 2px solid #047857; padding-bottom: 12px; margin-bottom: 20px; }
         .sbar-header h2 { margin: 0; color: #047857; font-size: 20px; text-transform: uppercase; font-weight: 700; }
@@ -307,26 +433,12 @@
         .sbar-btn-pdf { background-color: #dc2626; color: white; }
         .sbar-btn-pdf:hover { background-color: #b91c1c; }
         .sbar-btn-reset { background-color: #64748b; color: white; flex: 0.4; }
-
         .pdf-wrapper { position: absolute; left: -9999px; top: -9999px; width: 800px; }
-
-        @media screen and (max-width: 1150px) {
-            .mobile-menu-toggle { display: block; }
-            .nav-links { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); flex-direction: column; align-items: stretch; padding: 15px 20px; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-bottom: 1px solid var(--border); }
-            .nav-links.show { display: flex; }
-            .nav-btn { width: 100%; justify-content: flex-start; padding: 8px 12px; font-size: 0.85rem; background: rgba(255, 255, 255, 0.8); }
-            .nav-dropdown { width: 100%; }
-            .nav-dropdown-content { position: static; width: 100%; box-shadow: none; border: none; background: rgba(241, 245, 249, 0.7); margin-top: 5px; display: none; }
-            .nav-dropdown.active-dropdown .nav-dropdown-content { display: block; }
-            .full-year-calendar { grid-template-columns: repeat(1, 1fr); }
-            .main-container { padding: 0 10px; }
-            .sbar-row { flex-direction: column; gap: 0; }
-            .sbar-btn-group { flex-direction: column; }
-        }
     </style>
 </head>
 <body>
 
+    <!-- Header Atas (Logo dan Tombol Hamburger Menu Ikon Saja di Pojok Kanan Atas) -->
     <header>
         <div class="navbar">
             <a href="#" class="logo-container" onclick="resetToHome()">
@@ -337,465 +449,755 @@
                 </div>
             </a>
 
-            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <!-- Tombol Garis 3 (Hamburger Menu) Tanpa Teks "Menu" di Pojok Kanan Atas -->
+            <div class="hamburger-menu-wrapper" id="hamburgerWrapper">
+                <button class="btn-hamburger" onclick="toggleHamburgerMenu(event)" title="Menu Navigasi">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
 
-            <ul class="nav-links" id="navLinksContainer">
-                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">📁 Laporan Bulanan <span>▾</span></button>
-                    <div class="nav-dropdown-content" id="dropLaporanBulanan"></div>
-                </li>
+                <!-- Dropdown Berisi Seluruh Navigasi -->
+                <div class="hamburger-dropdown" id="hamburgerDropdownList">
+                    <button class="nav-btn btn-info-fixed" onclick="checkPasswordAndOpenInfo(); closeHamburgerMenu();" style="margin-bottom: 6px; justify-content: flex-start; gap: 8px;">
+                        ℹ️ Info Sistem
+                    </button>
 
-                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">📊 PPT Lokmin <span>▾</span></button>
-                    <div class="nav-dropdown-content" id="dropPPT"></div>
-                </li>
-
-                <li><button class="nav-btn" onclick="selectMenu('jadwal', 'all', 'Jadwal Rapat', 'Kalender 1 Tahun (2026)'); closeMobileMenu();">📅 Jadwal</button></li>
-                <li><button class="nav-btn" onclick="selectMenu('gallery', 'all', 'Gallery Dokumentasi', 'Semua Foto'); closeMobileMenu();">🖼️ Gallery</button></li>
-                
-                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">📦 Inventaris <span>▾</span></button>
-                    <div class="nav-dropdown-content">
-                        <a onclick="verifyAndSelectMenu('inventaris', 'obhp_bmhp', 'Inventaris', 'OBHP & BMHP Ruang tindakan dan gawat darurat')">OBHP & BMHP Ruang tindakan dan gawat darurat</a>
+                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                        <button class="nav-btn">📁 Laporan Bulanan <span>▾</span></button>
+                        <div class="nav-dropdown-content" id="dropLaporanBulanan"></div>
                     </div>
-                </li>
 
-                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">🚑 Rujukan <span>▾</span></button>
-                    <div class="nav-dropdown-content">
-                        <a onclick="verifyAndSelectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal')">Rujukan Internal</a>
-                        <a onclick="selectMenu('rujukan', 'eksternal', 'Rujukan', 'Rujukan Eksternal'); closeMobileMenu();">Rujukan Eksternal</a>
-                        <a onclick="selectMenu('rujukan_upkdk', 'upkdk', 'Rujukan', 'Rujukan UPKDK'); closeMobileMenu();">Rujukan UPKDK</a>
+                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                        <button class="nav-btn">📊 PPT Lokmin <span>▾</span></button>
+                        <div class="nav-dropdown-content" id="dropPPT"></div>
                     </div>
-                </li>
 
-                <li class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                    <button class="nav-btn" style="width: 100%; justify-content: space-between;">📋 Skrining <span>▾</span></button>
-                    <div class="nav-dropdown-content">
-                        <a onclick="selectMenu('skrining', 'get_up_and_go', 'Skrining', 'Skrining Resiko jatuh (Get up And Go)'); closeMobileMenu();">Skrining Resiko jatuh (Get up And Go)</a>
-                        <a onclick="selectMenu('skrining', 'morse', 'Skrining', 'Skrining Resiko jatuh (Skala Morse)'); closeMobileMenu();">Skrining Resiko jatuh (Skala Morse)</a>
-                        <a onclick="selectMenu('skrining', 'humpty_dumpty', 'Skrining', 'Skrining Resiko Jatuh (Humpty Dumpty)'); closeMobileMenu();">Skrining Resiko Jatuh (Humpty Dumpty)</a>
+                    <button class="nav-btn" onclick="selectMenu('jadwal', 'all', 'Jadwal Rapat', 'Kalender 1 Tahun (2026)'); closeHamburgerMenu();">📅 Jadwal Rapat</button>
+                    <button class="nav-btn" onclick="selectMenu('gallery', 'all', 'Gallery Dokumentasi', 'Semua Foto'); closeHamburgerMenu();">🖼️ Gallery Dokumentasi</button>
+                    
+                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                        <button class="nav-btn">📦 Inventaris <span>▾</span></button>
+                        <div class="nav-dropdown-content">
+                            <a onclick="verifyAndSelectMenu('inventaris', 'obhp_bmhp', 'Inventaris', 'OBHP & BMHP Ruang tindakan'); closeHamburgerMenu();">OBHP & BMHP Ruang tindakan</a>
+                        </div>
                     </div>
-                </li>
 
-                <li><button class="nav-btn" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data'); closeMobileMenu();">📚 Edukasi</button></li>
-                
-                <li><button class="nav-btn" onclick="bukaPengaturanPassword(); closeMobileMenu();">⚙️ Ganti Password</button></li>
-            </ul>
+                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                        <button class="nav-btn">🚑 Rujukan <span>▾</span></button>
+                        <div class="nav-dropdown-content">
+                            <a onclick="verifyAndSelectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal'); closeHamburgerMenu();">Rujukan Internal</a>
+                            <a onclick="selectMenu('rujukan', 'eksternal', 'Rujukan', 'Rujukan Eksternal'); closeHamburgerMenu();">Rujukan Eksternal</a>
+                            <a onclick="selectMenu('rujukan_upkdk', 'upkdk', 'Rujukan', 'Rujukan UPKDK'); closeHamburgerMenu();">Rujukan UPKDK</a>
+                        </div>
+                    </div>
+
+                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
+                        <button class="nav-btn">📋 Skrining <span>▾</span></button>
+                        <div class="nav-dropdown-content">
+                            <a onclick="selectMenu('skrining', 'get_up_and_go', 'Skrining', 'Skrining Resiko jatuh (Get up And Go)'); closeHamburgerMenu();">Resiko jatuh (Get up And Go)</a>
+                            <a onclick="selectMenu('skrining', 'morse', 'Skrining', 'Skrining Resiko jatuh (Skala Morse)'); closeHamburgerMenu();">Resiko jatuh (Skala Morse)</a>
+                            <a onclick="selectMenu('skrining', 'humpty_dumpty', 'Skrining', 'Skrining Resiko Jatuh (Humpty Dumpty)'); closeHamburgerMenu();">Resiko Jatuh (Humpty Dumpty)</a>
+                        </div>
+                    </div>
+
+                    <button class="nav-btn" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data'); closeHamburgerMenu();">📚 Informasi & Edukasi</button>
+                    <button class="nav-btn" onclick="selectMenu('pws', 'all', 'Dashboard PWS Penyakit', 'Pemantauan Wilayah Setempat'); closeHamburgerMenu();">📈 Dashboard PWS</button>
+                    <button class="nav-btn" onclick="bukaPengaturanPassword(); closeHamburgerMenu();">⚙️ Ganti Password</button>
+                </div>
+            </div>
         </div>
     </header>
 
-    <button class="btn-ambulance-fixed" onclick="selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan')">
-        🚨 Pelayanan Ambulance & Gawat Darurat
-    </button>
+    <div class="content-wrapper">
+        <!-- Tombol Ambulance & Darurat dipindahkan ke sudut kiri bawah -->
+        <button class="btn-ambulance-fixed" onclick="selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan')">
+            🚨 Ambulance & Darurat
+        </button>
 
-    <div class="main-container">
-        <div id="activeUI" class="workspace-card" style="display: none;">
-            <div class="card-header">
-                <div>
-                    <h2 id="activeTitle">Judul Menu</h2>
-                    <p id="activeSubtitle">Periode</p>
-                </div>
-                <button class="btn-close-card" onclick="resetToHome()">Tutup ✕</button>
-            </div>
-            
-            <div class="card-body">
-                <div id="calendarDisplayArea" style="display: none;">
-                    <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
-                </div>
-
-                <div id="formDisplayArea" style="display: none;">
-                    <div class="form-area-container">
-                        <h3 style="color: var(--primary);" id="formTitleLabel">Form Data Tautan</h3>
-                        
-                        <div class="form-group">
-                            <label>Link:</label>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="url" id="inputUrlRujukan1" placeholder="https://..." style="flex-grow: 1;">
-                                <button class="btn-submit-form" type="button" id="btnBukaRujukan1" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan()">Buka Link</button>
-                            </div>
-                        </div>
-
-                        <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+        <div class="main-container">
+            <div id="activeUI" class="workspace-card" style="display: none;">
+                <div class="card-header">
+                    <div>
+                        <h2 id="activeTitle">Judul Menu</h2>
+                        <p id="activeSubtitle">Periode</p>
                     </div>
-                </div>
-
-                <div id="formSkriningArea" style="display: none;">
-                    <div class="form-area-container">
-                        <h3 style="color: var(--primary);" id="formSkriningTitleLabel">Form Skrining</h3>
-                        <div class="form-group">
-                            <label>Link:</label>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="url" id="inputUrlSkrining" placeholder="https://..." style="flex-grow: 1;">
-                                <button class="btn-submit-form" type="button" id="btnBukaSkrining" style="background-color: var(--accent); display: none;" onclick="bukaUrlSkrining()">Buka Link</button>
-                            </div>
-                        </div>
-                        <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
-                    </div>
-                </div>
-
-                <!-- Area Formulir Rujukan Internal SBAR -->
-                <div id="rujukanInternalDisplayArea" style="display: none;">
-                    <div class="sbar-container" id="sbarFormContainer">
-                        <form id="sbarForm">
-                            <div class="sbar-header">
-                                <h2>UPTD PUSKESMAS LANJUT</h2>
-                                <h3>FORM RUJUKAN INTERNAL / SBAR</h3>
-                            </div>
-
-                            <div class="sbar-row">
-                                <div class="sbar-col sbar-form-group">
-                                    <label for="tgl_rujukan">Tanggal Rujukan (Otomatis)</label>
-                                    <input type="date" id="tgl_rujukan">
-                                </div>
-                                <div class="sbar-col sbar-form-group">
-                                    <label for="jam_rujukan">Jam Rujukan (Otomatis)</label>
-                                    <input type="time" id="jam_rujukan">
-                                </div>
-                            </div>
-
-                            <div class="sbar-row">
-                                <div class="sbar-col sbar-form-group">
-                                    <label for="rujukan_dari">Rujukan Dari (Klaster/Ruangan)</label>
-                                    <select id="rujukan_dari">
-                                        <option value="">-- Pilih Klaster / Ruangan Pengirim --</option>
-                                        <option value="Klaster 2 (MTBS/MTBM)">Klaster 2 (MTBS/MTBM)</option>
-                                        <option value="Klaster 2 (Ibu Hamil)">Klaster 2 (Ibu Hamil)</option>
-                                        <option value="Klaster 3 (Usia Produktif)">Klaster 3 (Usia Produktif)</option>
-                                        <option value="Klaster 3 (Lansia)">Klaster 3 (Lansia)</option>
-                                        <option value="Lintas Klaster (Ruang Pemeriksan Khusus)">Lintas Klaster (Ruang Pemeriksan Khusus)</option>
-                                        <option value="Lintas Klaster (Ruang Pelayanan Gigi & Mulut)">Lintas Klaster (Ruang Pelayanan Gigi & Mulut)</option>
-                                        <option value="Lintas Klaster (Ruang Tindakan & Gawat Darurat)">Lintas Klaster (Ruang Tindakan & Gawat Darurat)</option>
-                                    </select>
-                                </div>
-                                <div class="sbar-col sbar-form-group">
-                                    <label for="tujuan_rujukan">Tujuan Rujukan (Klaster/Ruangan)</label>
-                                    <select id="tujuan_rujukan">
-                                        <option value="">-- Pilih Klaster / Ruangan Tujuan --</option>
-                                        <option value="Klaster 2 (MTBS/MTBM)">Klaster 2 (MTBS/MTBM)</option>
-                                        <option value="Klaster 2 (Ibu Hamil)">Klaster 2 (Ibu Hamil)</option>
-                                        <option value="Klaster 3 (Usia Produktif)">Klaster 3 (Usia Produktif)</option>
-                                        <option value="Klaster 3 (Lansia)">Klaster 3 (Lansia)</option>
-                                        <option value="Lintas Klaster (Ruang Pemeriksan Khusus)">Lintas Klaster (Ruang Pemeriksan Khusus)</option>
-                                        <option value="Lintas Klaster (Ruang Pelayanan Gigi & Mulut)">Lintas Klaster (Ruang Pelayanan Gigi & Mulut)</option>
-                                        <option value="Lintas Klaster (Ruang Tindakan & Gawat Darurat)">Lintas Klaster (Ruang Tindakan & Gawat Darurat)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="sbar-row">
-                                <div class="sbar-col sbar-form-group">
-                                    <label for="dokter_pengirim">Dokter Pengirim</label>
-                                    <select id="dokter_pengirim">
-                                        <option value="">-- Pilih Dokter Pengirim --</option>
-                                        <option value="dr. Kartika Eka Dwi Putri">dr. Kartika Eka Dwi Putri</option>
-                                        <option value="dr. Shinta Annisa">dr. Shinta Annisa</option>
-                                        <option value="drg. Rotua Fitri">drg. Rotua Fitri</option>
-                                    </select>
-                                </div>
-                                <div class="sbar-col sbar-form-group">
-                                    <label for="perawat_bidan">Perawat / Bidan</label>
-                                    <select id="perawat_bidan">
-                                        <option value="">-- Pilih Perawat / Bidan --</option>
-                                        <option value="Shely Marselyna, A.Md.Keb">Shely Marselyna, A.Md.Keb</option>
-                                        <option value="Ismanefy, A.Md.Keb">Ismanefy, A.Md.Keb</option>
-                                        <option value="Nasha Baiti, A.Md.Keb">Nasha Baiti, A.Md.Keb</option>
-                                        <option value="Nidya Suarni, A.Md.Keb">Nidya Suarni, A.Md.Keb</option>
-                                        <option value="Ns. Dini Noviadi, S.Kep">Ns. Dini Noviadi, S.Kep</option>
-                                        <option value="Andri Harta Kirana, A.Md.Kep">Andri Harta Kirana, A.Md.Kep</option>
-                                        <option value="Mia Astri Ana, A.Md.Keb">Mia Astri Ana, A.Md.Keb</option>
-                                        <option value="Samira Wulandari, A.Md.Keb">Samira Wulandari, A.Md.Keb</option>
-                                        <option value="Maylinda, A.Md.Keb">Maylinda, A.Md.Keb</option>
-                                        <option value="Rendy Andrian, A.Md.Kep">Rendy Andrian, A.Md.Kep</option>
-                                        <option value="Wahyu Dharmawan, A.Md.Kep">Wahyu Dharmawan, A.Md.Kep</option>
-                                        <option value="M. Khalqi Hilmi, A.Md.Kep">M. Khalqi Hilmi, A.Md.Kep</option>
-                                        <option value="Yudi Andika, A.Md.Kep">Yudi Andika, A.Md.Kep</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="sbar-row">
-                                <div class="sbar-col-2 sbar-form-group">
-                                    <label for="nama_pasien">Nama Pasien</label>
-                                    <input type="text" id="nama_pasien" placeholder="Nama lengkap pasien">
-                                </div>
-                                <div class="sbar-col sbar-form-group">
-                                    <label for="tgl_lahir_umur">Tgl Lahir / Umur</label>
-                                    <input type="text" id="tgl_lahir_umur" placeholder="dd/mm/yyyy (umur)">
-                                </div>
-                            </div>
-
-                            <div class="sbar-form-group">
-                                <label for="sbar_alamat">Alamat Pasien</label>
-                                <input type="text" id="sbar_alamat" placeholder="Alamat lengkap pasien">
-                            </div>
-
-                            <div class="sbar-section-header">SITUATION (S)</div>
-                            <div class="sbar-form-group">
-                                <textarea id="situation" placeholder="Tuliskan situasi pasien saat ini, keluhan utama, dan riwayat penyakit..."></textarea>
-                            </div>
-
-                            <div class="sbar-section-header">BACKGROUND (B)</div>
-                            <div class="sbar-form-group">
-                                <textarea id="background" placeholder="Tuliskan latar belakang medis pasien, hasil pemeriksaan fisik, dan TTV..."></textarea>
-                            </div>
-
-                            <div class="sbar-section-header">ASSESSMENT (A)</div>
-                            <div class="sbar-form-group">
-                                <textarea id="assessment" placeholder="Tuliskan diagnosa / assessment klinis..."></textarea>
-                            </div>
-
-                            <div class="sbar-section-header">RECOMMENDATION (R)</div>
-                            <div class="sbar-form-group">
-                                <textarea id="recommendation" placeholder="Tuliskan rekomendasi tindakan, instruksi penanganan, atau obat yang diberikan..."></textarea>
-                            </div>
-
-                            <div class="sbar-btn-group" id="sbarActionButtons">
-                                <button type="button" class="sbar-btn sbar-btn-pdf" onclick="unduhPDFInternal()">📄 Unduh PDF</button>
-                                <button type="button" class="sbar-btn sbar-btn-wa" onclick="kirimWhatsAppInternal()">📲 Kirim via WhatsApp</button>
-                                <button type="reset" class="sbar-btn sbar-btn-reset">🔄 Reset</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Area Formulir Rujukan UPKDK -->
-                <div id="rujukanUpkdkDisplayArea" style="display: none;">
-                    <div class="rujukan-form-container">
-                        <div class="header-form">
-                            <h2>FORMULIR RUJUKAN UPKD/K KE PUSKESMAS</h2>
-                            <h3>WILAYAH KERJA UPTD PUSKESMAS LANJUT</h3>
-                        </div>
-
-                        <div class="info-note">
-                            <strong>Info:</strong> Isi data rujukan dengan lengkap. Anda dapat mengunduh dokumen dalam bentuk PDF atau langsung mengirimkannya ke nomor WhatsApp tujuan.
-                        </div>
-
-                        <form id="rujukanForm">
-                            <div class="form-group">
-                                <label for="jenisPelayanan">Jenis Pelayanan:</label>
-                                <select id="jenisPelayanan" required>
-                                    <option value="">-- Pilih Jenis Pelayanan --</option>
-                                    <option value="PELAYANAN BAYI BALITA">Pelayanan Bayi Balita</option>
-                                    <option value="PELAYANAN REMAJA">Pelayanan Remaja</option>
-                                    <option value="PELAYANAN IBU HAMIL">Pelayanan Ibu Hamil</option>
-                                    <option value="PELAYANAN USIA PRODUKTIF/DEWASA">Pelayanan Usia Produktif/Dewasa</option>
-                                    <option value="PELAYANAN LANSIA">Pelayanan Lansia</option>
-                                    <option value="PELAYANAN GIGI DAN MULUT">Pelayanan Gigi dan Mulut</option>
-                                    <option value="PELAYANAN TINDAKAN DAN GAWAT DARURAT">Pelayanan Tindakan dan Gawat Darurat</option>
-                                    <option value="PELAYANAN UMUM">Pelayanan Umum</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="tujuanWA">Tujuan Rujukan (Nomor WhatsApp Tujuan):</label>
-                                <select id="tujuanWA" required>
-                                    <option value="">-- Pilih Klaster / Ruangan Tujuan --</option>
-                                    <option value="6281364195736">KLASTER 2 (Ibu, Anak, Remaja) Shely Marselyna</option>
-                                    <option value="6285264825962">KLASTER 3 (Usia Produktif & Lansia) - Andri Harta Kirana</option>
-                                    <option value="6285264444567">LINTAS KLASTER (Ruang Tindakan & Gawat Darurat) - Rendy Andrian</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="namaPasien">Nama Pasien:</label>
-                                <input type="text" id="namaPasien" required placeholder="Masukkan nama lengkap pasien">
-                            </div>
-
-                            <div style="display: flex; gap: 15px;">
-                                <div class="form-group" style="flex: 1;">
-                                    <label for="umur">Umur (Tahun):</label>
-                                    <input type="number" id="umur" required placeholder="Contoh: 35">
-                                </div>
-                                <div class="form-group" style="flex: 1;">
-                                    <label for="kelamin">Jenis Kelamin:</label>
-                                    <select id="kelamin" required>
-                                        <option value="">Pilih</option>
-                                        <option value="Laki-laki">Laki-laki</option>
-                                        <option value="Perempuan">Perempuan</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="alamat">Alamat Lengkap:</label>
-                                <textarea id="alamat" placeholder="RT/RW, Desa, Kecamatan..." required></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="hasilPemeriksaan">Hasil Pemeriksaan Sementara:</label>
-                                <textarea id="hasilPemeriksaan" placeholder="Misal: TD: 165/100, Keluhan..."></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="tindakanAwal">Tindakan Awal yang Telah Dilakukan:</label>
-                                <textarea id="tindakanAwal"></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Alasan Rujukan:</label>
-                                <div class="checkbox-container">
-                                    <div class="checkbox-item"><input type="checkbox" name="alasan" value="Tindaklanjut Skrining"> Tindaklanjut Skrining</div>
-                                    <div class="checkbox-item"><input type="checkbox" name="alasan" value="Perlu perawatan khusus"> Perlu perawatan khusus</div>
-                                    <div class="checkbox-item"><input type="checkbox" name="alasan" value="Keterbatasan alat/obat"> Keterbatasan alat/obat</div>
-                                    <div class="checkbox-item"><input type="checkbox" name="alasan" id="cbLainnya" value="Lainnya" onchange="toggleLainnya()"> Lainnya</div>
-                                </div>
-                            </div>
-
-                            <div class="form-group" id="groupLainnya" style="display: none;">
-                                <label for="keteranganLainnya">Keterangan Alasan Lainnya:</label>
-                                <input type="text" id="keteranganLainnya" placeholder="Tuliskan alasan lainnya...">
-                            </div>
-
-                            <div style="display: flex; gap: 15px;">
-                                <div class="form-group" style="flex: 1;">
-                                    <label for="tanggalRujukan">Tanggal Rujukan:</label>
-                                    <input type="date" id="tanggalRujukan" required>
-                                </div>
-                                <div class="form-group" style="flex: 1;">
-                                    <label for="petugas">Petugas Pengirim:</label>
-                                    <input type="text" id="petugas" placeholder="Nama petugas pengirim" required>
-                                </div>
-                            </div>
-
-                            <div class="btn-container">
-                                <button type="button" class="btn-reset" onclick="resetFormRujukan()">Reset Form</button>
-                                <button type="button" class="btn-download" onclick="unduhPDF()">Unduh PDF</button>
-                                <button type="button" class="btn-whatsapp" onclick="kirimWhatsApp()">Kirim WA</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Template PDF Tersembunyi Rujukan -->
-                <div class="pdf-wrapper">
-                    <div id="pdfContent" style="background-color: #ffffff; padding: 40px; font-family: Arial, sans-serif; color: #000; line-height: 1.5;">
-                        <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 15px; margin-bottom: 20px;">
-                            <h3 style="margin: 0; font-size: 15px; font-weight: bold;">PEMERINTAH KABUPATEN</h3>
-                            <h3 style="margin: 0; font-size: 15px; font-weight: bold;">DINAS KESEHATAN</h3>
-                            <h1 style="margin: 5px 0; font-size: 22px; color: #047857; font-weight: bold;">UPTD PUSKESMAS LANJUT</h1>
-                            <p style="margin: 0; font-size: 12px;">Integrasi Layanan Primer</p>
-                        </div>
-                        
-                        <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 25px; font-size: 16px;">
-                            SURAT RUJUKAN UPKD/K
-                        </div>
-
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
-                            <tr>
-                                <th style="border: 1px solid #000; padding: 10px; text-align: left; width: 35%; background-color: #f3f4f6; font-size: 14px;">Jenis Pelayanan</th>
-                                <td style="border: 1px solid #000; padding: 10px; font-weight: bold; font-size: 14px;" id="pdfJenisPelayanan"></td>
-                            </tr>
-                            <tr>
-                                <th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Tujuan Rujukan</th>
-                                <td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfTujuan"></td>
-                            </tr>
-                        </table>
-
-                        <h4 style="margin: 15px 0 5px 0; font-size: 15px;">A. IDENTITAS PASIEN</h4>
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
-                            <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; width: 35%; background-color: #f3f4f6; font-size: 14px;">Nama Pasien</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfNama"></td></tr>
-                            <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Umur</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfUmur"></td></tr>
-                            <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Jenis Kelamin</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfKelamin"></td></tr>
-                            <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Alamat</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfAlamat"></td></tr>
-                        </table>
-
-                        <h4 style="margin: 15px 0 5px 0; font-size: 15px;">B. PEMERIKSAAN & PENANGANAN</h4>
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
-                            <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; width: 35%; background-color: #f3f4f6; font-size: 14px;">Hasil Pemeriksaan</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfHasil"></td></tr>
-                            <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Tindakan Awal</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfTindakan"></td></tr>
-                            <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Alasan Rujukan</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfAlasan"></td></tr>
-                        </table>
-                        
-                        <div style="display: flex; justify-content: space-between; margin-top: 50px; text-align: center; font-size: 14px;">
-                            <div style="width: 45%;">
-                                <p style="margin: 0;">Penerima Rujukan,</p>
-                                <div style="height: 80px;"></div>
-                                <p style="margin: 0; font-weight: bold; text-decoration: underline;">(...................................)</p>
-                            </div>
-                            <div style="width: 45%;">
-                                <p style="margin: 0 0 5px 0;" id="pdfTanggal">Tanggal: </p>
-                                <p style="margin: 0;">Petugas Pengirim,</p>
-                                <div style="height: 80px;"></div>
-                                <p style="margin: 0; font-weight: bold; text-decoration: underline;" id="pdfPetugas"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Akhir Area Rujukan -->
-
-                <div id="ambulanceDisplayArea" style="display: none; justify-content: center; align-items: center; width: 100%;">
-                    <div class="darurat-container" style="max-width: 500px;">
-                        <h3 style="color: #ef4444; margin-bottom: 15px;">Pelayanan Ambulance & Gawat Darurat</h3>
-                        <div class="kontak-info-box" style="display: flex; flex-direction: column; gap: 10px; text-align: left;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <h4 style="margin: 0; color: var(--text-main);">Info Petugas Ambulance</h4>
-                                <button class="btn-edit-kontak" onclick="verifikasiEditPetugas()">✏️ Edit Petugas</button>
-                            </div>
-                            <div id="viewPetugasAmbulance">
-                                <div style="text-align: center; margin-bottom: 15px;">
-                                    <img id="foto-petugas-tampil" src="" alt="Foto Petugas" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #ef4444; display: none; margin: 0 auto;">
-                                </div>
-                                <div class="kontak-info-details">
-                                    <span>Nama Petugas:</span>
-                                    <strong id="nama-petugas-tampil">-</strong>
-                                    <span style="margin-top: 4px;">No HP: <span id="hp-petugas-tampil">-</span></span>
-                                </div>
-                            </div>
-                            <div class="form-kontak" id="form-edit-petugas" style="display: none; margin-bottom: 0;">
-                                <label>Foto Petugas:</label>
-                                <input type="file" id="input-foto-petugas" accept="image/*" style="background: white; border: 1px dashed #ccc; padding: 10px; cursor: pointer;">
-                                <label>Nama Petugas Ambulance:</label>
-                                <input type="text" id="input-nama-petugas" placeholder="Masukkan nama petugas">
-                                <label>No Handphone Petugas:</label>
-                                <input type="tel" id="input-hp-petugas" placeholder="Mis: 08123456789">
-                                <button class="btn-simpan-darurat" style="background-color: #ef4444;" onclick="simpanPetugasAmbulance()">Simpan Data Petugas</button>
-                            </div>
-                        </div>
-                        <div class="form-area-container" style="text-align: left; margin-top: 15px;">
-                            <h4 style="margin-bottom: 10px; color: var(--text-main);">Data Pasien</h4>
-                            <div class="form-group">
-                                <label>Nama Pasien / Keluarga:</label>
-                                <input type="text" id="input-nama-pasien" placeholder="Masukkan nama pemesan">
-                            </div>
-                            <div class="form-group">
-                                <label>Nomor HP yang bisa dihubungi:</label>
-                                <input type="tel" id="input-hp-pasien" placeholder="Masukkan nomor HP pasien">
-                            </div>
-                            <div class="form-group">
-                                <label>Lokasi Jemput (Otomatis GPS):</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="text" id="input-lokasi-pasien" placeholder="Klik tombol ambil GPS ->" readonly style="flex-grow: 1; background: #e2e8f0; font-size: 0.8rem;">
-                                    <button type="button" class="btn-submit-form" onclick="dapatkanLokasiPasien()" style="background-color: #f59e0b; padding: 8px; font-size: 0.8rem;">📍 Ambil GPS</button>
-                                </div>
-                            </div>
-                            <button class="btn-darurat-main" style="background-color: #ef4444; margin-top: 15px; margin-bottom: 0;" onclick="kirimPermintaanAmbulance()">
-                                🚨 Pesan & Kirim ke WA Petugas
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="slideshowDisplayArea">
-                    <div class="slideshow-container" id="slideshowContainerImages"></div>
-                </div>
-
-                <div class="upload-area" id="uploadAreaContainer" onclick="triggerUpload()">
-                    <button class="btn-upload" type="button">Pilih Berkas</button>
-                    <input type="file" id="dynamicFileInput" class="file-input-hidden" multiple onchange="handleFiles(this)">
+                    <button class="btn-close-card" onclick="resetToHome()">Tutup ✕</button>
                 </div>
                 
-                <div class="file-list-container" id="fileListContainerArea">
-                    <ul id="dynamicFileList" class="file-list"></ul>
+                <div class="card-body">
+                    <div id="calendarDisplayArea" style="display: none;">
+                        <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
+                    </div>
+
+                    <div id="formDisplayArea" style="display: none;">
+                        <div class="form-area-container">
+                            <h3 style="color: var(--primary);" id="formTitleLabel">Form Data Tautan</h3>
+                            
+                            <div class="form-group">
+                                <label>Link:</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="url" id="inputUrlRujukan1" placeholder="https://..." style="flex-grow: 1;">
+                                    <button class="btn-submit-form" type="button" id="btnBukaRujukan1" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan()">Buka Link</button>
+                                </div>
+                            </div>
+
+                            <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+                        </div>
+                    </div>
+
+                    <div id="formSkriningArea" style="display: none;">
+                        <div class="form-area-container">
+                            <h3 style="color: var(--primary);" id="formSkriningTitleLabel">Form Skrining</h3>
+                            <div class="form-group">
+                                <label>Link:</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="url" id="inputUrlSkrining" placeholder="https://..." style="flex-grow: 1;">
+                                    <button class="btn-submit-form" type="button" id="btnBukaSkrining" style="background-color: var(--accent); display: none;" onclick="bukaUrlSkrining()">Buka Link</button>
+                                </div>
+                            </div>
+                            <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+                        </div>
+                    </div>
+
+                    <div id="rujukanInternalDisplayArea" style="display: none;">
+                        <div class="sbar-container" id="sbarFormContainer">
+                            <form id="sbarForm">
+                                <div class="sbar-header">
+                                    <h2>UPTD PUSKESMAS LANJUT</h2>
+                                    <h3>FORM RUJUKAN INTERNAL / SBAR</h3>
+                                </div>
+
+                                <div class="sbar-row">
+                                    <div class="sbar-col sbar-form-group">
+                                        <label for="tgl_rujukan">Tanggal Rujukan (Otomatis)</label>
+                                        <input type="date" id="tgl_rujukan">
+                                    </div>
+                                    <div class="sbar-col sbar-form-group">
+                                        <label for="jam_rujukan">Jam Rujukan (Otomatis)</label>
+                                        <input type="time" id="jam_rujukan">
+                                    </div>
+                                </div>
+
+                                <div class="sbar-row">
+                                    <div class="sbar-col sbar-form-group">
+                                        <label for="rujukan_dari">Rujukan Dari (Klaster/Ruangan)</label>
+                                        <select id="rujukan_dari">
+                                            <option value="">-- Pilih Klaster / Ruangan Pengirim --</option>
+                                            <option value="Klaster 2 (MTBS/MTBM)">Klaster 2 (MTBS/MTBM)</option>
+                                            <option value="Klaster 2 (Ibu Hamil)">Klaster 2 (Ibu Hamil)</option>
+                                            <option value="Klaster 3 (Usia Produktif)">Klaster 3 (Usia Produktif)</option>
+                                            <option value="Klaster 3 (Lansia)">Klaster 3 (Lansia)</option>
+                                            <option value="Lintas Klaster (Ruang Pemeriksan Khusus)">Lintas Klaster (Ruang Pemeriksan Khusus)</option>
+                                            <option value="Lintas Klaster (Ruang Pelayanan Gigi & Mulut)">Lintas Klaster (Ruang Pelayanan Gigi & Mulut)</option>
+                                            <option value="Lintas Klaster (Ruang Tindakan & Gawat Darurat)">Lintas Klaster (Ruang Tindakan & Gawat Darurat)</option>
+                                        </select>
+                                    </div>
+                                    <div class="sbar-col sbar-form-group">
+                                        <label for="tujuan_rujukan">Tujuan Rujukan (Klaster/Ruangan)</label>
+                                        <select id="tujuan_rujukan">
+                                            <option value="">-- Pilih Klaster / Ruangan Tujuan --</option>
+                                            <option value="Klaster 2 (MTBS/MTBM)">Klaster 2 (MTBS/MTBM)</option>
+                                            <option value="Klaster 2 (Ibu Hamil)">Klaster 2 (Ibu Hamil)</option>
+                                            <option value="Klaster 3 (Usia Produktif)">Klaster 3 (Usia Produktif)</option>
+                                            <option value="Klaster 3 (Lansia)">Klaster 3 (Lansia)</option>
+                                            <option value="Lintas Klaster (Ruang Pemeriksan Khusus)">Lintas Klaster (Ruang Pemeriksan Khusus)</option>
+                                            <option value="Lintas Klaster (Ruang Pelayanan Gigi & Mulut)">Lintas Klaster (Ruang Pelayanan Gigi & Mulut)</option>
+                                            <option value="Lintas Klaster (Ruang Tindakan & Gawat Darurat)">Lintas Klaster (Ruang Tindakan & Gawat Darurat)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="sbar-row">
+                                    <div class="sbar-col sbar-form-group">
+                                        <label for="dokter_pengirim">Dokter Pengirim</label>
+                                        <select id="dokter_pengirim">
+                                            <option value="">-- Pilih Dokter Pengirim --</option>
+                                            <option value="dr. Kartika Eka Dwi Putri">dr. Kartika Eka Dwi Putri</option>
+                                            <option value="dr. Shinta Annisa">dr. Shinta Annisa</option>
+                                            <option value="drg. Rotua Fitri">drg. Rotua Fitri</option>
+                                        </select>
+                                    </div>
+                                    <div class="sbar-col sbar-form-group">
+                                        <label for="perawat_bidan">Perawat / Bidan</label>
+                                        <select id="perawat_bidan">
+                                            <option value="">-- Pilih Perawat / Bidan --</option>
+                                            <option value="Shely Marselyna, A.Md.Keb">Shely Marselyna, A.Md.Keb</option>
+                                            <option value="Ismanefy, A.Md.Keb">Ismanefy, A.Md.Keb</option>
+                                            <option value="Nasha Baiti, A.Md.Keb">Nasha Baiti, A.Md.Keb</option>
+                                            <option value="Nidya Suarni, A.Md.Keb">Nidya Suarni, A.Md.Keb</option>
+                                            <option value="Ns. Dini Noviadi, S.Kep">Ns. Dini Noviadi, S.Kep</option>
+                                            <option value="Andri Harta Kirana, A.Md.Kep">Andri Harta Kirana, A.Md.Kep</option>
+                                            <option value="Mia Astri Ana, A.Md.Keb">Mia Astri Ana, A.Md.Keb</option>
+                                            <option value="Samira Wulandari, A.Md.Keb">Samira Wulandari, A.Md.Keb</option>
+                                            <option value="Maylinda, A.Md.Keb">Maylinda, A.Md.Keb</option>
+                                            <option value="Rendy Andrian, A.Md.Kep">Rendy Andrian, A.Md.Kep[cite: 4]</option>
+                                            <option value="Wahyu Dharmawan, A.Md.Kep">Wahyu Dharmawan, A.Md.Kep</option>
+                                            <option value="M. Khalqi Hilmi, A.Md.Kep">M. Khalqi Hilmi, A.Md.Kep</option>
+                                            <option value="Yudi Andika, A.Md.Kep">Yudi Andika, A.Md.Kep</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="sbar-row">
+                                    <div class="sbar-col-2 sbar-form-group">
+                                        <label for="nama_pasien">Nama Pasien</label>
+                                        <input type="text" id="nama_pasien" placeholder="Nama lengkap pasien">
+                                    </div>
+                                    <div class="sbar-col sbar-form-group">
+                                        <label for="tgl_lahir_umur">Tgl Lahir / Umur</label>
+                                        <input type="text" id="tgl_lahir_umur" placeholder="dd/mm/yyyy (umur)">
+                                    </div>
+                                </div>
+
+                                <div class="sbar-form-group">
+                                    <label for="sbar_alamat">Alamat Pasien</label>
+                                    <input type="text" id="sbar_alamat" placeholder="Alamat lengkap pasien">
+                                </div>
+
+                                <div class="sbar-section-header">SITUATION (S)</div>
+                                <div class="sbar-form-group">
+                                    <textarea id="situation" placeholder="Tuliskan situasi pasien saat ini, keluhan utama, dan riwayat penyakit..."></textarea>
+                                </div>
+
+                                <div class="sbar-section-header">BACKGROUND (B)</div>
+                                <div class="sbar-form-group">
+                                    <textarea id="background" placeholder="Tuliskan latar belakang medis pasien, hasil pemeriksaan fisik, dan TTV..."></textarea>
+                                </div>
+
+                                <div class="sbar-section-header">ASSESSMENT (A)</div>
+                                <div class="sbar-form-group">
+                                    <textarea id="assessment" placeholder="Tuliskan diagnosa / assessment klinis..."></textarea>
+                                </div>
+
+                                <div class="sbar-section-header">RECOMMENDATION (R)</div>
+                                <div class="sbar-form-group">
+                                    <textarea id="recommendation" placeholder="Tuliskan rekomendasi tindakan, instruksi penanganan, atau obat yang diberikan..."></textarea>
+                                </div>
+
+                                <div class="sbar-btn-group" id="sbarActionButtons">
+                                    <button type="button" class="sbar-btn sbar-btn-pdf" onclick="unduhPDFInternal()">📄 Unduh PDF</button>
+                                    <button type="button" class="sbar-btn sbar-btn-wa" onclick="kirimWhatsAppInternal()">📲 Kirim via WhatsApp</button>
+                                    <button type="reset" class="sbar-btn sbar-btn-reset">🔄 Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="rujukanUpkdkDisplayArea" style="display: none;">
+                        <div class="rujukan-form-container">
+                            <div class="header-form">
+                                <h2>FORMULIR RUJUKAN UPKD/K KE PUSKESMAS</h2>
+                                <h3>WILAYAH KERJA UPTD PUSKESMAS LANJUT</h3>
+                            </div>
+
+                            <div class="info-note">
+                                <strong>Info:</strong> Isi data rujukan dengan lengkap. Anda dapat mengunduh dokumen dalam bentuk PDF atau langsung mengirimkannya ke nomor WhatsApp tujuan.
+                            </div>
+
+                            <form id="rujukanForm">
+                                <div class="form-group">
+                                    <label for="jenisPelayanan">Jenis Pelayanan:</label>
+                                    <select id="jenisPelayanan" required>
+                                        <option value="">-- Pilih Jenis Pelayanan --</option>
+                                        <option value="PELAYANAN BAYI BALITA">Pelayanan Bayi Balita</option>
+                                        <option value="PELAYANAN REMAJA">Pelayanan Remaja</option>
+                                        <option value="PELAYANAN IBU HAMIL">Pelayanan Ibu Hamil</option>
+                                        <option value="PELAYANAN USIA PRODUKTIF/DEWASA">Pelayanan Usia Produktif/Dewasa</option>
+                                        <option value="PELAYANAN LANSIA">Pelayanan Lansia</option>
+                                        <option value="PELAYANAN GIGI DAN MULUT">Pelayanan Gigi dan Mulut</option>
+                                        <option value="PELAYANAN TINDAKAN DAN GAWAT DARURAT">Pelayanan Tindakan dan Gawat Darurat</option>
+                                        <option value="PELAYANAN UMUM">Pelayanan Umum</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tujuanWA">Tujuan Rujukan (Nomor WhatsApp Tujuan):</label>
+                                    <select id="tujuanWA" required>
+                                        <option value="">-- Pilih Klaster / Ruangan Tujuan --</option>
+                                        <option value="6281364195736">KLASTER 2 (Ibu, Anak, Remaja) Shely Marselyna</option>
+                                        <option value="6285264825962">KLASTER 3 (Usia Produktif & Lansia) - Andri Harta Kirana</option>
+                                        <option value="6285264444567">LINTAS KLASTER (Ruang Tindakan & Gawat Darurat) - Rendy Andrian[cite: 4]</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="namaPasien">Nama Pasien:</label>
+                                    <input type="text" id="namaPasien" required placeholder="Masukkan nama lengkap pasien">
+                                </div>
+
+                                <div style="display: flex; gap: 15px;">
+                                    <div class="form-group" style="flex: 1;">
+                                        <label for="umur">Umur (Tahun):</label>
+                                        <input type="number" id="umur" required placeholder="Contoh: 35">
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label for="kelamin">Jenis Kelamin:</label>
+                                        <select id="kelamin" required>
+                                            <option value="">Pilih</option>
+                                            <option value="Laki-laki">Laki-laki</option>
+                                            <option value="Perempuan">Perempuan</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="alamat">Alamat Lengkap:</label>
+                                    <textarea id="alamat" placeholder="RT/RW, Desa, Kecamatan..." required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="hasilPemeriksaan">Hasil Pemeriksaan Sementara:</label>
+                                    <textarea id="hasilPemeriksaan" placeholder="Misal: TD: 165/100, Keluhan..."></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tindakanAwal">Tindakan Awal yang Telah Dilakukan:</label>
+                                    <textarea id="tindakanAwal"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Alasan Rujukan:</label>
+                                    <div class="checkbox-container">
+                                        <div class="checkbox-item"><input type="checkbox" name="alasan" value="Tindaklanjut Skrining"> Tindaklanjut Skrining</div>
+                                        <div class="checkbox-item"><input type="checkbox" name="alasan" value="Perlu perawatan khusus"> Perlu perawatan khusus</div>
+                                        <div class="checkbox-item"><input type="checkbox" name="alasan" value="Keterbatasan alat/obat"> Keterbatasan alat/obat</div>
+                                        <div class="checkbox-item"><input type="checkbox" name="alasan" id="cbLainnya" value="Lainnya" onchange="toggleLainnya()"> Lainnya</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" id="groupLainnya" style="display: none;">
+                                    <label for="keteranganLainnya">Keterangan Alasan Lainnya:</label>
+                                    <input type="text" id="keteranganLainnya" placeholder="Tuliskan alasan lainnya...">
+                                </div>
+
+                                <div style="display: flex; gap: 15px;">
+                                    <div class="form-group" style="flex: 1;">
+                                        <label for="tanggalRujukan">Tanggal Rujukan:</label>
+                                        <input type="date" id="tanggalRujukan" required>
+                                    </div>
+                                    <div class="form-group" style="flex: 1;">
+                                        <label for="petugas">Petugas Pengirim:</label>
+                                        <input type="text" id="petugas" placeholder="Nama petugas pengirim" required>
+                                    </div>
+                                </div>
+
+                                <div class="btn-container">
+                                    <button type="button" class="btn-reset" onclick="resetFormRujukan()">Reset Form</button>
+                                    <button type="button" class="btn-download" onclick="unduhPDF()">Unduh PDF</button>
+                                    <button type="button" class="btn-whatsapp" onclick="kirimWhatsApp()">Kirim WA</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="pdf-wrapper">
+                        <div id="pdfContent" style="background-color: #ffffff; padding: 40px; font-family: Arial, sans-serif; color: #000; line-height: 1.5;">
+                            <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 15px; margin-bottom: 20px;">
+                                <h3 style="margin: 0; font-size: 15px; font-weight: bold;">PEMERINTAH KABUPATEN</h3>
+                                <h3 style="margin: 0; font-size: 15px; font-weight: bold;">DINAS KESEHATAN</h3>
+                                <h1 style="margin: 5px 0; font-size: 22px; color: #047857; font-weight: bold;">UPTD PUSKESMAS LANJUT</h1>
+                                <p style="margin: 0; font-size: 12px;">Integrasi Layanan Primer</p>
+                            </div>
+                            
+                            <div style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 25px; font-size: 16px;">
+                                SURAT RUJUKAN UPKD/K
+                            </div>
+
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+                                <tr>
+                                    <th style="border: 1px solid #000; padding: 10px; text-align: left; width: 35%; background-color: #f3f4f6; font-size: 14px;">Jenis Pelayanan</th>
+                                    <td style="border: 1px solid #000; padding: 10px; font-weight: bold; font-size: 14px;" id="pdfJenisPelayanan"></td>
+                                </tr>
+                                <tr>
+                                    <th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Tujuan Rujukan</th>
+                                    <td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfTujuan"></td>
+                                </tr>
+                            </table>
+
+                            <h4 style="margin: 15px 0 5px 0; font-size: 15px;">A. IDENTITAS PASIEN</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+                                <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; width: 35%; background-color: #f3f4f6; font-size: 14px;">Nama Pasien</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfNama"></td></tr>
+                                <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Umur</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfUmur"></td></tr>
+                                <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Jenis Kelamin</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfKelamin"></td></tr>
+                                <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Alamat</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfAlamat"></td></tr>
+                            </table>
+
+                            <h4 style="margin: 15px 0 5px 0; font-size: 15px;">B. PEMERIKSAAN & PENANGANAN</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+                                <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; width: 35%; background-color: #f3f4f6; font-size: 14px;">Hasil Pemeriksaan</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfHasil"></td></tr>
+                                <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Tindakan Awal</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfTindakan"></td></tr>
+                                <tr><th style="border: 1px solid #000; padding: 10px; text-align: left; background-color: #f3f4f6; font-size: 14px;">Alasan Rujukan</th><td style="border: 1px solid #000; padding: 10px; font-size: 14px;" id="pdfAlasan"></td></tr>
+                            </table>
+                            
+                            <div style="display: flex; justify-content: space-between; margin-top: 50px; text-align: center; font-size: 14px;">
+                                <div style="width: 45%;">
+                                    <p style="margin: 0;">Penerima Rujukan,</p>
+                                    <div style="height: 80px;"></div>
+                                    <p style="margin: 0; font-weight: bold; text-decoration: underline;">(...................................)</p>
+                                </div>
+                                <div style="width: 45%;">
+                                    <p style="margin: 0 0 5px 0;" id="pdfTanggal">Tanggal: </p>
+                                    <p style="margin: 0;">Petugas Pengirim,</p>
+                                    <div style="height: 80px;"></div>
+                                    <p style="margin: 0; font-weight: bold; text-decoration: underline;" id="pdfPetugas"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="ambulanceDisplayArea" style="display: none; justify-content: center; align-items: center; width: 100%;">
+                        <div class="darurat-container" style="max-width: 500px;">
+                            <h3 style="color: #ef4444; margin-bottom: 15px;">Pelayanan Ambulance & Gawat Darurat</h3>
+                            <div class="kontak-info-box" style="display: flex; flex-direction: column; gap: 10px; text-align: left;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <h4 style="margin: 0; color: var(--text-main);">Info Petugas Ambulance</h4>
+                                    <button class="btn-edit-kontak" onclick="verifikasiEditPetugas()">✏️ Edit Petugas</button>
+                                </div>
+                                <div id="viewPetugasAmbulance">
+                                    <div style="text-align: center; margin-bottom: 15px;">
+                                        <img id="foto-petugas-tampil" src="" alt="Foto Petugas" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #ef4444; display: none; margin: 0 auto;">
+                                    </div>
+                                    <div class="kontak-info-details">
+                                        <span>Nama Petugas:</span>
+                                        <strong id="nama-petugas-tampil">-</strong>
+                                        <span style="margin-top: 4px;">No HP: <span id="hp-petugas-tampil">-</span></span>
+                                    </div>
+                                </div>
+                                <div class="form-kontak" id="form-edit-petugas" style="display: none; margin-bottom: 0;">
+                                    <label>Foto Petugas:</label>
+                                    <input type="file" id="input-foto-petugas" accept="image/*" style="background: white; border: 1px dashed #ccc; padding: 10px; cursor: pointer;">
+                                    <label>Nama Petugas Ambulance:</label>
+                                    <input type="text" id="input-nama-petugas" placeholder="Masukkan nama petugas">
+                                    <label>No Handphone Petugas:</label>
+                                    <input type="tel" id="input-hp-petugas" placeholder="Mis: 08123456789">
+                                    <button class="btn-simpan-darurat" style="background-color: #ef4444;" onclick="simpanPetugasAmbulance()">Simpan Data Petugas</button>
+                                </div>
+                            </div>
+                            <div class="form-area-container" style="text-align: left; margin-top: 15px;">
+                                <h4 style="margin-bottom: 10px; color: var(--text-main);">Data Pasien</h4>
+                                <div class="form-group">
+                                    <label>Nama Pasien / Keluarga:</label>
+                                    <input type="text" id="input-nama-pasien" placeholder="Masukkan nama pemesan">
+                                </div>
+                                <div class="form-group">
+                                    <label>Nomor HP yang bisa dihubungi:</label>
+                                    <input type="tel" id="input-hp-pasien" placeholder="Masukkan nomor HP pasien">
+                                </div>
+                                <div class="form-group">
+                                    <label>Lokasi Jemput (Otomatis GPS):</label>
+                                    <div style="display: flex; gap: 8px;">
+                                        <input type="text" id="input-lokasi-pasien" placeholder="Klik tombol ambil GPS ->" readonly style="flex-grow: 1; background: #e2e8f0; font-size: 0.8rem;">
+                                        <button type="button" class="btn-submit-form" onclick="dapatkanLokasiPasien()" style="background-color: #f59e0b; padding: 8px; font-size: 0.8rem;">📍 Ambil GPS</button>
+                                    </div>
+                                </div>
+                                <button class="btn-darurat-main" style="background-color: #ef4444; margin-top: 15px; margin-bottom: 0;" onclick="kirimPermintaanAmbulance()">
+                                    🚨 Pesan & Kirim ke WA Petugas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard PWS Display Area -->
+                    <div id="pwsDisplayArea" style="display: none; flex-direction: column; gap: 20px; width: 100%;">
+                        <div class="glass-panel rounded-xl shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-3 bg-blue-100 text-blue-600 rounded-lg">
+                                    <i class="fa-regular fa-calendar-days text-xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-base font-bold text-gray-800">Periode Pelaporan PWS</h2>
+                                    <p class="text-xs text-gray-500">Pilih rentang waktu untuk pelaporan mingguan.</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <select id="filter-minggu" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium bg-white">
+                                    <option value="1">Minggu ke-1</option>
+                                    <option value="2" selected>Minggu ke-2</option>
+                                    <option value="3">Minggu ke-3</option>
+                                    <option value="4">Minggu ke-4</option>
+                                    <option value="5">Minggu ke-5</option>
+                                </select>
+                                <select id="filter-bulan" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium bg-white">
+                                    <option value="1">Januari</option>
+                                    <option value="2">Februari</option>
+                                    <option value="3">Maret</option>
+                                    <option value="4">April</option>
+                                    <option value="5">Mei</option>
+                                    <option value="6">Juni</option>
+                                    <option value="7">Juli</option>
+                                    <option value="8">Agustus</option>
+                                    <option value="9" selected>September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                                <select id="filter-tahun" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium bg-white">
+                                    <option value="2025">2025</option>
+                                    <option value="2026" selected>2026</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="notification" class="hidden p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 shadow-sm border border-green-200 fade-in" role="alert">
+                            <i class="fa-solid fa-check-circle mr-2"></i><span class="font-bold">Berhasil!</span> <span id="notification-text">Data telah diperbarui.</span>
+                        </div>
+
+                        <!-- Grid 10 Penyakit PWS -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                            <!-- Diare -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-blue-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">Diare</p>
+                                    <i class="fa-solid fa-droplet text-blue-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-diare-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-diare-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-diare-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-diare-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                            <!-- Hipertensi -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-red-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">Hipertensi</p>
+                                    <i class="fa-solid fa-heart-pulse text-red-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-hipertensi-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-hipertensi-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-hipertensi-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-hipertensi-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                            <!-- Stroke -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-purple-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">Stroke</p>
+                                    <i class="fa-solid fa-brain text-purple-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-stroke-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-stroke-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-stroke-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-stroke-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                            <!-- TB Paru -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-orange-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">TB Paru</p>
+                                    <i class="fa-solid fa-lungs text-orange-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-tb-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-tb-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-tb-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-tb-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                            <!-- Diabetes Mellitus -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-yellow-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">Diabetes</p>
+                                    <i class="fa-solid fa-cubes-stacked text-yellow-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-dm-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-dm-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-dm-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-dm-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                            <!-- Dengue -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-green-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">Dengue</p>
+                                    <i class="fa-solid fa-mosquito text-green-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-dengue-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-dengue-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-dengue-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-dengue-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                            <!-- Ibu Hamil -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-pink-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">Ibu Hamil</p>
+                                    <i class="fa-solid fa-person-pregnant text-pink-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-ibuhamil-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-ibuhamil-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-ibuhamil-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-ibuhamil-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                            <!-- Stunting -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-teal-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">Stunting</p>
+                                    <i class="fa-solid fa-child text-teal-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-stunting-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-stunting-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-stunting-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-stunting-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                            <!-- ODGJ -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-indigo-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">ODGJ</p>
+                                    <i class="fa-solid fa-users text-indigo-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-odgj-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-odgj-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-odgj-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-odgj-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                            <!-- Malaria -->
+                            <div class="glass-panel rounded-xl shadow-sm p-3 border-t-4 border-lime-500 hover:shadow-md transition">
+                                <div class="flex justify-between items-start mb-2">
+                                    <p class="text-sm font-bold text-gray-700 uppercase">Malaria</p>
+                                    <i class="fa-solid fa-mosquito text-lime-400 text-lg"></i>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1 text-center border-t pt-2">
+                                    <div><p class="text-[9px] text-gray-500 font-bold uppercase">Kasus</p><p id="sum-malaria-k" class="text-sm font-bold text-red-600">0</p></div>
+                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[9px] text-gray-500 font-bold uppercase" title="Dalam Pemantauan">Pantau</p><p id="sum-malaria-p" class="text-sm font-bold text-yellow-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Sembuh</p><p id="sum-malaria-s" class="text-sm font-bold text-green-600">0</p></div>
+                                    <div class="border-l"><p class="text-[9px] text-gray-500 font-bold uppercase">Meninggal</p><p id="sum-malaria-m" class="text-sm font-bold text-gray-600">0</p></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Struktur Layout: Tabel PWS di Atas, Grafik Trend PWS Dipindahkan ke Bawah -->
+                        <div class="flex flex-col gap-6">
+                            <!-- Tabel PWS -->
+                            <div class="glass-panel rounded-xl shadow-sm overflow-hidden flex flex-col">
+                                <div class="px-6 py-4 border-b border-gray-200 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                                    <h3 class="text-lg font-semibold text-gray-800"><i class="fa-solid fa-map-location-dot mr-2 text-blue-600"></i> Distribusi Kasus per Wilayah (Desa)</h3>
+                                    <div class="text-[11px] sm:text-xs text-gray-500 flex flex-wrap gap-3">
+                                        <span><span class="font-bold text-red-600">K</span> = Kasus</span>
+                                        <span><span class="font-bold text-yellow-600">P</span> = Pantau</span>
+                                        <span><span class="font-bold text-green-600">S</span> = Sembuh</span>
+                                        <span><span class="font-bold text-gray-600">M</span> = Meninggal</span>
+                                    </div>
+                                </div>
+                                <div class="table-container overflow-x-auto overflow-y-visible flex-grow">
+                                    <table class="min-w-full divide-y divide-gray-300">
+                                        <thead class="bg-gray-100">
+                                            <tr>
+                                                <th rowspan="2" class="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider sticky left-0 bg-gray-100 z-10 shadow-[1px_0_0_0_#cbd5e1]">Nama Desa</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Diare</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Hipertensi</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Stroke</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">TB Paru</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">DM</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Dengue</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Ibu Hamil</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Stunting</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">ODGJ</th>
+                                                <th colspan="4" class="px-2 py-2 border-l border-gray-300 text-center text-[11px] font-bold text-gray-700 uppercase tracking-wider">Malaria</th>
+                                                <th colspan="4" class="px-2 py-2 border-l-2 border-gray-400 bg-blue-200 text-center text-[11px] font-bold text-gray-800 uppercase tracking-wider" title="Total Akumulasi Seluruh Penyakit">Total PWS</th>
+                                                <th rowspan="2" class="px-4 py-3 border-l border-gray-300 text-center text-xs font-bold text-gray-700 uppercase tracking-wider min-w-[90px]">Aksi</th>
+                                            </tr>
+                                            <tr class="bg-gray-50 border-t border-gray-200">
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-600 border-l border-gray-300">K</th><th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-600 bg-yellow-50">P</th><th class="px-1 py-1 text-center text-[10px] font-bold text-green-600">S</th><th class="px-1 py-1 text-center text-[10px] font-bold text-gray-600">M</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-red-700 border-l-2 border-gray-400 bg-blue-100">K</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-yellow-900 bg-yellow-300 border border-yellow-400">P</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-green-700 bg-blue-100">S</th>
+                                                <th class="px-1 py-1 text-center text-[10px] font-bold text-gray-800 bg-blue-100">M</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Grafik Trend PWS Dipindahkan ke Bawah -->
+                            <div class="glass-panel rounded-xl shadow-sm p-6 flex flex-col w-full">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2"><i class="fa-solid fa-chart-column mr-2 text-blue-600"></i> Akumulasi Penyakit</h3>
+                                <p class="text-xs text-gray-500 mb-4">Perbandingan antara kasus, pemantauan, sembuh, dan meninggal seluruh wilayah.</p>
+                                <div class="relative w-full" style="height: 350px;">
+                                    <canvas id="trendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="calendarDisplayArea" style="display: none;">
+                        <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
+                    </div>
+
+                    <div id="formDisplayArea" style="display: none;">
+                        <div class="form-area-container">
+                            <h3 style="color: var(--primary);" id="formTitleLabel">Form Data Tautan</h3>
+                            <div class="form-group">
+                                <label>Link:</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="url" id="inputUrlRujukan1" placeholder="https://..." style="flex-grow: 1;">
+                                    <button class="btn-submit-form" type="button" id="btnBukaRujukan1" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan()">Buka Link</button>
+                                </div>
+                            </div>
+                            <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+                        </div>
+                    </div>
+
+                    <div id="formSkriningArea" style="display: none;">
+                        <div class="form-area-container">
+                            <h3 style="color: var(--primary);" id="formSkriningTitleLabel">Form Skrining</h3>
+                            <div class="form-group">
+                                <label>Link:</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="url" id="inputUrlSkrining" placeholder="https://..." style="flex-grow: 1;">
+                                    <button class="btn-submit-form" type="button" id="btnBukaSkrining" style="background-color: var(--accent); display: none;" onclick="bukaUrlSkrining()">Buka Link</button>
+                                </div>
+                            </div>
+                            <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 10px; width: 100%;">Simpan Tautan</button>
+                        </div>
+                    </div>
+
+                    <div id="slideshowDisplayArea">
+                        <div class="slideshow-container" id="slideshowContainerImages"></div>
+                    </div>
+
+                    <div class="upload-area" id="uploadAreaContainer" onclick="triggerUpload()">
+                        <button class="btn-upload" type="button">Pilih Berkas</button>
+                        <input type="file" id="dynamicFileInput" class="file-input-hidden" multiple onchange="handleFiles(this)">
+                    </div>
+                    
+                    <div class="file-list-container" id="fileListContainerArea">
+                        <ul id="dynamicFileList" class="file-list"></ul>
+                    </div>
                 </div>
             </div>
+
+            <div id="homeViewContainer"></div>
         </div>
-
-        <div id="homeViewContainer"></div>
+        
+        <footer>
+            <div class="footer-running">
+                <marquee scrollamount="5">LINTAS KLASTER UPTD PUSKESMAS LANJUT</marquee>
+            </div>
+            <div class="footer-clock" id="liveClock">-</div>
+        </footer>
     </div>
-    
-    <button class="btn-info-fixed" onclick="checkPasswordAndOpenInfo()">ℹ️ Informasi Sistem</button>
 
+    <!-- Modals -->
     <div id="previewModal">
         <div class="modal-content-full">
             <div class="modal-header-full">
@@ -816,22 +1218,10 @@
                 <button class="btn-close-info" onclick="closeInfoModal()">✕</button>
             </div>
             <div class="info-modal-body">
-                <div class="info-item">
-                    <span class="info-label">Total File</span>
-                    <span class="info-value" id="statTotalFile">0</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Penyimpanan Terpakai</span>
-                    <span class="info-value" id="statStorageSize">0 MB</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Status Sistem</span>
-                    <span class="badge-active">Aktif (Supabase)</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Backup Otomatis</span>
-                    <span class="badge-active">Aktif</span>
-                </div>
+                <div class="info-item"><span class="info-label">Total File</span><span class="info-value" id="statTotalFile">0</span></div>
+                <div class="info-item"><span class="info-label">Penyimpanan Terpakai</span><span class="info-value" id="statStorageSize">0 MB</span></div>
+                <div class="info-item"><span class="info-label">Status Sistem</span><span class="badge-active">Aktif (Supabase)</span></div>
+                <div class="info-item"><span class="info-label">Backup Otomatis</span><span class="badge-active">Aktif</span></div>
             </div>
         </div>
     </div>
@@ -850,12 +1240,28 @@
         </div>
     </div>
 
-    <footer>
-        <div class="footer-running">
-            <marquee scrollamount="5">LINTAS KLASTER UPTD PUSKESMAS LANJUT</marquee>
+    <!-- Modal Login Edit PWS Desa -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-70 overflow-y-auto h-full w-full z-50 fade-in flex items-center justify-center backdrop-blur-sm">
+        <div class="relative p-6 border w-full max-w-sm shadow-2xl rounded-2xl bg-white">
+            <div class="mt-2">
+                <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-blue-100 border-4 border-white shadow-md transform -mt-10">
+                    <i class="fa-solid fa-lock text-blue-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg leading-6 font-bold text-gray-900 text-center mt-4">Akses Edit Desa</h3>
+                <p class="text-sm text-gray-500 text-center mt-1 font-semibold text-blue-700" id="modal-desa-name">UPKDK Nama Desa</p>
+                <p class="text-xs text-gray-400 text-center mt-2">Silakan masukkan sandi khusus desa ini.</p>
+                
+                <div class="mt-4">
+                    <input type="password" id="password-input" placeholder="Kata Sandi Desa..." class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-center text-lg tracking-widest">
+                    <p id="login-error" class="text-red-500 text-xs mt-2 hidden text-center font-medium"><i class="fa-solid fa-circle-exclamation"></i> Kata sandi salah!</p>
+                </div>
+                <div class="mt-6 flex gap-3">
+                    <button onclick="closeLoginModal()" class="w-full px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-semibold transition">Batal</button>
+                    <button onclick="verifyPassword()" class="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition shadow-md">Buka Kunci</button>
+                </div>
+            </div>
         </div>
-        <div class="footer-clock" id="liveClock">-</div>
-    </footer>
+    </div>
 
     <!-- JavaScript Terintegrasi -->
     <script>
@@ -915,7 +1321,7 @@
                 if(success) {
                     if (pwd === systemPassword || pwd === 'admin') {
                         selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle);
-                        closeMobileMenu();
+                        closeHamburgerMenu();
                     } else if (pwd !== "") {
                         alert("Password yang Anda masukkan salah!");
                     }
@@ -998,25 +1404,41 @@
 
         function triggerUpload() { document.getElementById('dynamicFileInput').click(); }
 
-        function toggleMobileMenu() {
-            const nav = document.getElementById('navLinksContainer');
-            nav.classList.toggle('show');
+        function toggleHamburgerMenu(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('hamburgerDropdownList');
+            dropdown.classList.toggle('show');
         }
 
-        function closeMobileMenu() {
-            const nav = document.getElementById('navLinksContainer');
-            if (nav.classList.contains('show')) nav.classList.remove('show');
+        function closeHamburgerMenu() {
+            const dropdown = document.getElementById('hamburgerDropdownList');
+            if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
         }
 
         function toggleDropdown(element, event) {
-            if (window.innerWidth <= 1150) {
-                event.stopPropagation();
-                document.querySelectorAll('.nav-dropdown').forEach(drop => {
-                    if (drop !== element) drop.classList.remove('active-dropdown');
-                });
-                element.classList.toggle('active-dropdown');
+            event.stopPropagation();
+            const content = element.querySelector('.nav-dropdown-content');
+            const isOpen = element.classList.contains('active-dropdown');
+            
+            // Tutup semua dropdown lain dalam hamburger menu
+            document.querySelectorAll('.hamburger-dropdown .nav-dropdown').forEach(drop => {
+                drop.classList.remove('active-dropdown');
+            });
+
+            if (!isOpen) {
+                element.classList.add('active-dropdown');
             }
         }
+
+        window.addEventListener('click', (e) => {
+            const wrapper = document.getElementById('hamburgerWrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                closeHamburgerMenu();
+            }
+            document.querySelectorAll('.hamburger-dropdown .nav-dropdown').forEach(drop => {
+                if (!drop.contains(e.target)) drop.classList.remove('active-dropdown');
+            });
+        });
 
         function updateLiveClock() {
             const now = new Date();
@@ -1033,8 +1455,8 @@
             const dropPPT = document.getElementById('dropPPT');
             let htmlLaporan = "", htmlPPT = "";
             for(let i=0; i<12; i++) {
-                htmlLaporan += `<a onclick="verifyAndSelectMenu('lokmin', ${i}, 'Laporan Bulanan', '${monthNames[i]}')">${monthNames[i]}</a>`;
-                htmlPPT += `<a onclick="verifyAndSelectMenu('pptlokmin', ${i}, 'PPT Lokmin', '${monthNames[i]}')">${monthNames[i]}</a>`;
+                htmlLaporan += `<a onclick="verifyAndSelectMenu('lokmin', ${i}, 'Laporan Bulanan', '${monthNames[i]}'); closeHamburgerMenu();">${monthNames[i]}</a>`;
+                htmlPPT += `<a onclick="verifyAndSelectMenu('pptlokmin', ${i}, 'PPT Lokmin', '${monthNames[i]}'); closeHamburgerMenu();">${monthNames[i]}</a>`;
             }
             dropLaporan.innerHTML = htmlLaporan;
             dropPPT.innerHTML = htmlPPT;
@@ -1109,6 +1531,7 @@
             const ambulanceArea = document.getElementById('ambulanceDisplayArea');
             const rujukanUpkdkArea = document.getElementById('rujukanUpkdkDisplayArea');
             const rujukanInternalArea = document.getElementById('rujukanInternalDisplayArea');
+            const pwsArea = document.getElementById('pwsDisplayArea');
 
             if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
 
@@ -1121,6 +1544,7 @@
             ambulanceArea.style.display = 'none';
             rujukanUpkdkArea.style.display = 'none';
             rujukanInternalArea.style.display = 'none';
+            pwsArea.style.display = 'none';
 
             if (categoryCode === 'jadwal') {
                 calArea.style.display = 'block';
@@ -1146,6 +1570,9 @@
             } else if (categoryCode === 'ambulance') {
                 ambulanceArea.style.display = 'flex';
                 muatDataPetugasAmbulance();
+            } else if (categoryCode === 'pws') {
+                pwsArea.style.display = 'flex';
+                renderTable();
             } else {
                 uploadArea.style.display = 'block';
                 fileListArea.style.display = 'block';
@@ -1154,7 +1581,7 @@
             document.getElementById('dynamicFileList').innerHTML = '';
             document.getElementById('slideshowContainerImages').innerHTML = '';
             
-            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
+            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && categoryCode !== 'pws' && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
                 loadFilesForCurrentMenu(categoryCode);
             }
         }
@@ -1216,10 +1643,9 @@
 
         function checkUploadAreaVisibility() {
             const categoryCode = currentMenuId.split("-")[0];
-            const periodIdentifier = currentMenuId.split("-")[1];
             const uploadArea = document.getElementById('uploadAreaContainer');
             
-            if (categoryCode === 'rujukan' || categoryCode === 'rujukan_upkdk' || categoryCode === 'inventaris' || categoryCode === 'skrining' || categoryCode === 'ambulance') {
+            if (categoryCode === 'rujukan' || categoryCode === 'rujukan_upkdk' || categoryCode === 'inventaris' || categoryCode === 'skrining' || categoryCode === 'ambulance' || categoryCode === 'pws') {
                 uploadArea.style.display = 'none';
                 return;
             }
@@ -1335,9 +1761,6 @@
             document.getElementById('modalBody').innerHTML = ''; 
         }
 
-        // ==========================================
-        // FITUR RUJUKAN INTERNAL / SBAR
-        // ==========================================
         function initRujukanInternalDateTime() {
             const now = new Date();
             const year = now.getFullYear();
@@ -1404,9 +1827,6 @@
             }, 1200);
         }
 
-        // ==========================================
-        // FITUR PELAYANAN AMBULANCE & DARURAT
-        // ==========================================
         let linkMapsPasien = "";
 
         function verifikasiEditPetugas() {
@@ -1554,9 +1974,6 @@
             window.open(`https://wa.me/${formattedNomor}?text=${pesan}`, '_blank');
         }
 
-        // ==========================================
-        // FITUR FORMULIR RUJUKAN UPKD/K
-        // ==========================================
         function toggleLainnya() {
             const cbLainnya = document.getElementById('cbLainnya');
             const groupLainnya = document.getElementById('groupLainnya');
@@ -1686,6 +2103,309 @@
             document.getElementById('rujukanForm').reset();
             document.getElementById('groupLainnya').style.display = 'none';
             document.getElementById('tanggalRujukan').valueAsDate = new Date();
+        }
+
+        // Script Dashboard PWS
+        let pwsData = [
+            { id: 1, desa: 'UPKDK Desa Berindat', password: 'berindat123', diare_k: 12, diare_s: 10, diare_m: 0, hipertensi_k: 45, hipertensi_s: 12, hipertensi_m: 1, stroke_k: 2, stroke_s: 0, stroke_m: 1, tb_k: 4, tb_s: 1, tb_m: 0, dm_k: 20, dm_s: 5, dm_m: 0, dengue_k: 1, dengue_s: 1, dengue_m: 0, ibuhamil_k: 5, ibuhamil_s: 4, ibuhamil_m: 0, stunting_k: 3, stunting_s: 1, stunting_m: 0, odgj_k: 2, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
+            { id: 2, desa: 'UPKDK Desa Persing', password: 'persing123', diare_k: 8, diare_s: 8, diare_m: 0, hipertensi_k: 30, hipertensi_s: 10, hipertensi_m: 0, stroke_k: 1, stroke_s: 0, stroke_m: 0, tb_k: 2, tb_s: 2, tb_m: 0, dm_k: 15, dm_s: 4, dm_m: 1, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 3, ibuhamil_s: 2, ibuhamil_m: 0, stunting_k: 5, stunting_s: 2, stunting_m: 0, odgj_k: 1, odgj_s: 0, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
+            { id: 3, desa: 'UPKDK Desa Sedamai', password: 'sedamai123', diare_k: 15, diare_s: 12, diare_m: 1, hipertensi_k: 50, hipertensi_s: 20, hipertensi_m: 2, stroke_k: 4, stroke_s: 1, stroke_m: 0, tb_k: 5, tb_s: 3, tb_m: 1, dm_k: 25, dm_s: 10, dm_m: 0, dengue_k: 2, dengue_s: 2, dengue_m: 0, ibuhamil_k: 8, ibuhamil_s: 6, ibuhamil_m: 0, stunting_k: 7, stunting_s: 3, stunting_m: 0, odgj_k: 0, odgj_s: 0, odgj_m: 0, malaria_k: 1, malaria_s: 1, malaria_m: 0 },
+            { id: 4, desa: 'UPKDK Desa Lanjut', password: 'lanjut123', diare_k: 5, diare_s: 5, diare_m: 0, hipertensi_k: 20, hipertensi_s: 15, hipertensi_m: 0, stroke_k: 0, stroke_s: 0, stroke_m: 0, tb_k: 1, tb_s: 1, tb_m: 0, dm_k: 10, dm_s: 8, dm_m: 0, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 2, ibuhamil_s: 2, ibuhamil_m: 0, stunting_k: 2, stunting_s: 1, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
+            { id: 5, desa: 'UPKDK Desa Kote', password: 'kote123', diare_k: 10, diare_s: 9, diare_m: 0, hipertensi_k: 35, hipertensi_s: 15, hipertensi_m: 1, stroke_k: 1, stroke_s: 0, stroke_m: 0, tb_k: 3, tb_s: 2, tb_m: 0, dm_k: 18, dm_s: 12, dm_m: 0, dengue_k: 1, dengue_s: 1, dengue_m: 0, ibuhamil_k: 4, ibuhamil_s: 3, ibuhamil_m: 0, stunting_k: 4, stunting_s: 2, stunting_m: 0, odgj_k: 0, odgj_s: 0, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
+            { id: 6, desa: 'UPKDK Desa Pelakak', password: 'pelakak123', diare_k: 7, diare_s: 7, diare_m: 0, hipertensi_k: 25, hipertensi_s: 18, hipertensi_m: 0, stroke_k: 0, stroke_s: 0, stroke_m: 0, tb_k: 2, tb_s: 2, tb_m: 0, dm_k: 12, dm_s: 10, dm_m: 0, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 2, ibuhamil_s: 1, ibuhamil_m: 0, stunting_k: 1, stunting_s: 0, stunting_m: 0, odgj_k: 1, odgj_s: 0, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 }
+        ];
+
+        let editState = {};
+        let currentEditingId = null;
+        let trendChartInstance = null;
+
+        function showNotification(message) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notification-text').textContent = message;
+            notif.classList.remove('hidden');
+            setTimeout(() => { notif.classList.add('hidden'); }, 3500);
+        }
+
+        function promptLogin(id) {
+            currentEditingId = id;
+            const desaObj = pwsData.find(item => item.id === id);
+            document.getElementById('modal-desa-name').textContent = desaObj ? desaObj.desa : '';
+            document.getElementById('password-input').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('hidden');
+            document.getElementById('password-input').focus();
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+            currentEditingId = null;
+        }
+
+        function verifyPassword() {
+            const inputVal = document.getElementById('password-input').value;
+            const desaObj = pwsData.find(item => item.id === currentEditingId);
+            
+            if (desaObj && inputVal === desaObj.password) {
+                editState[currentEditingId] = true;
+                closeLoginModal();
+                renderTable();
+                showNotification(`Akses Edit dibuka untuk ${desaObj.desa}`);
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function cancelEdit(id) {
+            editState[id] = false;
+            renderTable();
+        }
+
+        function calcPantau(k, s, m) {
+            let val = k - (s + m);
+            return val < 0 ? 0 : val;
+        }
+
+        function getDesaTotals(item) {
+            let kTotal = item.diare_k + item.hipertensi_k + item.stroke_k + item.tb_k + item.dm_k + item.dengue_k + item.ibuhamil_k + item.stunting_k + item.odgj_k + item.malaria_k;
+            let sTotal = item.diare_s + item.hipertensi_s + item.stroke_s + item.tb_s + item.dm_s + item.dengue_s + item.ibuhamil_s + item.stunting_s + item.odgj_s + item.malaria_s;
+            let mTotal = item.diare_m + item.hipertensi_m + item.stroke_m + item.tb_m + item.dm_m + item.dengue_m + item.ibuhamil_m + item.stunting_m + item.odgj_m + item.malaria_m;
+            let pTotal = calcPantau(item.diare_k, item.diare_s, item.diare_m) +
+                         calcPantau(item.hipertensi_k, item.hipertensi_s, item.hipertensi_m) +
+                         calcPantau(item.stroke_k, item.stroke_s, item.stroke_m) +
+                         calcPantau(item.tb_k, item.tb_s, item.tb_m) +
+                         calcPantau(item.dm_k, item.dm_s, item.dm_m) +
+                         calcPantau(item.dengue_k, item.dengue_s, item.dengue_m) +
+                         calcPantau(item.ibuhamil_k, item.ibuhamil_s, item.ibuhamil_m) +
+                         calcPantau(item.stunting_k, item.stunting_s, item.stunting_m) +
+                         calcPantau(item.odgj_k, item.odgj_s, item.odgj_m) +
+                         calcPantau(item.malaria_k, item.malaria_s, item.malaria_m);
+            return { k: kTotal, p: pTotal, s: sTotal, m: mTotal };
+        }
+
+        function handleLiveInput(id, disease, type) {
+            const kInput = document.getElementById(`input-${id}-${disease}-k`);
+            const sInput = document.getElementById(`input-${id}-${disease}-s`);
+            const mInput = document.getElementById(`input-${id}-${disease}-m`);
+            const pCell = document.getElementById(`live-p-${id}-${disease}`);
+
+            if (!kInput || !sInput || !mInput) return;
+
+            let k = parseInt(kInput.value) || 0;
+            let s = parseInt(sInput.value) || 0;
+            let m = parseInt(mInput.value) || 0;
+
+            if (s + m > k) {
+                if (type === 's' && s + m > k) {
+                    s = Math.max(0, k - m);
+                    sInput.value = s;
+                } else if (type === 'm' && s + m > k) {
+                    m = Math.max(0, k - s);
+                    mInput.value = m;
+                }
+            }
+
+            let p = calcPantau(k, s, m);
+            if (pCell) pCell.textContent = p;
+
+            const item = pwsData.find(d => d.id === id);
+            if (item) {
+                item[disease + '_k'] = k;
+                item[disease + '_s'] = s;
+                item[disease + '_m'] = m;
+            }
+
+            const totals = getDesaTotals(item);
+            const totK = document.getElementById(`tot-k-${id}`);
+            const totP = document.getElementById(`tot-p-${id}`);
+            const totS = document.getElementById(`tot-s-${id}`);
+            const totM = document.getElementById(`tot-m-${id}`);
+
+            if (totK) totK.textContent = totals.k;
+            if (totP) totP.textContent = totals.p;
+            if (totS) totS.textContent = totals.s;
+            if (totM) totM.textContent = totals.m;
+
+            updateGlobalSummaryAndChart();
+        }
+
+        function saveRow(id) {
+            const diseases = ['diare', 'hipertensi', 'stroke', 'tb', 'dm', 'dengue', 'ibuhamil', 'stunting', 'odgj', 'malaria'];
+            const item = pwsData.find(d => d.id === id);
+
+            if (item) {
+                diseases.forEach(dis => {
+                    const kIn = document.getElementById(`input-${id}-${dis}-k`);
+                    const sIn = document.getElementById(`input-${id}-${dis}-s`);
+                    const mIn = document.getElementById(`input-${id}-${dis}-m`);
+
+                    if (kIn && sIn && mIn) {
+                        item[dis + '_k'] = parseInt(kIn.value) || 0;
+                        item[dis + '_s'] = parseInt(sIn.value) || 0;
+                        item[dis + '_m'] = parseInt(mIn.value) || 0;
+                    }
+                });
+            }
+
+            editState[id] = false;
+            renderTable();
+            showNotification('Data berhasil disimpan!');
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            pwsData.forEach(item => {
+                const isEditing = editState[item.id] || false;
+                const row = document.createElement('tr');
+                row.className = "hover:bg-blue-50/50 transition";
+
+                const totals = getDesaTotals(item);
+
+                let html = `
+                    <td class="px-4 py-3 whitespace-nowrap text-xs font-bold text-gray-900 sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#cbd5e1]">${item.desa}</td>
+                `;
+
+                const diseases = [
+                    { key: 'diare', k: item.diare_k, p: calcPantau(item.diare_k, item.diare_s, item.diare_m), s: item.diare_s, m: item.diare_m },
+                    { key: 'hipertensi', k: item.hipertensi_k, p: calcPantau(item.hipertensi_k, item.hipertensi_s, item.hipertensi_m), s: item.hipertensi_s, m: item.hipertensi_m },
+                    { key: 'stroke', k: item.stroke_k, p: calcPantau(item.stroke_k, item.stroke_s, item.stroke_m), s: item.stroke_s, m: item.stroke_m },
+                    { key: 'tb', k: item.tb_k, p: calcPantau(item.tb_k, item.tb_s, item.tb_m), s: item.tb_s, m: item.tb_m },
+                    { key: 'dm', k: item.dm_k, p: calcPantau(item.dm_k, item.dm_s, item.dm_m), s: item.dm_s, m: item.dm_m },
+                    { key: 'dengue', k: item.dengue_k, p: calcPantau(item.dengue_k, item.dengue_s, item.dengue_m), s: item.dengue_s, m: item.dengue_m },
+                    { key: 'ibuhamil', k: item.ibuhamil_k, p: calcPantau(item.ibuhamil_k, item.ibuhamil_s, item.ibuhamil_m), s: item.ibuhamil_s, m: item.ibuhamil_m },
+                    { key: 'stunting', k: item.stunting_k, p: calcPantau(item.stunting_k, item.stunting_s, item.stunting_m), s: item.stunting_s, m: item.stunting_m },
+                    { key: 'odgj', k: item.odgj_k, p: calcPantau(item.odgj_k, item.odgj_s, item.odgj_m), s: item.odgj_s, m: item.odgj_m },
+                    { key: 'malaria', k: item.malaria_k, p: calcPantau(item.malaria_k, item.malaria_s, item.malaria_m), s: item.malaria_s, m: item.malaria_m }
+                ];
+
+                diseases.forEach(dis => {
+                    if (isEditing) {
+                        html += `
+                            <td class="px-1 py-1 text-center border-l border-gray-200"><input type="number" min="0" id="input-${item.id}-${dis.key}-k" value="${dis.k}" oninput="handleLiveInput(${item.id}, '${dis.key}', 'k')" class="w-10 text-center text-xs border rounded p-0.5 focus:border-blue-500 font-bold text-red-600 bg-white"></td>
+                            <td class="px-1 py-1 text-center bg-yellow-50 font-bold text-yellow-600 text-xs" id="live-p-${item.id}-${dis.key}">${dis.p}</td>
+                            <td class="px-1 py-1 text-center"><input type="number" min="0" id="input-${item.id}-${dis.key}-s" value="${dis.s}" oninput="handleLiveInput(${item.id}, '${dis.key}', 's')" class="w-10 text-center text-xs border rounded p-0.5 focus:border-blue-500 font-bold text-green-600 bg-white"></td>
+                            <td class="px-1 py-1 text-center"><input type="number" min="0" id="input-${item.id}-${dis.key}-m" value="${dis.m}" oninput="handleLiveInput(${item.id}, '${dis.key}', 'm')" class="w-10 text-center text-xs border rounded p-0.5 focus:border-blue-500 font-bold text-gray-600 bg-white"></td>
+                        `;
+                    } else {
+                        html += `
+                            <td class="px-1 py-1 text-center text-xs font-bold text-red-600 border-l border-gray-200">${dis.k}</td>
+                            <td class="px-1 py-1 text-center text-xs font-bold text-yellow-600 bg-yellow-50">${dis.p}</td>
+                            <td class="px-1 py-1 text-center text-xs font-bold text-green-600">${dis.s}</td>
+                            <td class="px-1 py-1 text-center text-xs font-bold text-gray-600">${dis.m}</td>
+                        `;
+                    }
+                });
+
+                html += `
+                    <td id="tot-k-${item.id}" class="px-1 py-1 text-center text-xs font-bold text-red-700 border-l-2 border-gray-400 bg-blue-50">${totals.k}</td>
+                    <td id="tot-p-${item.id}" class="px-1 py-1 text-center text-xs font-extrabold text-yellow-900 bg-yellow-300 border border-yellow-400 blinking-badge">${totals.p}</td>
+                    <td id="tot-s-${item.id}" class="px-1 py-1 text-center text-xs font-bold text-green-700 bg-blue-50">${totals.s}</td>
+                    <td id="tot-m-${item.id}" class="px-1 py-1 text-center text-xs font-bold text-gray-800 bg-blue-50">${totals.m}</td>
+                `;
+
+                if (isEditing) {
+                    html += `
+                        <td class="px-2 py-2 text-center border-l border-gray-200 whitespace-nowrap">
+                            <button onclick="saveRow(${item.id})" class="bg-green-600 hover:bg-green-700 text-white px-2.5 py-1 rounded text-xs font-semibold shadow mr-1 transition"><i class="fa-solid fa-check"></i></button>
+                            <button onclick="cancelEdit(${item.id})" class="bg-gray-400 hover:bg-gray-500 text-white px-2.5 py-1 rounded text-xs font-semibold shadow transition"><i class="fa-solid fa-xmark"></i></button>
+                        </td>
+                    `;
+                } else {
+                    html += `
+                        <td class="px-2 py-2 text-center border-l border-gray-200 whitespace-nowrap">
+                            <button onclick="promptLogin(${item.id})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit</button>
+                        </td>
+                    `;
+                }
+
+                row.innerHTML = html;
+                tbody.appendChild(row);
+            });
+
+            updateGlobalSummaryAndChart();
+        }
+
+        function updateGlobalSummaryAndChart() {
+            let sums = {
+                diare: { k: 0, p: 0, s: 0, m: 0 },
+                hipertensi: { k: 0, p: 0, s: 0, m: 0 },
+                stroke: { k: 0, p: 0, s: 0, m: 0 },
+                tb: { k: 0, p: 0, s: 0, m: 0 },
+                dm: { k: 0, p: 0, s: 0, m: 0 },
+                dengue: { k: 0, p: 0, s: 0, m: 0 },
+                ibuhamil: { k: 0, p: 0, s: 0, m: 0 },
+                stunting: { k: 0, p: 0, s: 0, m: 0 },
+                odgj: { k: 0, p: 0, s: 0, m: 0 },
+                malaria: { k: 0, p: 0, s: 0, m: 0 }
+            };
+
+            const allKeys = ['diare', 'hipertensi', 'stroke', 'tb', 'dm', 'dengue', 'ibuhamil', 'stunting', 'odgj', 'malaria'];
+            
+            pwsData.forEach(item => {
+                allKeys.forEach(k => {
+                    sums[k].k += item[k + '_k'];
+                    sums[k].s += item[k + '_s'];
+                    sums[k].m += item[k + '_m'];
+                    sums[k].p += calcPantau(item[k + '_k'], item[k + '_s'], item[k + '_m']);
+                });
+            });
+
+            for (let key in sums) {
+                const elK = document.getElementById(`sum-${key}-k`);
+                const elP = document.getElementById(`sum-${key}-p`);
+                const elS = document.getElementById(`sum-${key}-s`);
+                const elM = document.getElementById(`sum-${key}-m`);
+
+                if (elK) elK.textContent = sums[key].k;
+                if (elP) elP.textContent = sums[key].p;
+                if (elS) elS.textContent = sums[key].s;
+                if (elM) elM.textContent = sums[key].m;
+            }
+
+            const labels = ['Diare', 'Hipertensi', 'Stroke', 'TB Paru', 'Diabetes', 'Dengue', 'Ibu Hamil', 'Stunting', 'ODGJ', 'Malaria'];
+            const dataK = labels.map((_, i) => sums[allKeys[i]].k);
+            const dataP = labels.map((_, i) => sums[allKeys[i]].p);
+            const dataS = labels.map((_, i) => sums[allKeys[i]].s);
+            const dataM = labels.map((_, i) => sums[allKeys[i]].m);
+
+            const canvasEl = document.getElementById('trendChart');
+            if(!canvasEl) return;
+
+            if (trendChartInstance) {
+                trendChartInstance.data.labels = labels;
+                trendChartInstance.data.datasets[0].data = dataK;
+                trendChartInstance.data.datasets[1].data = dataP;
+                trendChartInstance.data.datasets[2].data = dataS;
+                trendChartInstance.data.datasets[3].data = dataM;
+                trendChartInstance.update();
+            } else {
+                const ctx = canvasEl.getContext('2d');
+                trendChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'Kasus', data: dataK, backgroundColor: '#dc2626', borderRadius: 4 },
+                            { label: 'Pemantauan', data: dataP, backgroundColor: '#ca8a04', borderRadius: 4 },
+                            { label: 'Sembuh', data: dataS, backgroundColor: '#16a34a', borderRadius: 4 },
+                            { label: 'Meninggal', data: dataM, backgroundColor: '#4b5563', borderRadius: 4 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, grid: { borderDash: [2, 2] } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
         }
     </script>
 </body>
