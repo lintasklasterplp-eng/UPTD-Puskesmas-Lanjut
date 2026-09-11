@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -37,7 +38,7 @@
 
         body {
             color: var(--text-main);
-            height: 100vh;
+            height: 100vh; height: 100dvh;
             width: 100vw;
             overflow: hidden;
             display: flex;
@@ -49,7 +50,7 @@
             background-repeat: no-repeat;
         }
 
-        /* Top Header Utama */
+        /* Top Header Utama - Diperkecil padding atas-bawah agar tombol navigasi naik */
         header {
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
@@ -63,7 +64,7 @@
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 20px;
+            padding: 2px 12px;
         }
 
         .navbar {
@@ -72,17 +73,18 @@
             width: auto;
         }
 
+        /* Logo Diperbesar */
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             text-decoration: none;
             max-width: 100%;
         }
 
         .logo-img {
-            width: 35px;
-            height: 35px;
+            width: 45px;
+            height: 45px;
             object-fit: cover;
             border-radius: 50%;
             border: 2px solid var(--primary);
@@ -96,8 +98,9 @@
             overflow: hidden;
         }
 
+        /* Tulisan UPTD PUSKESMAS LANJUT Diperbesar */
         .logo-text {
-            font-size: 0.95rem;
+            font-size: 1.2rem;
             font-weight: 800;
             color: var(--primary);
             line-height: 1.1;
@@ -105,36 +108,33 @@
         }
 
         .logo-subtext {
-            font-size: 0.6rem;
+            font-size: 0.7rem;
             font-weight: 600;
             color: var(--text-muted);
         }
 
-        /* Navigasi Horizontal Desktop & Mobile */
+        /* Navigasi Horizontal Desktop & Mobile - Dinaikkan */
         .top-nav-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            padding: 5px 0;
+            gap: 6px;
+            padding: 2px 0;
             background: transparent;
             justify-content: flex-end;
             flex: 1;
         }
 
+        .hamburger-btn { display: none; background: transparent; border: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; padding: 4px; }
+        
         @media (max-width: 900px) {
-            header {
-                flex-direction: column;
-                padding: 12px 15px;
-                gap: 10px;
-            }
-            .navbar {
-                justify-content: center;
-                width: 100%;
-            }
-            .top-nav-bar {
-                justify-content: center;
-                width: 100%;
-            }
+            header { flex-direction: column; padding: 8px 12px; gap: 6px; align-items: stretch; }
+            .navbar { justify-content: space-between; width: 100%; }
+            .hamburger-btn { display: block; }
+            .top-nav-bar { display: none; flex-direction: column; width: 100%; align-items: stretch; }
+            .top-nav-bar.show-mobile { display: flex; }
+            .nav-item, .nav-btn-h { width: 100%; text-align: left; justify-content: space-between; }
+            .dropdown-content-h { position: static; transform: none; width: 100%; box-shadow: none; border: 1px solid #cbd5e1; margin-top: 5px; }
+            .sub-dropdown-content { position: static; width: 100%; box-shadow: none; margin-top: 5px; border-left: 3px solid var(--primary); }
         }
         
         .nav-item { position: relative; outline: none; }
@@ -144,15 +144,15 @@
             border: 1px solid #cbd5e1;
             color: var(--primary);
             font-weight: 700;
-            font-size: 0.75rem;
-            padding: 8px 14px;
-            border-radius: 8px;
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border-radius: 7px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .nav-btn-h:hover, .nav-item:focus-within .nav-btn-h {
@@ -181,7 +181,7 @@
         
         .dropdown-content-h a, .dropdown-content-h .sub-nav-btn {
             color: var(--text-main);
-            padding: 10px 15px;
+            padding: 8px 14px;
             text-decoration: none;
             display: flex;
             justify-content: space-between;
@@ -257,7 +257,7 @@
             100% { background-color: rgba(239, 68, 68, 0.95); color: white; border-color: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
         }
         
-        /* Tombol Ambulance & Darurat di Sudut Kiri Bawah (Dioptimalkan untuk HP) */
+        /* Tombol Ambulance & Darurat di Sudut Kiri Bawah */
         .btn-ambulance-fixed {
             position: fixed;
             bottom: 45px;
@@ -371,7 +371,7 @@
         .slide-img { max-width: 100%; max-height: 100%; object-fit: contain; position: absolute; opacity: 0; transition: opacity 1s ease-in-out; }
         .slide-img.active { opacity: 1; }
 
-        #previewModal, #infoModal, #passwordModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 10px; backdrop-filter: blur(5px); }
+        #previewModal, #infoModal, #passwordModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; background: rgba(15, 23, 42, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 10px; backdrop-filter: blur(5px); }
         .modal-content-full { background: #fff; width: 100%; height: 100%; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
         .modal-header-full { padding: 12px 15px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
         .btn-close-back { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.95rem; }
@@ -492,7 +492,7 @@
 
     <!-- Header Atas (Logo dan Tombol Hamburger Menu Ikon Saja di Pojok Kanan Atas) -->
     <header>
-        <div class="navbar">
+        <div class="navbar" style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
             <a href="#" class="logo-container" onclick="resetToHome()">
                 <img src="WhatsApp Image 2026-08-23 at 21.43.36 (1).jpeg" alt="Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/40/047857/FFFFFF?text=P'">
                 <div class="logo-text-wrapper">
@@ -500,8 +500,11 @@
                     <span class="logo-subtext">Integrasi Layanan Primer</span>
                 </div>
             </a>
+            <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
-        <div class="top-nav-bar">
+        <div class="top-nav-bar" id="topNavBar">
             <!-- Pelayanan -->
             <div class="nav-item" tabindex="0">
                 <button class="nav-btn-h"><i class="fa-solid fa-stethoscope"></i> Pelayanan ▾</button>
@@ -1463,6 +1466,10 @@
 
         function triggerUpload() { document.getElementById('dynamicFileInput').click(); }
 
+        function toggleMobileMenu() {
+            document.getElementById('topNavBar').classList.toggle('show-mobile');
+        }
+
         function toggleHamburgerMenu(event) {
             event.stopPropagation();
             const dropdown = document.getElementById('hamburgerDropdownList');
@@ -1572,6 +1579,7 @@
         function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
 
         function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
+            document.getElementById('topNavBar').classList.remove('show-mobile');
             currentMenuId = categoryCode + "-" + periodIdentifier;
 
             document.getElementById('homeViewContainer').style.display = 'none';
@@ -1820,7 +1828,6 @@
             document.getElementById('modalBody').innerHTML = ''; 
         }
 
-        
         let sbarNomorUsed = false;
 
         function getRomanMonth(monthIndex) {
