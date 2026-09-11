@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -60,14 +59,17 @@
             width: 100%;
             flex-shrink: 0;
             position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px;
         }
 
         .navbar {
-            padding: 10px 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            width: 100%;
+            width: auto;
         }
 
         .logo-container {
@@ -75,7 +77,7 @@
             align-items: center;
             gap: 10px;
             text-decoration: none;
-            max-width: calc(100% - 50px);
+            max-width: 100%;
         }
 
         .logo-img {
@@ -95,13 +97,11 @@
         }
 
         .logo-text {
-            font-size: 0.8rem;
+            font-size: 0.95rem;
             font-weight: 800;
             color: var(--primary);
             line-height: 1.1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
         }
 
         .logo-subtext {
@@ -110,122 +110,132 @@
             color: var(--text-muted);
         }
 
-        /* Tombol Hamburger Garis 3 di Pojok Kanan Atas (Hanya Ikon Saja) */
-        .hamburger-menu-wrapper {
-            position: relative;
+        /* Navigasi Horizontal Desktop & Mobile */
+        .top-nav-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 5px 0;
+            background: transparent;
+            justify-content: flex-end;
+            flex: 1;
         }
 
-        .btn-hamburger {
-            background: rgba(4, 120, 87, 0.1);
-            border: 1px solid rgba(4, 120, 87, 0.3);
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                padding: 12px 15px;
+                gap: 10px;
+            }
+            .navbar {
+                justify-content: center;
+                width: 100%;
+            }
+            .top-nav-bar {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+        
+        .nav-item { position: relative; outline: none; }
+        
+        .nav-btn-h {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             color: var(--primary);
-            font-size: 1.15rem;
-            padding: 6px 10px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 8px 14px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-
-        .btn-hamburger:hover {
-            background: rgba(4, 120, 87, 0.2);
+        
+        .nav-btn-h:hover, .nav-item:focus-within .nav-btn-h {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
         }
-
-        /* Dropdown Menu Utama dari Tombol Garis 3 (Mobile Friendly) */
-        .hamburger-dropdown {
+        
+        .dropdown-content-h {
             display: none;
             position: absolute;
-            top: calc(100% + 10px);
-            right: 0;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
             background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-            width: 280px;
-            max-width: calc(100vw - 30px);
-            z-index: 1100;
-            border: 1px solid var(--border);
-            padding: 8px;
-            animation: fadeInDrop 0.2s ease-in-out;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .hamburger-dropdown.show {
-            display: flex;
+            min-width: 170px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            z-index: 1200;
             flex-direction: column;
-            gap: 4px;
+            margin-top: 5px;
         }
-
-        @keyframes fadeInDrop { 
-            from { opacity: 0; transform: translateY(-8px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        .nav-btn {
-            background-color: transparent; 
-            color: var(--text-main); 
-            border: 1px solid transparent; 
-            font-size: 0.8rem; 
-            font-weight: 600;
-            cursor: pointer; 
-            padding: 10px 12px; 
-            border-radius: 6px;
-            transition: all 0.2s ease-in-out; 
+        
+        .nav-item:hover .dropdown-content-h, .nav-item:focus-within .dropdown-content-h { display: flex; }
+        
+        .dropdown-content-h a, .dropdown-content-h .sub-nav-btn {
+            color: var(--text-main);
+            padding: 10px 15px;
+            text-decoration: none;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            background: transparent;
+            border-left: none; border-right: none; border-top: none;
             width: 100%;
             text-align: left;
-            text-decoration: none;
-        }
-
-        .nav-btn:hover, .nav-dropdown.active-dropdown > .nav-btn { 
-            background-color: rgba(4, 120, 87, 0.1); 
-            color: var(--primary); 
-        }
-
-        .nav-dropdown { 
-            position: relative; 
-            width: 100%; 
         }
         
-        .nav-dropdown-content { 
-            display: none; 
-            flex-direction: column;
-            background: #f8fafc; 
-            border-radius: 6px; 
-            margin-top: 2px;
-            overflow: hidden; 
-            border-left: 2px solid var(--primary);
-            margin-left: 6px;
-        }
-
-        .nav-dropdown.active-dropdown .nav-dropdown-content {
-            display: flex;
+        .dropdown-content-h a:hover, .dropdown-content-h .sub-nav-btn:hover, .sub-dropdown:focus-within .sub-nav-btn {
+            background-color: rgba(4, 120, 87, 0.1);
+            color: var(--primary);
         }
         
-        .nav-dropdown-content a { 
-            color: var(--text-main); 
-            padding: 10px 12px; 
-            text-decoration: none; 
-            display: block; 
-            font-size: 0.75rem; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: background 0.2s, color 0.2s; 
-            border-bottom: 1px solid rgba(226, 232, 240, 0.6); 
+        .sub-dropdown { position: relative; width: 100%; outline: none; }
+        
+        .sub-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            background: #ffffff;
+            min-width: 170px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            z-index: 1300;
+            margin-left: 2px;
         }
-        .nav-dropdown-content a:last-child { border-bottom: none; }
-        .nav-dropdown-content a:hover { background-color: rgba(4, 120, 87, 0.15); color: var(--primary); }
+        
+        .sub-dropdown:hover .sub-dropdown-content, .sub-dropdown:focus-within .sub-dropdown-content { display: flex; flex-direction: column; }
+
+        @media (max-width: 768px) {
+            .sub-dropdown-content {
+                left: 10%;
+                top: 100%;
+                margin-top: 0;
+                width: 90%;
+            }
+            .dropdown-content-h {
+                left: 0;
+                transform: none;
+            }
+        }
 
         .content-wrapper {
-            flex-grow: 1;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 60px);
             overflow-y: auto;
             position: relative;
         }
@@ -322,7 +332,7 @@
 
         .form-area-container { background: rgba(255, 255, 255, 0.9); padding: 15px; border-radius: 10px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
         .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--primary); }
+        .form-group label { font-size: 0.95rem; font-weight: 600; color: var(--primary); }
         .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; outline: none; background: #f8fafc; width: 100%; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
         .btn-submit-form { background-color: var(--primary); color: white; padding: 10px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
@@ -333,12 +343,12 @@
         .btn-darurat-main:hover { background-color: #dc2626; }
         
         .form-kontak { display: none; background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 12px; text-align: left; }
-        .form-kontak label { font-size: 0.8rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; display: block; }
+        .form-kontak label { font-size: 0.95rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; display: block; }
         .form-kontak input { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.85rem; }
         .btn-simpan-darurat { background-color: #4CAF50; color: white; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 0.85rem; }
         .btn-simpan-darurat:hover { background-color: #388E3C; }
         .kontak-info-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: left; }
-        .kontak-info-details span { display: block; font-size: 0.8rem; color: var(--text-muted); }
+        .kontak-info-details span { display: block; font-size: 0.95rem; color: var(--text-muted); }
         .kontak-info-details strong { font-size: 1rem; color: var(--text-main); }
         .btn-edit-kontak { background: #f59e0b; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn-edit-kontak:hover { background: #d97706; }
@@ -364,7 +374,7 @@
         #previewModal, #infoModal, #passwordModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 10px; backdrop-filter: blur(5px); }
         .modal-content-full { background: #fff; width: 100%; height: 100%; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
         .modal-header-full { padding: 12px 15px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
-        .btn-close-back { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .btn-close-back { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.95rem; }
         .modal-body-full { flex-grow: 1; background: #f1f5f9; overflow: auto; position: relative; }
         .modal-body-full iframe, .modal-body-full embed { width: 100%; height: 100%; border: none; }
         .excel-table-container { padding: 15px; background: white; min-height: 100%; }
@@ -490,60 +500,64 @@
                     <span class="logo-subtext">Integrasi Layanan Primer</span>
                 </div>
             </a>
-
-            <!-- Tombol Garis 3 (Hamburger Menu) Tanpa Teks "Menu" di Pojok Kanan Atas -->
-            <div class="hamburger-menu-wrapper" id="hamburgerWrapper">
-                <button class="btn-hamburger" onclick="toggleHamburgerMenu(event)" title="Menu Navigasi">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-
-                <!-- Dropdown Berisi Seluruh Navigasi -->
-                <div class="hamburger-dropdown" id="hamburgerDropdownList">
-                    <button class="nav-btn btn-info-fixed" onclick="checkPasswordAndOpenInfo(); closeHamburgerMenu();" style="margin-bottom: 6px; justify-content: flex-start; gap: 8px;">
-                        ℹ️ Info Sistem
-                    </button>
-
-                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                        <button class="nav-btn">📁 Laporan Bulanan <span>▾</span></button>
-                        <div class="nav-dropdown-content" id="dropLaporanBulanan"></div>
-                    </div>
-
-                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                        <button class="nav-btn">📊 PPT Lokmin <span>▾</span></button>
-                        <div class="nav-dropdown-content" id="dropPPT"></div>
-                    </div>
-
-                    <button class="nav-btn" onclick="selectMenu('jadwal', 'all', 'Jadwal Rapat', 'Kalender 1 Tahun (2026)'); closeHamburgerMenu();">📅 Jadwal Rapat</button>
-                    <button class="nav-btn" onclick="selectMenu('gallery', 'all', 'Gallery Dokumentasi', 'Semua Foto'); closeHamburgerMenu();">🖼️ Gallery Dokumentasi</button>
-                    
-                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                        <button class="nav-btn">📦 Inventaris <span>▾</span></button>
-                        <div class="nav-dropdown-content">
-                            <a onclick="verifyAndSelectMenu('inventaris', 'obhp_bmhp', 'Inventaris', 'OBHP & BMHP Ruang tindakan'); closeHamburgerMenu();">OBHP & BMHP Ruang tindakan</a>
+        </div>
+        <div class="top-nav-bar">
+            <!-- Pelayanan -->
+            <div class="nav-item" tabindex="0">
+                <button class="nav-btn-h"><i class="fa-solid fa-stethoscope"></i> Pelayanan ▾</button>
+                <div class="dropdown-content-h">
+                    <div class="sub-dropdown" tabindex="0">
+                        <button class="sub-nav-btn">Skrining ▸</button>
+                        <div class="sub-dropdown-content">
+                            <a onclick="selectMenu('skrining', 'get_up_and_go', 'Skrining', 'Resiko jatuh (Get up And Go)')">Get up And Go</a>
+                            <a onclick="selectMenu('skrining', 'morse', 'Skrining', 'Resiko jatuh (Skala Morse)')">Skala Morse</a>
+                            <a onclick="selectMenu('skrining', 'humpty_dumpty', 'Skrining', 'Resiko Jatuh (Humpty Dumpty)')">Humpty Dumpty</a>
                         </div>
                     </div>
-
-                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                        <button class="nav-btn">🚑 Rujukan <span>▾</span></button>
-                        <div class="nav-dropdown-content">
-                            <a onclick="verifyAndSelectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal'); closeHamburgerMenu();">Rujukan Internal</a>
-                            <a onclick="selectMenu('rujukan', 'eksternal', 'Rujukan', 'Rujukan Eksternal'); closeHamburgerMenu();">Rujukan Eksternal</a>
-                            <a onclick="selectMenu('rujukan_upkdk', 'upkdk', 'Rujukan', 'Rujukan UPKDK'); closeHamburgerMenu();">Rujukan UPKDK</a>
+                    <div class="sub-dropdown" tabindex="0">
+                        <button class="sub-nav-btn">Rujukan ▸</button>
+                        <div class="sub-dropdown-content">
+                            <a onclick="verifyAndSelectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal')">Internal</a>
+                            <a onclick="selectMenu('rujukan', 'eksternal', 'Rujukan', 'Rujukan Eksternal')">Eksternal</a>
+                            <a onclick="selectMenu('rujukan_upkdk', 'upkdk', 'Rujukan', 'Rujukan UPKDK')">UPKDK</a>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="nav-dropdown" onclick="toggleDropdown(this, event)">
-                        <button class="nav-btn">📋 Skrining <span>▾</span></button>
-                        <div class="nav-dropdown-content">
-                            <a onclick="selectMenu('skrining', 'get_up_and_go', 'Skrining', 'Skrining Resiko jatuh (Get up And Go)'); closeHamburgerMenu();">Resiko jatuh (Get up And Go)</a>
-                            <a onclick="selectMenu('skrining', 'morse', 'Skrining', 'Skrining Resiko jatuh (Skala Morse)'); closeHamburgerMenu();">Resiko jatuh (Skala Morse)</a>
-                            <a onclick="selectMenu('skrining', 'humpty_dumpty', 'Skrining', 'Skrining Resiko Jatuh (Humpty Dumpty)'); closeHamburgerMenu();">Resiko Jatuh (Humpty Dumpty)</a>
-                        </div>
+            <!-- Arsip -->
+            <div class="nav-item" tabindex="0">
+                <button class="nav-btn-h"><i class="fa-solid fa-folder-open"></i> Arsip ▾</button>
+                <div class="dropdown-content-h">
+                    <div class="sub-dropdown" tabindex="0">
+                        <button class="sub-nav-btn">Laporan Bulanan ▸</button>
+                        <div class="sub-dropdown-content" id="dropLaporanBulananH" style="max-height: 250px; overflow-y: auto;"></div>
                     </div>
+                    <div class="sub-dropdown" tabindex="0">
+                        <button class="sub-nav-btn">PPT Lokmin ▸</button>
+                        <div class="sub-dropdown-content" id="dropPPTH" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                    <a onclick="selectMenu('jadwal', 'all', 'Jadwal Rapat', 'Kalender 1 Tahun (2026)')">Jadwal Rapat</a>
+                    <a onclick="selectMenu('gallery', 'all', 'Gallery Dokumentasi', 'Semua Foto')">Dokumentasi</a>
+                </div>
+            </div>
 
-                    <button class="nav-btn" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data'); closeHamburgerMenu();">📚 Informasi & Edukasi</button>
-                    <button class="nav-btn" onclick="selectMenu('pws', 'all', 'Dashboard PWS Penyakit', 'Pemantauan Wilayah Setempat'); closeHamburgerMenu();">📈 Dashboard PWS</button>
-                    <button class="nav-btn" onclick="bukaPengaturanPassword(); closeHamburgerMenu();">⚙️ Ganti Password</button>
+            <!-- Dashboard PWS -->
+            <div class="nav-item">
+                <button class="nav-btn-h" onclick="selectMenu('pws', 'all', 'Dashboard PWS Penyakit', 'Pemantauan Wilayah Setempat')"><i class="fa-solid fa-chart-line"></i> Dashboard PWS</button>
+            </div>
+
+            <!-- Informasi & Edukasi -->
+            <div class="nav-item">
+                <button class="nav-btn-h" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data')"><i class="fa-solid fa-book-medical"></i> Info & Edukasi</button>
+            </div>
+
+            <!-- Pengaturan -->
+            <div class="nav-item" tabindex="0">
+                <button class="nav-btn-h"><i class="fa-solid fa-gear"></i> Pengaturan ▾</button>
+                <div class="dropdown-content-h">
+                    <a onclick="bukaPengaturanPassword()">Ganti Password</a>
+                    <a onclick="checkPasswordAndOpenInfo()">Informasi Sistem</a>
                 </div>
             </div>
         </div>
@@ -551,7 +565,7 @@
 
     <div class="content-wrapper">
         <!-- Tombol Ambulance & Darurat di Sudut Kiri Bawah -->
-        <button class="btn-ambulance-fixed" onclick="selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan')">
+        <button id="btnAmbulanceFixed" class="btn-ambulance-fixed" onclick="selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan')">
             🚨 Ambulance & Darurat
         </button>
 
@@ -606,6 +620,7 @@
                                 <div class="sbar-header">
                                     <h2>UPTD PUSKESMAS LANJUT</h2>
                                     <h3>FORM RUJUKAN INTERNAL / SBAR</h3>
+                                    <h4 id="sbar_nomor_surat_display" style="margin: 8px 0 0 0; font-size: 13px; color: #dc2626; font-weight: bold;">No 001/RUJ-INT/IX/PKM/2026</h4>
                                 </div>
 
                                 <div class="sbar-row">
@@ -718,7 +733,7 @@
                                 <div class="sbar-btn-group" id="sbarActionButtons">
                                     <button type="button" class="sbar-btn sbar-btn-pdf" onclick="unduhPDFInternal()">📄 Unduh PDF</button>
                                     <button type="button" class="sbar-btn sbar-btn-wa" onclick="kirimWhatsAppInternal()">📲 Kirim WA</button>
-                                    <button type="reset" class="sbar-btn sbar-btn-reset">🔄 Reset</button>
+                                    <button type="reset" class="sbar-btn sbar-btn-reset" onclick="setTimeout(initRujukanInternalDateTime, 50)">🔄 Reset</button>
                                 </div>
                             </form>
                         </div>
@@ -1235,7 +1250,7 @@
         <!-- Footer dengan Running Text Responsif Selalu Tampil di Handphone -->
         <footer>
             <div class="footer-running">
-                <marquee scrollamount="4">LINTAS KLASTER UPTD PUSKESMAS LANJUT - MELAYANI DENGAN SEPENUH HATI</marquee>
+                <marquee scrollamount="4">LINTAS KLASTER UPTD PUSKESMAS LANJUT</marquee>
             </div>
             <div class="footer-clock" id="liveClock">-</div>
         </footer>
@@ -1486,22 +1501,22 @@
             const now = new Date();
             const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
             const dateStr = now.toLocaleDateString('id-ID', options);
-            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             document.getElementById('liveClock').innerText = `${dateStr} | ${timeStr}`;
         }
         setInterval(updateLiveClock, 1000);
         updateLiveClock();
 
         function generateDropdowns() {
-            const dropLaporan = document.getElementById('dropLaporanBulanan');
-            const dropPPT = document.getElementById('dropPPT');
+            const dropLaporan = document.getElementById('dropLaporanBulananH');
+            const dropPPT = document.getElementById('dropPPTH');
             let htmlLaporan = "", htmlPPT = "";
             for(let i=0; i<12; i++) {
-                htmlLaporan += `<a onclick="verifyAndSelectMenu('lokmin', ${i}, 'Laporan Bulanan', '${monthNames[i]}'); closeHamburgerMenu();">${monthNames[i]}</a>`;
-                htmlPPT += `<a onclick="verifyAndSelectMenu('pptlokmin', ${i}, 'PPT Lokmin', '${monthNames[i]}'); closeHamburgerMenu();">${monthNames[i]}</a>`;
+                htmlLaporan += `<a onclick="verifyAndSelectMenu('lokmin', ${i}, 'Laporan Bulanan', '${monthNames[i]}')">${monthNames[i]}</a>`;
+                htmlPPT += `<a onclick="verifyAndSelectMenu('pptlokmin', ${i}, 'PPT Lokmin', '${monthNames[i]}')">${monthNames[i]}</a>`;
             }
-            dropLaporan.innerHTML = htmlLaporan;
-            dropPPT.innerHTML = htmlPPT;
+            if (dropLaporan) dropLaporan.innerHTML = htmlLaporan;
+            if (dropPPT) dropPPT.innerHTML = htmlPPT;
         }
         generateDropdowns();
 
@@ -1561,6 +1576,7 @@
 
             document.getElementById('homeViewContainer').style.display = 'none';
             document.getElementById('activeUI').style.display = 'flex';
+            document.getElementById('btnAmbulanceFixed').style.display = 'none';
             document.getElementById('activeTitle').innerText = mainTitle;
             document.getElementById('activeSubtitle').innerText = "Periode: " + subTitle;
 
@@ -1632,6 +1648,7 @@
             if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
             document.getElementById('activeUI').style.display = 'none';
             document.getElementById('homeViewContainer').style.display = 'block';
+            document.getElementById('btnAmbulanceFixed').style.display = 'inline-flex';
             currentMenuId = "";
             updateSystemStats();
         }
@@ -1803,6 +1820,31 @@
             document.getElementById('modalBody').innerHTML = ''; 
         }
 
+        
+        let sbarNomorUsed = false;
+
+        function getRomanMonth(monthIndex) {
+            const roman = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+            return roman[monthIndex];
+        }
+
+        function updateSbarNomorDisplay() {
+            let currentCounter = parseInt(localStorage.getItem('sbar_counter')) || 1;
+            const now = new Date();
+            const num = String(currentCounter).padStart(3, '0');
+            const romMonth = getRomanMonth(now.getMonth());
+            const year = now.getFullYear();
+            document.getElementById('sbar_nomor_surat_display').innerText = `No ${num}/RUJ-INT/${romMonth}/PKM/${year}`;
+        }
+
+        function markSbarNomorAsUsed() {
+            if (!sbarNomorUsed) {
+                let currentCounter = parseInt(localStorage.getItem('sbar_counter')) || 1;
+                localStorage.setItem('sbar_counter', currentCounter + 1);
+                sbarNomorUsed = true;
+            }
+        }
+
         function initRujukanInternalDateTime() {
             const now = new Date();
             const year = now.getFullYear();
@@ -1813,6 +1855,9 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             document.getElementById('jam_rujukan').value = `${hours}:${minutes}`;
+            
+            sbarNomorUsed = false;
+            updateSbarNomorDisplay();
         }
 
         function getSbarVal(id) {
@@ -1820,6 +1865,7 @@
         }
 
         function unduhPDFInternal() {
+            markSbarNomorAsUsed();
             const btnGroup = document.getElementById('sbarActionButtons');
             btnGroup.style.display = 'none';
 
@@ -1838,12 +1884,14 @@
         }
 
         function kirimWhatsAppInternal() {
+            const nomorSurat = document.getElementById('sbar_nomor_surat_display').innerText;
             unduhPDFInternal();
 
             const targetNo = "6285264444567";
 
             let pesan = `*UPTD PUSKESMAS LANJUT*\n`;
             pesan += `*FORM RUJUKAN INTERNAL / SBAR*\n`;
+            pesan += `*${nomorSurat}*\n`;
             pesan += `===============================\n\n`;
             pesan += `📅 *Tanggal:* ${getSbarVal('tgl_rujukan')} | *Jam:* ${getSbarVal('jam_rujukan')}\n`;
             pesan += `📍 *Dari:* ${getSbarVal('rujukan_dari')}\n`;
