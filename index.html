@@ -50,7 +50,7 @@
             background-repeat: no-repeat;
         }
 
-        /* Top Header Utama - Diperkecil padding atas-bawah agar tombol navigasi naik */
+        /* Top Header Utama */
         header {
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(12px);
@@ -73,7 +73,6 @@
             width: auto;
         }
 
-        /* Logo Diperbesar */
         .logo-container {
             display: flex;
             align-items: center;
@@ -98,7 +97,6 @@
             overflow: hidden;
         }
 
-        /* Tulisan UPTD PUSKESMAS LANJUT Diperbesar */
         .logo-text {
             font-size: 1.2rem;
             font-weight: 800;
@@ -113,7 +111,6 @@
             color: var(--text-muted);
         }
 
-        /* Navigasi Horizontal Desktop & Mobile - Dinaikkan */
         .top-nav-bar {
             display: flex;
             flex-wrap: wrap;
@@ -257,7 +254,6 @@
             100% { background-color: rgba(239, 68, 68, 0.95); color: white; border-color: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
         }
         
-        /* Tombol Ambulance & Darurat di Sudut Kiri Bawah */
         .btn-ambulance-fixed {
             position: fixed;
             bottom: 45px;
@@ -294,35 +290,53 @@
         .btn-close-card { background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: background 0.2s; }
         .btn-close-card:hover { background: #dc2626; }
 
-        .card-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; }
+        .card-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto;}
 
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        /* CSS KHUSUS KIR */
+        .kir-wrapper {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            color: #000;
+            border: 1px solid var(--border);
+            overflow-x: auto;
         }
-        .table-container::-webkit-scrollbar {
-            height: 6px;
-        }
-        .table-container::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 4px;
-        }
-        @keyframes highContrastPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.06); }
-        }
-        .blinking-badge {
-            animation: highContrastPulse 1.2s infinite ease-in-out;
-        }
+        .kir-wrapper h2, .kir-wrapper h3 { text-align: center; margin: 5px 0; color: #000; font-weight: bold; font-size: 16px;}
+        .kir-wrapper h3 { font-size: 14px; }
+        .kir-wrapper .garis-kop { border: 0; border-top: 3px solid #000; border-bottom: 1px solid #000; height: 2px; margin-top: 15px; margin-bottom: 20px; }
+        .kir-wrapper .header-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+        .kir-wrapper .header-info table { border-collapse: collapse; }
+        .kir-wrapper .header-info td { padding: 3px 5px; vertical-align: middle; color:#000; font-weight:bold; font-size:12px; }
+        .kir-wrapper .header-info select { font-family: Arial, sans-serif; font-size: 12px; padding: 3px; width: 250px; border:1px solid #ccc; }
+        .kir-wrapper [contenteditable="true"] { padding: 4px; min-height: 16px; min-width: 50px; display: inline-block; border: 1px dashed #ccc; border-radius: 3px; word-wrap: break-word; white-space: pre-wrap; transition: all 0.2s; }
+        .kir-wrapper [contenteditable="true"]:focus { outline: none; border: 1px dashed #4CAF50; background-color: #f9fff9; }
+        .kir-wrapper [contenteditable="true"]:empty:before { content: attr(data-placeholder); color: #999; font-style: italic; }
+        .kir-wrapper table.main-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: auto; min-width: 800px;}
+        .kir-wrapper table.main-table th, .kir-wrapper table.main-table td { border: 1px solid #000; padding: 5px; text-align: center; vertical-align: middle; color:#000; font-size:12px;}
+        .kir-wrapper table.main-table th { background-color: #d9d2e9; font-weight: bold; }
+        .kir-wrapper table.main-table tbody tr td [contenteditable="true"] { width: 95%; border: none; border-bottom: 1px dotted #ddd; }
+        .kir-wrapper .signature-section { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 50px; text-align: center; }
+        .kir-wrapper .signature-box { width: 280px; color:#000; font-size: 12px;}
+        .kir-wrapper .signature-space { height: 70px; }
+        .kir-wrapper .line { border-bottom: 1px solid #000; margin-top: 2px; margin-bottom: 5px; }
+        .kir-wrapper .nama-pejabat { font-weight: bold; text-transform: uppercase; }
+        .kir-wrapper .btn-action { background-color: #16a34a; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 20px; margin-right: 10px; font-weight:bold; transition: 0.2s; }
+        .kir-wrapper .btn-action.btn-save { background-color: #0284c7; }
+        .kir-wrapper .btn-action.btn-load { background-color: #f59e0b; }
+        .kir-wrapper .btn-action.btn-pdf { background-color: #dc2626; }
+        .kir-wrapper .btn-action:hover { opacity: 0.9; }
+
+        /* Akhir CSS KIR */
+
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .table-container::-webkit-scrollbar { height: 6px; }
+        .table-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        @keyframes highContrastPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.06); } }
+        .blinking-badge { animation: highContrastPulse 1.2s infinite ease-in-out; }
 
         .full-year-calendar { display: grid; grid-template-columns: repeat(1, 1fr); gap: 12px; }
-        @media (min-width: 640px) {
-            .full-year-calendar { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (min-width: 1024px) {
-            .full-year-calendar { grid-template-columns: repeat(4, 1fr); }
-        }
+        @media (min-width: 640px) { .full-year-calendar { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .full-year-calendar { grid-template-columns: repeat(4, 1fr); } }
         .mini-month-card { background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
         .mini-month-card h4 { font-size: 0.85rem; color: var(--primary); text-align: center; margin-bottom: 6px; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
         .mini-grid { display: grid; grid-template-columns: repeat(7, 1fr); font-size: 0.65rem; text-align: center; gap: 3px; }
@@ -404,7 +418,6 @@
 
         #homeViewContainer { text-align: center; padding: 40px 15px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        /* Footer & Running Text Dioptimalkan agar selalu muncul responsif di HP */
         footer { 
             background: rgba(4, 120, 87, 0.95); 
             backdrop-filter: blur(10px); 
@@ -420,25 +433,9 @@
             width: 100%;
             z-index: 999;
         }
-        .footer-running { 
-            flex-grow: 1; 
-            overflow: hidden; 
-            margin: 0 10px; 
-            white-space: nowrap;
-        }
-        .footer-running marquee { 
-            font-weight: 700; 
-            font-size: 0.75rem; 
-            letter-spacing: 0.3px; 
-        }
-        .footer-clock { 
-            font-weight: 600; 
-            background: rgba(0, 0, 0, 0.2); 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            font-size: 0.65rem; 
-            white-space: nowrap;
-        }
+        .footer-running { flex-grow: 1; overflow: hidden; margin: 0 10px; white-space: nowrap; }
+        .footer-running marquee { font-weight: 700; font-size: 0.75rem; letter-spacing: 0.3px; }
+        .footer-clock { font-weight: 600; background: rgba(0, 0, 0, 0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; white-space: nowrap; }
         
         .btn-info-fixed { background-color: rgba(14, 165, 233, 0.1); color: var(--accent); border: 1px solid rgba(14, 165, 233, 0.3); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
         .btn-info-fixed:hover { background-color: rgba(14, 165, 233, 0.2); }
@@ -452,9 +449,7 @@
         .rujukan-form-container .checkbox-container { background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 6px; }
         .rujukan-form-container .checkbox-item { margin-bottom: 6px; display: flex; align-items: center; font-size: 0.85rem; }
         .rujukan-form-container .btn-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        @media (min-width: 640px) {
-            .rujukan-form-container .btn-container { flex-direction: row; }
-        }
+        @media (min-width: 640px) { .rujukan-form-container .btn-container { flex-direction: row; } }
         .rujukan-form-container button { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
         .rujukan-form-container .btn-reset { background-color: #64748b; color: white; }
         .rujukan-form-container .btn-download { background-color: #dc2626; color: white; }
@@ -465,9 +460,7 @@
         .sbar-header h2 { margin: 0; color: #047857; font-size: 17px; text-transform: uppercase; font-weight: 700; }
         .sbar-header h3 { margin: 4px 0 0 0; font-size: 12px; color: var(--text-main); font-weight: 600; }
         .sbar-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-        @media (min-width: 640px) {
-            .sbar-row { flex-direction: row; }
-        }
+        @media (min-width: 640px) { .sbar-row { flex-direction: row; } }
         .sbar-col { flex: 1; }
         .sbar-col-2 { flex: 2; }
         .sbar-form-group { display: flex; flex-direction: column; margin-bottom: 8px; }
@@ -476,9 +469,7 @@
         .sbar-container textarea { resize: vertical; min-height: 75px; }
         .sbar-section-header { background-color: var(--primary); color: #ffffff; padding: 5px 8px; font-weight: bold; border-radius: 4px; margin-top: 15px; margin-bottom: 8px; font-size: 12px; letter-spacing: 0.5px; }
         .sbar-btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        @media (min-width: 640px) {
-            .sbar-btn-group { flex-direction: row; }
-        }
+        @media (min-width: 640px) { .sbar-btn-group { flex-direction: row; } }
         .sbar-btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
         .sbar-btn-wa { background-color: #16a34a; color: white; }
         .sbar-btn-wa:hover { background-color: #15803d; }
@@ -490,7 +481,7 @@
 </head>
 <body>
 
-    <!-- Header Atas (Logo dan Tombol Hamburger Menu Ikon Saja di Pojok Kanan Atas) -->
+    <!-- Header Atas -->
     <header>
         <div class="navbar" style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
             <a href="#" class="logo-container" onclick="resetToHome()">
@@ -545,6 +536,15 @@
                 </div>
             </div>
 
+            <!-- Inventaris / KIR & OBHP/BMHP -->
+            <div class="nav-item" tabindex="0">
+                <button class="nav-btn-h"><i class="fa-solid fa-boxes-stacked"></i> Inventaris ▾</button>
+                <div class="dropdown-content-h">
+                    <a onclick="verifyAndSelectMenu('inventaris', 'kir', 'Inventaris', 'KIR')">KIR</a>
+                    <a onclick="verifyAndSelectMenu('inventaris', 'obhp_bmhp', 'Inventaris', 'OBHP/BMHP')">OBHP/BMHP</a>
+                </div>
+            </div>
+
             <!-- Dashboard PWS -->
             <div class="nav-item">
                 <button class="nav-btn-h" onclick="selectMenu('pws', 'all', 'Dashboard PWS Penyakit', 'Pemantauan Wilayah Setempat')"><i class="fa-solid fa-chart-line"></i> Dashboard PWS</button>
@@ -567,7 +567,6 @@
     </header>
 
     <div class="content-wrapper">
-        <!-- Tombol Ambulance & Darurat di Sudut Kiri Bawah -->
         <button id="btnAmbulanceFixed" class="btn-ambulance-fixed" onclick="selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan')">
             🚨 Ambulance & Darurat
         </button>
@@ -583,6 +582,179 @@
                 </div>
                 
                 <div class="card-body">
+                    
+                    <!-- DISPLAY AREA INVENTARIS KIR -->
+                    <div id="inventarisKirDisplayArea" style="display: none;">
+                        <div class="kir-wrapper" id="kirContainerData">
+                            <h2>KARTU INVENTARIS RUANGAN (KIR)</h2>
+                            <h3>UPTD PUSKESMAS LANJUT</h3>
+                            <hr class="garis-kop">
+
+                            <div class="header-section">
+                                <div class="header-info">
+                                    <table>
+                                        <tr>
+                                            <td>PROPINSI</td>
+                                            <td>:</td>
+                                            <td>
+                                                <select id="provinsi" onchange="fetchKabupatenKIR()">
+                                                    <option value="">-- Memuat Provinsi... --</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>KABUPATEN/KOTA</td>
+                                            <td>:</td>
+                                            <td>
+                                                <select id="kabupaten">
+                                                    <option value="">-- Pilih Provinsi Terlebih Dahulu --</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>UNIT KERJA</td>
+                                            <td>:</td>
+                                            <td><b>UPTD PUSKESMAS LANJUT</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>KLASTER</td>
+                                            <td>:</td>
+                                            <td>
+                                                <select name="klaster" id="klaster_kir">
+                                                    <option value="">-- Pilih Klaster --</option>
+                                                    <option value="Klaster 1">Klaster 1</option>
+                                                    <option value="Klaster 2">Klaster 2</option>
+                                                    <option value="Klaster 3">Klaster 3</option>
+                                                    <option value="Klaster 4">Klaster 4</option>
+                                                    <option value="Lintas Klaster">Lintas Klaster</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>RUANGAN</td>
+                                            <td>:</td>
+                                            <td>
+                                                <select name="ruangan" id="ruangan_kir">
+                                                    <option value="">-- Pilih Ruangan --</option>
+                                                    <option value="Ruang Pendaftaran dan Rekam Medis">Ruang Pendaftaran dan Rekam Medis</option>
+                                                    <option value="Ruang Pengaduan">Ruang Pengaduan</option>
+                                                    <option value="Ruang Farmasi">Ruang Farmasi</option>
+                                                    <option value="Ruang MTBS/MTBM/PKPR">Ruang MTBS/MTBM/PKPR</option>
+                                                    <option value="Ruang KIA">Ruang KIA</option>
+                                                    <option value="Ruang Pemeriksaan Gigi & Mulut">Ruang Pemeriksaan Gigi & Mulut</option>
+                                                    <option value="Ruang Pemeriksaan Usia Produktif/Lansia/KB">Ruang Pemeriksaan Usia Produktif/Lansia/KB</option>
+                                                    <option value="Ruang Manajemen">Ruang Manajemen</option>
+                                                    <option value="Ruang Keuangan">Ruang Keuangan</option>
+                                                    <option value="Ruang Gudang">Ruang Gudang</option>
+                                                    <option value="Ruang Mushola">Ruang Mushola</option>
+                                                    <option value="Ruang Pantry">Ruang Pantry</option>
+                                                    <option value="Ruang Laboratorium">Ruang Laboratorium</option>
+                                                    <option value="Ruang Pertemuan">Ruang Pertemuan</option>
+                                                    <option value="Ruang Promkes">Ruang Promkes</option>
+                                                    <option value="Ruang Konseling">Ruang Konseling</option>
+                                                    <option value="Ruang Klaster 4">Ruang Klaster 4</option>
+                                                    <option value="Ruang Tindakan & Gawat Darurat">Ruang Tindakan & Gawat Darurat</option>
+                                                    <option value="Ruang Sterilisasi">Ruang Sterilisasi</option>
+                                                    <option value="Ruang Voned">Ruang Voned</option>
+                                                    <option value="Pemeriksaan Khusus">Pemeriksaan Khusus</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <table class="main-table" id="tabel-inventaris-kir">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" style="width: 30px;">No.<br>Urut</th>
+                                        <th rowspan="2">Nama Barang / Jenis Barang</th>
+                                        <th rowspan="2">Merk /<br>Model</th>
+                                        <th rowspan="2">No. Seri<br>Pabrik</th>
+                                        <th rowspan="2">Ukuran</th>
+                                        <th rowspan="2">Bahan</th>
+                                        <th rowspan="2">Tahun<br>Pembuatan /<br>Pembelian</th>
+                                        <th rowspan="2">No. Kode Barang</th>
+                                        <th rowspan="2">Jumlah<br>Barang<br>(SATUAN)</th>
+                                        <th rowspan="2">Harga Beli /<br>Perolehan</th>
+                                        <th colspan="3">Keadaan Barang</th>
+                                        <th rowspan="2">Keterangan / Mutasi<br>dll</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 40px;">Baik (B)</th>
+                                        <th style="width: 40px;">Kurang<br>Baik (KB)</th>
+                                        <th style="width: 40px;">Rusak<br>Berat (RB)</th>
+                                    </tr>
+                                    <tr style="background-color: #d9d2e9;">
+                                        <td>1</td>
+                                        <td>2</td>
+                                        <td>3</td>
+                                        <td>4</td>
+                                        <td>5</td>
+                                        <td>6</td>
+                                        <td>7</td>
+                                        <td>8</td>
+                                        <td>9</td>
+                                        <td>10</td>
+                                        <td>11</td>
+                                        <td>12</td>
+                                        <td>13</td>
+                                        <td>14</td>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabel-body-kir">
+                                    <tr>
+                                        <td>1</td>
+                                        <td><div contenteditable="true"></div></td>
+                                        <td><div contenteditable="true"></div></td>
+                                        <td><div contenteditable="true"></div></td>
+                                        <td><div contenteditable="true"></div></td>
+                                        <td><div contenteditable="true"></div></td>
+                                        <td><div contenteditable="true"></div></td>
+                                        <td><div contenteditable="true"></div></td>
+                                        <td><div contenteditable="true"></div></td>
+                                        <td><div contenteditable="true"></div></td>
+                                        <td><input type="checkbox"></td>
+                                        <td><input type="checkbox"></td>
+                                        <td><input type="checkbox"></td>
+                                        <td><div contenteditable="true"></div></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Tombol Aksi (Akan di-hide otomatis saat Export PDF berkat style/logic) -->
+                            <div class="no-print" id="kirActionButtons" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;">
+                                <button class="btn-action" onclick="tambahBarisKIR()">+ Tambah Baris Barang</button>
+                                <button class="btn-action btn-save" onclick="simpanKIRSementara()">💾 Simpan Sementara</button>
+                                <button class="btn-action btn-load" onclick="muatKIRSementara()">🔄 Muat Data Tersimpan</button>
+                                <button class="btn-action btn-pdf" onclick="unduhPDFKIR()">📄 Unduh PDF</button>
+                            </div>
+
+                            <div class="signature-section" id="signature-section-kir">
+                                <div class="signature-box">
+                                    Mengetahui,<br>
+                                    <div contenteditable="true" style="font-weight: bold; min-width: 200px;">Kepala UPTD Puskesmas Lanjut</div><br>
+                                    <div class="signature-space"></div>
+                                    
+                                    <div contenteditable="true" class="nama-pejabat" data-placeholder="[Ketik Nama Kepala UPTD]" style="min-width: 200px;"></div>
+                                    <div class="line"></div>
+                                    NIP. <div contenteditable="true" data-placeholder="[Ketik NIP]" style="min-width: 150px;"></div>
+                                </div>
+                                
+                                <div class="signature-box">
+                                    <div contenteditable="true" data-placeholder="Tempat, Tanggal Bulan Tahun" style="min-width: 200px;">Lanjut, ......................... 20....</div><br>
+                                    <div contenteditable="true" style="min-width: 200px;">Pengurus / Pemegang Barang</div><br>
+                                    <div class="signature-space"></div>
+                                    
+                                    <div contenteditable="true" class="nama-pejabat" data-placeholder="[Ketik Nama Pengurus Barang]" style="min-width: 200px;"></div>
+                                    <div class="line"></div>
+                                    NIP. <div contenteditable="true" data-placeholder="[Ketik NIP]" style="min-width: 150px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AKHIR KIR DISPLAY AREA -->
+
                     <div id="calendarDisplayArea" style="display: none;">
                         <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
                     </div>
@@ -689,7 +861,7 @@
                                             <option value="Mia Astri Ana, A.Md.Keb">Mia Astri Ana, A.Md.Keb</option>
                                             <option value="Samira Wulandari, A.Md.Keb">Samira Wulandari, A.Md.Keb</option>
                                             <option value="Maylinda, A.Md.Keb">Maylinda, A.Md.Keb</option>
-                                            <option value="Rendy Andrian, A.Md.Kep">Rendy Andrian, A.Md.Kep[cite: 4]</option>
+                                            <option value="Rendy Andrian, A.Md.Kep">Rendy Andrian, A.Md.Kep</option>
                                             <option value="Wahyu Dharmawan, A.Md.Kep">Wahyu Dharmawan, A.Md.Kep</option>
                                             <option value="M. Khalqi Hilmi, A.Md.Kep">M. Khalqi Hilmi, A.Md.Kep</option>
                                             <option value="Yudi Andika, A.Md.Kep">Yudi Andika, A.Md.Kep</option>
@@ -775,7 +947,7 @@
                                         <option value="">-- Pilih Klaster / Ruangan Tujuan --</option>
                                         <option value="6281364195736">KLASTER 2 (Ibu, Anak, Remaja) Shely Marselyna</option>
                                         <option value="6285264825962">KLASTER 3 (Usia Produktif & Lansia) - Andri Harta Kirana</option>
-                                        <option value="6285264444567">LINTAS KLASTER (Ruang Tindakan & Gawat Darurat) - Rendy Andrian[cite: 4]</option>
+                                        <option value="6285264444567">LINTAS KLASTER (Ruang Tindakan & Gawat Darurat) - Rendy Andrian</option>
                                     </select>
                                 </div>
 
@@ -956,7 +1128,6 @@
                         </div>
                     </div>
 
-                    <!-- Dashboard PWS Display Area -->
                     <div id="pwsDisplayArea" style="display: none; flex-direction: column; gap: 15px; width: 100%;">
                         <div class="glass-panel rounded-xl shadow-sm p-3 flex flex-col sm:flex-row justify-between items-center gap-3">
                             <div class="flex items-center space-x-2">
@@ -1001,7 +1172,6 @@
                             <i class="fa-solid fa-check-circle mr-1"></i><span class="font-bold">Berhasil!</span> <span id="notification-text">Data telah diperbarui.</span>
                         </div>
 
-                        <!-- Grid 10 Penyakit PWS -->
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                             <!-- Diare -->
                             <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-blue-500">
@@ -1135,9 +1305,7 @@
                             </div>
                         </div>
 
-                        <!-- Struktur Layout: Tabel PWS di Atas, Grafik Trend PWS di Bawah -->
                         <div class="flex flex-col gap-4">
-                            <!-- Tabel PWS -->
                             <div class="glass-panel rounded-xl shadow-sm overflow-hidden flex flex-col">
                                 <div class="px-4 py-3 border-b border-gray-200 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                                     <h3 class="text-sm font-semibold text-gray-800"><i class="fa-solid fa-map-location-dot mr-1 text-blue-600"></i> Distribusi Kasus per Wilayah (Desa)</h3>
@@ -1167,7 +1335,6 @@
                                                 <th rowspan="2" class="px-3 py-2 border-l border-gray-300 text-center font-bold text-gray-700 min-w-[70px]">Aksi</th>
                                             </tr>
                                             <tr class="bg-gray-50 border-t border-gray-200 text-[9px]">
-                                                <!-- Diulang untuk setiap penyakit (K, P, S, M) -->
                                                 <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
                                                 <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
                                                 <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
@@ -1189,7 +1356,6 @@
                                 </div>
                             </div>
 
-                            <!-- Grafik Trend PWS di Bawah -->
                             <div class="glass-panel rounded-xl shadow-sm p-4 flex flex-col w-full">
                                 <h3 class="text-sm font-semibold text-gray-800 mb-2 border-b pb-1.5"><i class="fa-solid fa-chart-column mr-1 text-blue-600"></i> Akumulasi Penyakit</h3>
                                 <p class="text-[11px] text-gray-500 mb-3">Perbandingan kasus, pemantauan, sembuh, dan meninggal seluruh wilayah.</p>
@@ -1197,38 +1363,6 @@
                                     <canvas id="trendChart"></canvas>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div id="calendarDisplayArea" style="display: none;">
-                        <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
-                    </div>
-
-                    <div id="formDisplayArea" style="display: none;">
-                        <div class="form-area-container">
-                            <h3 style="color: var(--primary);" id="formTitleLabel">Form Data Tautan</h3>
-                            <div class="form-group">
-                                <label>Link:</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="url" id="inputUrlRujukan1" placeholder="https://..." style="flex-grow: 1;">
-                                    <button class="btn-submit-form" type="button" id="btnBukaRujukan1" style="background-color: var(--accent); display: none;" onclick="bukaUrlRujukan()">Buka</button>
-                                </div>
-                            </div>
-                            <button class="btn-submit-form" type="button" onclick="simpanUrlRujukan()" style="margin-top: 5px; width: 100%;">Simpan Tautan</button>
-                        </div>
-                    </div>
-
-                    <div id="formSkriningArea" style="display: none;">
-                        <div class="form-area-container">
-                            <h3 style="color: var(--primary);" id="formSkriningTitleLabel">Form Skrining</h3>
-                            <div class="form-group">
-                                <label>Link:</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <input type="url" id="inputUrlSkrining" placeholder="https://..." style="flex-grow: 1;">
-                                    <button class="btn-submit-form" type="button" id="btnBukaSkrining" style="background-color: var(--accent); display: none;" onclick="bukaUrlSkrining()">Buka</button>
-                                </div>
-                            </div>
-                            <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 5px; width: 100%;">Simpan Tautan</button>
                         </div>
                     </div>
 
@@ -1250,7 +1384,6 @@
             <div id="homeViewContainer"></div>
         </div>
         
-        <!-- Footer dengan Running Text Responsif Selalu Tampil di Handphone -->
         <footer>
             <div class="footer-running">
                 <marquee scrollamount="4">LINTAS KLASTER UPTD PUSKESMAS LANJUT</marquee>
@@ -1302,7 +1435,6 @@
         </div>
     </div>
 
-    <!-- Modal Login Edit PWS Desa -->
     <div id="login-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-70 overflow-y-auto h-full w-full z-50 fade-in flex items-center justify-center backdrop-blur-sm p-4">
         <div class="relative p-5 border w-full max-w-sm shadow-2xl rounded-2xl bg-white">
             <div class="mt-1">
@@ -1410,6 +1542,146 @@
             });
         }
 
+        /* ---------------- SCRIPT API PROVINSI & KABUPATEN (KIR) ---------------- */
+        const urlProvinsiKIR = 'https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json';
+        fetch(urlProvinsiKIR)
+            .then(response => response.json())
+            .then(provinces => {
+                let options = '<option value="">-- Pilih Provinsi --</option>';
+                provinces.forEach(prov => {
+                    options += `<option value="${prov.id}">${prov.name}</option>`;
+                });
+                const provSelect = document.getElementById('provinsi');
+                if(provSelect && provSelect.selectedIndex <= 0) {
+                    provSelect.innerHTML = options;
+                }
+            }).catch(e => console.log('Error fetch provinsi', e));
+
+        function fetchKabupatenKIR() {
+            const idProvinsi = document.getElementById('provinsi').value;
+            const selectKab = document.getElementById('kabupaten');
+            
+            if (!idProvinsi) {
+                selectKab.innerHTML = '<option value="">-- Pilih Provinsi Terlebih Dahulu --</option>';
+                return;
+            }
+
+            selectKab.innerHTML = '<option value="">-- Memuat Kabupaten... --</option>';
+            const urlKabupaten = `https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${idProvinsi}.json`;
+
+            fetch(urlKabupaten)
+                .then(response => response.json())
+                .then(regencies => {
+                    let options = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+                    regencies.forEach(kab => {
+                        options += `<option value="${kab.id}">${kab.name}</option>`;
+                    });
+                    selectKab.innerHTML = options;
+                }).catch(e => console.log('Error fetch kabupaten', e));
+        }
+
+        /* ----- FUNGSI SIMPAN & MUAT DATA KIR SEMENTARA ----- */
+        function simpanKIRSementara() {
+            // Sinkronkan atribut checkbox agar tersimpan di innerHTML
+            const checkboxes = document.querySelectorAll('#tabel-body-kir input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                if (cb.checked) cb.setAttribute('checked', 'checked');
+                else cb.removeAttribute('checked');
+            });
+
+            const kirData = {
+                provinsi: document.getElementById('provinsi').value,
+                kabupatenHtml: document.getElementById('kabupaten').innerHTML,
+                kabupatenVal: document.getElementById('kabupaten').value,
+                klaster: document.getElementById('klaster_kir').value,
+                ruangan: document.getElementById('ruangan_kir').value,
+                tbodyHtml: document.getElementById('tabel-body-kir').innerHTML,
+                signatureHtml: document.getElementById('signature-section-kir').innerHTML
+            };
+
+            localStorage.setItem('kir_temp_data', JSON.stringify(kirData));
+            alert('Data KIR berhasil disimpan sementara! Anda bisa memuatnya kembali nanti tanpa takut data hilang.');
+        }
+
+        function muatKIRSementara() {
+            const saved = localStorage.getItem('kir_temp_data');
+            if (!saved) {
+                alert('Tidak ada data KIR tersimpan.');
+                return;
+            }
+
+            try {
+                const kirData = JSON.parse(saved);
+                
+                // Kembalikan Dropdown
+                document.getElementById('provinsi').value = kirData.provinsi || "";
+                if (kirData.kabupatenHtml) {
+                    document.getElementById('kabupaten').innerHTML = kirData.kabupatenHtml;
+                    document.getElementById('kabupaten').value = kirData.kabupatenVal || "";
+                }
+                document.getElementById('klaster_kir').value = kirData.klaster || "";
+                document.getElementById('ruangan_kir').value = kirData.ruangan || "";
+
+                // Kembalikan Tabel Baris dan TTD
+                if (kirData.tbodyHtml) {
+                    document.getElementById('tabel-body-kir').innerHTML = kirData.tbodyHtml;
+                }
+                if (kirData.signatureHtml) {
+                    document.getElementById('signature-section-kir').innerHTML = kirData.signatureHtml;
+                }
+                
+                alert('Data KIR berhasil dikembalikan seperti semula!');
+            } catch (e) {
+                console.error('Error loading KIR data', e);
+                alert('Gagal memuat data KIR.');
+            }
+        }
+        /* ----- AKHIR FUNGSI SIMPAN/MUAT KIR ----- */
+
+        function tambahBarisKIR() {
+            var tbody = document.getElementById("tabel-body-kir");
+            var rowCount = tbody.getElementsByTagName("tr").length;
+            var nextNumber = rowCount + 1;
+            
+            var newRow = document.createElement("tr");
+            newRow.innerHTML = `
+                <td>${nextNumber}</td>
+                <td><div contenteditable="true"></div></td>
+                <td><div contenteditable="true"></div></td>
+                <td><div contenteditable="true"></div></td>
+                <td><div contenteditable="true"></div></td>
+                <td><div contenteditable="true"></div></td>
+                <td><div contenteditable="true"></div></td>
+                <td><div contenteditable="true"></div></td>
+                <td><div contenteditable="true"></div></td>
+                <td><div contenteditable="true"></div></td>
+                <td><input type="checkbox"></td>
+                <td><input type="checkbox"></td>
+                <td><input type="checkbox"></td>
+                <td><div contenteditable="true"></div></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        function unduhPDFKIR() {
+            const btnGroup = document.getElementById('kirActionButtons');
+            if (btnGroup) btnGroup.style.display = 'none';
+
+            const element = document.getElementById('kirContainerData');
+            const opt = {
+                margin:       10,
+                filename:     'KIR_Inventaris_Puskesmas.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                if (btnGroup) btnGroup.style.display = 'flex';
+            });
+        }
+        /* ---------------- AKHIR SCRIPT KIR ---------------- */
+
         function simpanUrlRujukan() {
             const urlInput = document.getElementById('inputUrlRujukan1').value;
             localStorage.setItem('url_rujukan_' + currentMenuId + '_1', urlInput);
@@ -1478,7 +1750,7 @@
 
         function closeHamburgerMenu() {
             const dropdown = document.getElementById('hamburgerDropdownList');
-            if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
+            if (dropdown && dropdown.classList.contains('show')) dropdown.classList.remove('show');
         }
 
         function toggleDropdown(element, event) {
@@ -1598,6 +1870,7 @@
             const rujukanUpkdkArea = document.getElementById('rujukanUpkdkDisplayArea');
             const rujukanInternalArea = document.getElementById('rujukanInternalDisplayArea');
             const pwsArea = document.getElementById('pwsDisplayArea');
+            const inventarisKirArea = document.getElementById('inventarisKirDisplayArea');
 
             if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
 
@@ -1611,6 +1884,7 @@
             rujukanUpkdkArea.style.display = 'none';
             rujukanInternalArea.style.display = 'none';
             pwsArea.style.display = 'none';
+            inventarisKirArea.style.display = 'none';
 
             if (categoryCode === 'jadwal') {
                 calArea.style.display = 'block';
@@ -1624,6 +1898,8 @@
             } else if (categoryCode === 'rujukan' && periodIdentifier === 'internal') {
                 rujukanInternalArea.style.display = 'block';
                 initRujukanInternalDateTime();
+            } else if (categoryCode === 'inventaris' && periodIdentifier === 'kir') {
+                inventarisKirArea.style.display = 'block';
             } else if (categoryCode === 'rujukan' || categoryCode === 'inventaris') {
                 formArea.style.display = 'block';
                 document.getElementById('formTitleLabel').innerText = "Tautan - " + subTitle;
@@ -1647,7 +1923,7 @@
             document.getElementById('dynamicFileList').innerHTML = '';
             document.getElementById('slideshowContainerImages').innerHTML = '';
             
-            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && categoryCode !== 'pws' && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
+            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && categoryCode !== 'pws' && categoryCode !== 'inventaris' && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
                 loadFilesForCurrentMenu(categoryCode);
             }
         }
