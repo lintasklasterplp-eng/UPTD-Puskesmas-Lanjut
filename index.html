@@ -292,35 +292,57 @@
 
         .card-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto;}
 
-        /* CSS KHUSUS KIR */
+        /* CSS KHUSUS KIR YANG DISEMPURNAKAN UNTUK HP */
         .kir-wrapper {
             background: #ffffff;
-            padding: 20px;
+            padding: 12px;
             border-radius: 10px;
             color: #000;
             border: 1px solid var(--border);
+            width: 100%;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        .kir-wrapper h2, .kir-wrapper h3 { text-align: center; margin: 5px 0; color: #000; font-weight: bold; font-size: 16px;}
-        .kir-wrapper h3 { font-size: 14px; }
-        .kir-wrapper .garis-kop { border: 0; border-top: 3px solid #000; border-bottom: 1px solid #000; height: 2px; margin-top: 15px; margin-bottom: 20px; }
-        .kir-wrapper .header-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
-        .kir-wrapper .header-info table { border-collapse: collapse; }
-        .kir-wrapper .header-info td { padding: 3px 5px; vertical-align: middle; color:#000; font-weight:bold; font-size:12px; }
-        .kir-wrapper .header-info select { font-family: Arial, sans-serif; font-size: 12px; padding: 3px; width: 250px; border:1px solid #ccc; }
-        .kir-wrapper [contenteditable="true"] { padding: 4px; min-height: 16px; min-width: 50px; display: inline-block; border: 1px dashed #ccc; border-radius: 3px; word-wrap: break-word; white-space: pre-wrap; transition: all 0.2s; }
+        .kir-wrapper h2, .kir-wrapper h3 { text-align: center; margin: 5px 0; color: #000; font-weight: bold; font-size: 14px;}
+        .kir-wrapper h3 { font-size: 12px; }
+        .kir-wrapper .garis-kop { border: 0; border-top: 3px solid #000; border-bottom: 1px solid #000; height: 2px; margin-top: 10px; margin-bottom: 15px; }
+        .kir-wrapper .header-section { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .kir-wrapper .header-info table { border-collapse: collapse; width: 100%; }
+        .kir-wrapper .header-info td { padding: 4px 2px; vertical-align: middle; color:#000; font-weight:bold; font-size:11px; display: block; width: 100%; }
+        @media (min-width: 640px) {
+            .kir-wrapper .header-info td { display: table-cell; width: auto; }
+            .kir-wrapper .header-info tr { display: table-row; }
+            .kir-wrapper h2 { font-size: 16px; }
+            .kir-wrapper h3 { font-size: 14px; }
+        }
+        .kir-wrapper .header-info select { font-family: Arial, sans-serif; font-size: 11px; padding: 5px; width: 100%; border:1px solid #ccc; max-width: 100%; }
+        @media (min-width: 640px) {
+            .kir-wrapper .header-info select { width: 250px; font-size: 12px; }
+        }
+        .kir-wrapper [contenteditable="true"] { padding: 4px; min-height: 16px; min-width: 40px; display: inline-block; border: 1px dashed #ccc; border-radius: 3px; word-wrap: break-word; white-space: pre-wrap; transition: all 0.2s; font-size: 11px; }
         .kir-wrapper [contenteditable="true"]:focus { outline: none; border: 1px dashed #4CAF50; background-color: #f9fff9; }
         .kir-wrapper [contenteditable="true"]:empty:before { content: attr(data-placeholder); color: #999; font-style: italic; }
-        .kir-wrapper table.main-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; table-layout: auto; min-width: 800px;}
-        .kir-wrapper table.main-table th, .kir-wrapper table.main-table td { border: 1px solid #000; padding: 5px; text-align: center; vertical-align: middle; color:#000; font-size:12px;}
+        
+        .kir-table-container { width: 100%; overflow-x: auto; margin-bottom: 10px; -webkit-overflow-scrolling: touch; }
+        .kir-wrapper table.main-table { width: 100%; border-collapse: collapse; table-layout: auto; min-width: 750px;}
+        .kir-wrapper table.main-table th, .kir-wrapper table.main-table td { border: 1px solid #000; padding: 4px; text-align: center; vertical-align: middle; color:#000; font-size:11px;}
         .kir-wrapper table.main-table th { background-color: #d9d2e9; font-weight: bold; }
         .kir-wrapper table.main-table tbody tr td [contenteditable="true"] { width: 95%; border: none; border-bottom: 1px dotted #ddd; }
-        .kir-wrapper .signature-section { display: flex; justify-content: space-between; margin-top: 40px; padding: 0 50px; text-align: center; }
-        .kir-wrapper .signature-box { width: 280px; color:#000; font-size: 12px;}
-        .kir-wrapper .signature-space { height: 70px; }
+        
+        .kir-wrapper .signature-section { display: flex; flex-direction: column; gap: 20px; margin-top: 30px; padding: 0 10px; text-align: center; }
+        @media (min-width: 640px) {
+            .kir-wrapper .signature-section { flex-direction: row; justify-content: space-between; padding: 0 30px; }
+        }
+        .kir-wrapper .signature-box { width: 100%; color:#000; font-size: 11px;}
+        @media (min-width: 640px) { .kir-wrapper .signature-box { width: 260px; font-size: 12px; } }
+        .kir-wrapper .signature-space { height: 60px; }
         .kir-wrapper .line { border-bottom: 1px solid #000; margin-top: 2px; margin-bottom: 5px; }
         .kir-wrapper .nama-pejabat { font-weight: bold; text-transform: uppercase; }
-        .kir-wrapper .btn-action { background-color: #16a34a; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 20px; margin-right: 10px; font-weight:bold; transition: 0.2s; }
+        
+        .kir-btn-group { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+        @media (min-width: 640px) { .kir-btn-group { flex-direction: row; flex-wrap: wrap; } }
+        .kir-wrapper .btn-action { background-color: #16a34a; color: white; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: bold; transition: 0.2s; width: 100%; }
+        @media (min-width: 640px) { .kir-wrapper .btn-action { width: auto; font-size: 12px; } }
         .kir-wrapper .btn-action.btn-save { background-color: #0284c7; }
         .kir-wrapper .btn-action.btn-load { background-color: #f59e0b; }
         .kir-wrapper .btn-action.btn-pdf { background-color: #dc2626; }
@@ -328,24 +350,34 @@
 
         /* Akhir CSS KIR */
 
-        /* CSS KHUSUS OBHP/BMHP */
+        /* CSS KHUSUS OBHP/BMHP YANG DISEMPURNAKAN UNTUK HP */
         .obhp-container {
             max-width: 100%;
             margin: 0 auto;
             background: #fff;
-            padding: 25px;
+            padding: 12px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
         }
+        @media (min-width: 640px) { .obhp-container { padding: 20px; } }
         .obhp-kop-header { text-align: center; margin-bottom: 5px; }
-        .obhp-kop-header h2 { margin: 0; font-size: 22px; font-weight: bold; color: #1a5276; letter-spacing: 1px; text-transform: uppercase; }
-        .obhp-kop-header h3 { margin: 5px 0 0 0; font-size: 18px; font-weight: bold; color: #2c3e50; text-transform: uppercase; }
-        .obhp-garis-kop { border: 0; border-top: 3px double #000; margin: 12px 0 18px 0; }
-        .obhp-status-badge { display: inline-block; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 15px; }
+        .obhp-kop-header h2 { margin: 0; font-size: 15px; font-weight: bold; color: #1a5276; letter-spacing: 0.5px; text-transform: uppercase; }
+        .obhp-kop-header h3 { margin: 4px 0 0 0; font-size: 12px; font-weight: bold; color: #2c3e50; text-transform: uppercase; }
+        @media (min-width: 640px) {
+            .obhp-kop-header h2 { font-size: 20px; }
+            .obhp-kop-header h3 { font-size: 16px; }
+        }
+        .obhp-garis-kop { border: 0; border-top: 3px double #000; margin: 10px 0 15px 0; }
+        .obhp-status-badge { display: block; text-align: center; padding: 6px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-bottom: 12px; }
+        @media (min-width: 640px) { .obhp-status-badge { display: inline-block; font-size: 12px; } }
         .obhp-status-mode-edit { background-color: #e8f8f5; color: #117864; border: 1px solid #a3e4d7; }
         .obhp-status-mode-tersimpan { background-color: #fef9e7; color: #7d6608; border: 1px solid #f9e79f; }
-        .obhp-btn-container { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .obhp-btn { padding: 9px 16px; font-size: 13px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        
+        .obhp-btn-container { margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+        @media (min-width: 640px) { .obhp-btn-container { flex-direction: row; flex-wrap: wrap; gap: 10px; } }
+        .obhp-btn { padding: 8px 12px; font-size: 12px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; }
+        @media (min-width: 640px) { .obhp-btn { width: auto; font-size: 13px; padding: 9px 16px; } }
         .obhp-btn-add { background-color: #27ae60; color: white; }
         .obhp-btn-add:hover { background-color: #219150; }
         .obhp-btn-save { background-color: #f39c12; color: white; }
@@ -354,28 +386,31 @@
         .obhp-btn-edit:hover { background-color: #732d91; }
         .obhp-btn-print { background-color: #2980b9; color: white; }
         .obhp-btn-print:hover { background-color: #1f6391; }
-        .obhp-btn-delete { background-color: #e74c3c; color: white; padding: 5px 10px; font-size: 12px; border: none; border-radius: 3px; cursor: pointer; }
+        .obhp-btn-delete { background-color: #e74c3c; color: white; padding: 4px 8px; font-size: 11px; border: none; border-radius: 3px; cursor: pointer; }
         .obhp-btn-delete:hover { background-color: #c0392b; }
         
-        .obhp-table-responsive { width: 100%; overflow-x: auto; }
-        .obhp-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
-        .obhp-table th, .obhp-table td { border: 1px solid #bdc3c7; padding: 6px; text-align: center; vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; color: #000; }
-        .obhp-table th { background-color: #34495e; color: white; font-weight: 600; text-transform: uppercase; font-size: 11px; padding: 8px 4px; }
+        .obhp-table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .obhp-table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 850px; }
+        @media (min-width: 768px) { .obhp-table { font-size: 12px; table-layout: fixed; } }
+        .obhp-table th, .obhp-table td { border: 1px solid #bdc3c7; padding: 5px; text-align: center; vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; color: #000; }
+        .obhp-table th { background-color: #34495e; color: white; font-weight: 600; text-transform: uppercase; font-size: 10px; padding: 6px 3px; }
+        @media (min-width: 768px) { .obhp-table th { font-size: 11px; padding: 8px 4px; } }
         
-        .col-no { width: 3.5%; }
-        .col-nama { width: 25%; text-align: left; }
-        .col-batch { width: 11%; }
-        .col-satuan { width: 7.5%; }
-        .col-exp { width: 9.5%; }
-        .col-jumlah { width: 7%; }
-        .col-tgl-terima { width: 11%; }
-        .col-pemakaian { width: 7%; }
-        .col-tgl-pakai { width: 11%; }
-        .col-sisa { width: 7.5%; }
-        .col-aksi { width: 5%; }
+        .col-no { width: 35px; }
+        .col-nama { width: 180px; text-align: left; }
+        .col-batch { width: 90px; }
+        .col-satuan { width: 75px; }
+        .col-exp { width: 110px; }
+        .col-jumlah { width: 70px; }
+        .col-tgl-terima { width: 100px; }
+        .col-pemakaian { width: 70px; }
+        .col-tgl-pakai { width: 100px; }
+        .col-sisa { width: 70px; }
+        .col-aksi { width: 55px; }
         
-        .obhp-container input, .obhp-container select, .obhp-container textarea { width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; background-color: #fff; box-sizing: border-box; font-family: inherit; color:#000;}
-        .obhp-container textarea.auto-expand { resize: none; overflow: hidden; min-height: 32px; line-height: 1.3; vertical-align: middle; }
+        .obhp-container input, .obhp-container select, .obhp-container textarea { width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background-color: #fff; box-sizing: border-box; font-family: inherit; color:#000;}
+        @media (min-width: 768px) { .obhp-container input, .obhp-container select, .obhp-container textarea { font-size: 12px; padding: 5px; } }
+        .obhp-container textarea.auto-expand { resize: none; overflow: hidden; min-height: 28px; line-height: 1.3; vertical-align: middle; }
         .obhp-container input[readonly] { background-color: #f8f9fa; font-weight: bold; color: #2c3e50; text-align: center; }
         
         .obhp-locked input, .obhp-locked select, .obhp-locked textarea { background-color: #f2f4f4 !important; pointer-events: none; color: #333; border-color: #d5dbdb; }
@@ -395,7 +430,7 @@
             .obhp-kop-header h2 { font-size: 16pt !important; color: #000 !important; }
             .obhp-kop-header h3 { font-size: 13pt !important; color: #000 !important; }
             .obhp-garis-kop { border-top: 2px solid #000 !important; margin: 8px 0 12px 0 !important; }
-            .obhp-table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
+            .obhp-table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; min-width: 100% !important; }
             .obhp-table thead { display: table-header-group; }
             .obhp-table tr { page-break-inside: avoid; }
             .obhp-table th { background-color: #eaeded !important; color: #000 !important; border: 1px solid #000 !important; font-size: 8.5pt !important; padding: 4px 2px !important; }
@@ -746,65 +781,67 @@
                                 </div>
                             </div>
 
-                            <table class="main-table" id="tabel-inventaris-kir">
-                                <thead>
-                                    <tr>
-                                        <th rowspan="2" style="width: 30px;">No.<br>Urut</th>
-                                        <th rowspan="2">Nama Barang / Jenis Barang</th>
-                                        <th rowspan="2">Merk /<br>Model</th>
-                                        <th rowspan="2">No. Seri<br>Pabrik</th>
-                                        <th rowspan="2">Ukuran</th>
-                                        <th rowspan="2">Bahan</th>
-                                        <th rowspan="2">Tahun<br>Pembuatan /<br>Pembelian</th>
-                                        <th rowspan="2">No. Kode Barang</th>
-                                        <th rowspan="2">Jumlah<br>Barang<br>(SATUAN)</th>
-                                        <th rowspan="2">Harga Beli /<br>Perolehan</th>
-                                        <th colspan="3">Keadaan Barang</th>
-                                        <th rowspan="2">Keterangan / Mutasi<br>dll</th>
-                                    </tr>
-                                    <tr>
-                                        <th style="width: 40px;">Baik (B)</th>
-                                        <th style="width: 40px;">Kurang<br>Baik (KB)</th>
-                                        <th style="width: 40px;">Rusak<br>Berat (RB)</th>
-                                    </tr>
-                                    <tr style="background-color: #d9d2e9;">
-                                        <td>1</td>
-                                        <td>2</td>
-                                        <td>3</td>
-                                        <td>4</td>
-                                        <td>5</td>
-                                        <td>6</td>
-                                        <td>7</td>
-                                        <td>8</td>
-                                        <td>9</td>
-                                        <td>10</td>
-                                        <td>11</td>
-                                        <td>12</td>
-                                        <td>13</td>
-                                        <td>14</td>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabel-body-kir">
-                                    <tr>
-                                        <td>1</td>
-                                        <td><div contenteditable="true"></div></td>
-                                        <td><div contenteditable="true"></div></td>
-                                        <td><div contenteditable="true"></div></td>
-                                        <td><div contenteditable="true"></div></td>
-                                        <td><div contenteditable="true"></div></td>
-                                        <td><div contenteditable="true"></div></td>
-                                        <td><div contenteditable="true"></div></td>
-                                        <td><div contenteditable="true"></div></td>
-                                        <td><div contenteditable="true"></div></td>
-                                        <td><input type="checkbox"></td>
-                                        <td><input type="checkbox"></td>
-                                        <td><input type="checkbox"></td>
-                                        <td><div contenteditable="true"></div></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="kir-table-container">
+                                <table class="main-table" id="tabel-inventaris-kir">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" style="width: 30px;">No.<br>Urut</th>
+                                            <th rowspan="2">Nama Barang / Jenis Barang</th>
+                                            <th rowspan="2">Merk /<br>Model</th>
+                                            <th rowspan="2">No. Seri<br>Pabrik</th>
+                                            <th rowspan="2">Ukuran</th>
+                                            <th rowspan="2">Bahan</th>
+                                            <th rowspan="2">Tahun<br>Pembuatan /<br>Pembelian</th>
+                                            <th rowspan="2">No. Kode Barang</th>
+                                            <th rowspan="2">Jumlah<br>Barang<br>(SATUAN)</th>
+                                            <th rowspan="2">Harga Beli /<br>Perolehan</th>
+                                            <th colspan="3">Keadaan Barang</th>
+                                            <th rowspan="2">Keterangan / Mutasi<br>dll</th>
+                                        </tr>
+                                        <tr>
+                                            <th style="width: 35px;">Baik (B)</th>
+                                            <th style="width: 35px;">Kurang<br>Baik (KB)</th>
+                                            <th style="width: 35px;">Rusak<br>Berat (RB)</th>
+                                        </tr>
+                                        <tr style="background-color: #d9d2e9;">
+                                            <td>1</td>
+                                            <td>2</td>
+                                            <td>3</td>
+                                            <td>4</td>
+                                            <td>5</td>
+                                            <td>6</td>
+                                            <td>7</td>
+                                            <td>8</td>
+                                            <td>9</td>
+                                            <td>10</td>
+                                            <td>11</td>
+                                            <td>12</td>
+                                            <td>13</td>
+                                            <td>14</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabel-body-kir">
+                                        <tr>
+                                            <td>1</td>
+                                            <td><div contenteditable="true"></div></td>
+                                            <td><div contenteditable="true"></div></td>
+                                            <td><div contenteditable="true"></div></td>
+                                            <td><div contenteditable="true"></div></td>
+                                            <td><div contenteditable="true"></div></td>
+                                            <td><div contenteditable="true"></div></td>
+                                            <td><div contenteditable="true"></div></td>
+                                            <td><div contenteditable="true"></div></td>
+                                            <td><div contenteditable="true"></div></td>
+                                            <td><input type="checkbox"></td>
+                                            <td><input type="checkbox"></td>
+                                            <td><input type="checkbox"></td>
+                                            <td><div contenteditable="true"></div></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 
-                            <div class="no-print" id="kirActionButtons" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;">
+                            <div class="no-print kir-btn-group" id="kirActionButtons">
                                 <button class="btn-action" onclick="tambahBarisKIR()">+ Tambah Baris Barang</button>
                                 <button class="btn-action btn-save" onclick="simpanKIRSementara()">💾 Simpan Sementara</button>
                                 <button class="btn-action btn-load" onclick="muatKIRSementara()">🔄 Muat Data Tersimpan</button>
@@ -814,22 +851,22 @@
                             <div class="signature-section" id="signature-section-kir">
                                 <div class="signature-box">
                                     Mengetahui,<br>
-                                    <div contenteditable="true" style="font-weight: bold; min-width: 200px;">Kepala UPTD Puskesmas Lanjut</div><br>
+                                    <div contenteditable="true" style="font-weight: bold; min-width: 150px;">Kepala UPTD Puskesmas Lanjut</div><br>
                                     <div class="signature-space"></div>
                                     
-                                    <div contenteditable="true" class="nama-pejabat" data-placeholder="[Ketik Nama Kepala UPTD]" style="min-width: 200px;"></div>
+                                    <div contenteditable="true" class="nama-pejabat" data-placeholder="[Ketik Nama Kepala UPTD]" style="min-width: 150px;"></div>
                                     <div class="line"></div>
-                                    NIP. <div contenteditable="true" data-placeholder="[Ketik NIP]" style="min-width: 150px;"></div>
+                                    NIP. <div contenteditable="true" data-placeholder="[Ketik NIP]" style="min-width: 120px;"></div>
                                 </div>
                                 
                                 <div class="signature-box">
-                                    <div contenteditable="true" data-placeholder="Tempat, Tanggal Bulan Tahun" style="min-width: 200px;">Lanjut, ......................... 20....</div><br>
-                                    <div contenteditable="true" style="min-width: 200px;">Pengurus / Pemegang Barang</div><br>
+                                    <div contenteditable="true" data-placeholder="Tempat, Tanggal Bulan Tahun" style="min-width: 150px;">Lanjut, ......................... 20....</div><br>
+                                    <div contenteditable="true" style="min-width: 150px;">Pengurus / Pemegang Barang</div><br>
                                     <div class="signature-space"></div>
                                     
-                                    <div contenteditable="true" class="nama-pejabat" data-placeholder="[Ketik Nama Pengurus Barang]" style="min-width: 200px;"></div>
+                                    <div contenteditable="true" class="nama-pejabat" data-placeholder="[Ketik Nama Pengurus Barang]" style="min-width: 150px;"></div>
                                     <div class="line"></div>
-                                    NIP. <div contenteditable="true" data-placeholder="[Ketik NIP]" style="min-width: 150px;"></div>
+                                    NIP. <div contenteditable="true" data-placeholder="[Ketik NIP]" style="min-width: 120px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -3210,7 +3247,7 @@
             const labels = ['Diare', 'Hipertensi', 'Stroke', 'TB Paru', 'Diabetes', 'Dengue', 'Ibu Hamil', 'Stunting', 'ODGJ', 'Malaria'];
             const dataK = labels.map((_, i) => sums[allKeys[i]].k);
             const dataP = labels.map((_, i) => sums[allKeys[i]].p);
-            const dataS = labels.map((_, i) => sums[allKeys[i]].s);
+            const dataS = labels.map((_, i) => sums[allKeys5[i]] ? sums[allKeys[i]].s : sums[allKeys[i]].s); // fallback safety
             const dataM = labels.map((_, i) => sums[allKeys[i]].m);
 
             const canvasEl = document.getElementById('trendChart');
