@@ -328,6 +328,88 @@
 
         /* Akhir CSS KIR */
 
+        /* CSS KHUSUS OBHP/BMHP */
+        .obhp-container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .obhp-kop-header { text-align: center; margin-bottom: 5px; }
+        .obhp-kop-header h2 { margin: 0; font-size: 22px; font-weight: bold; color: #1a5276; letter-spacing: 1px; text-transform: uppercase; }
+        .obhp-kop-header h3 { margin: 5px 0 0 0; font-size: 18px; font-weight: bold; color: #2c3e50; text-transform: uppercase; }
+        .obhp-garis-kop { border: 0; border-top: 3px double #000; margin: 12px 0 18px 0; }
+        .obhp-status-badge { display: inline-block; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 15px; }
+        .obhp-status-mode-edit { background-color: #e8f8f5; color: #117864; border: 1px solid #a3e4d7; }
+        .obhp-status-mode-tersimpan { background-color: #fef9e7; color: #7d6608; border: 1px solid #f9e79f; }
+        .obhp-btn-container { margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .obhp-btn { padding: 9px 16px; font-size: 13px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .obhp-btn-add { background-color: #27ae60; color: white; }
+        .obhp-btn-add:hover { background-color: #219150; }
+        .obhp-btn-save { background-color: #f39c12; color: white; }
+        .obhp-btn-save:hover { background-color: #d68910; }
+        .obhp-btn-edit { background-color: #8e44ad; color: white; }
+        .obhp-btn-edit:hover { background-color: #732d91; }
+        .obhp-btn-print { background-color: #2980b9; color: white; }
+        .obhp-btn-print:hover { background-color: #1f6391; }
+        .obhp-btn-delete { background-color: #e74c3c; color: white; padding: 5px 10px; font-size: 12px; border: none; border-radius: 3px; cursor: pointer; }
+        .obhp-btn-delete:hover { background-color: #c0392b; }
+        
+        .obhp-table-responsive { width: 100%; overflow-x: auto; }
+        .obhp-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+        .obhp-table th, .obhp-table td { border: 1px solid #bdc3c7; padding: 6px; text-align: center; vertical-align: middle; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; color: #000; }
+        .obhp-table th { background-color: #34495e; color: white; font-weight: 600; text-transform: uppercase; font-size: 11px; padding: 8px 4px; }
+        
+        .col-no { width: 3.5%; }
+        .col-nama { width: 25%; text-align: left; }
+        .col-batch { width: 11%; }
+        .col-satuan { width: 7.5%; }
+        .col-exp { width: 9.5%; }
+        .col-jumlah { width: 7%; }
+        .col-tgl-terima { width: 11%; }
+        .col-pemakaian { width: 7%; }
+        .col-tgl-pakai { width: 11%; }
+        .col-sisa { width: 7.5%; }
+        .col-aksi { width: 5%; }
+        
+        .obhp-container input, .obhp-container select, .obhp-container textarea { width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; background-color: #fff; box-sizing: border-box; font-family: inherit; color:#000;}
+        .obhp-container textarea.auto-expand { resize: none; overflow: hidden; min-height: 32px; line-height: 1.3; vertical-align: middle; }
+        .obhp-container input[readonly] { background-color: #f8f9fa; font-weight: bold; color: #2c3e50; text-align: center; }
+        
+        .obhp-locked input, .obhp-locked select, .obhp-locked textarea { background-color: #f2f4f4 !important; pointer-events: none; color: #333; border-color: #d5dbdb; }
+        
+        .exp-merah { background-color: #e74c3c !important; color: white !important; font-weight: bold; }
+        .exp-kuning { background-color: #f1c40f !important; color: #2c3e50 !important; font-weight: bold; }
+        .exp-hijau { background-color: #2ecc71 !important; color: white !important; font-weight: bold; }
+        .exp-normal { background-color: #ffffff !important; color: #333 !important; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #obhpBmhpDisplayArea, #obhpBmhpDisplayArea * { visibility: visible; }
+            #obhpBmhpDisplayArea { position: absolute; left: 0; top: 0; width: 100%; }
+            
+            .obhp-container { box-shadow: none !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+            .obhp-btn-container, .btn-delete-col, .col-aksi, .obhp-status-badge { display: none !important; }
+            .obhp-kop-header h2 { font-size: 16pt !important; color: #000 !important; }
+            .obhp-kop-header h3 { font-size: 13pt !important; color: #000 !important; }
+            .obhp-garis-kop { border-top: 2px solid #000 !important; margin: 8px 0 12px 0 !important; }
+            .obhp-table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
+            .obhp-table thead { display: table-header-group; }
+            .obhp-table tr { page-break-inside: avoid; }
+            .obhp-table th { background-color: #eaeded !important; color: #000 !important; border: 1px solid #000 !important; font-size: 8.5pt !important; padding: 4px 2px !important; }
+            .obhp-table td { border: 1px solid #000 !important; padding: 4px 3px !important; font-size: 8.5pt !important; word-wrap: break-word !important; overflow-wrap: break-word !important; white-space: normal !important; }
+            
+            .obhp-container input, .obhp-container select, .obhp-container textarea { border: none !important; background: transparent !important; box-shadow: none !important; appearance: none !important; -webkit-appearance: none !important; font-size: 8.5pt !important; padding: 0 !important; margin: 0 !important; width: 100% !important; white-space: normal !important; word-wrap: break-word !important; overflow-wrap: break-word !important; resize: none !important; color: #000 !important; }
+            .obhp-container select { text-align-last: center; }
+            
+            .exp-merah { background-color: #ffc7ce !important; color: #9c0006 !important; }
+            .exp-kuning { background-color: #ffeb9c !important; color: #9c6500 !important; }
+            .exp-hijau { background-color: #c6efce !important; color: #006100 !important; }
+        }
+        /* Akhir CSS OBHP/BMHP */
+
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
         .table-container::-webkit-scrollbar { height: 6px; }
         .table-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
@@ -722,7 +804,6 @@
                                 </tbody>
                             </table>
 
-                            <!-- Tombol Aksi (Akan di-hide otomatis saat Export PDF berkat style/logic) -->
                             <div class="no-print" id="kirActionButtons" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px;">
                                 <button class="btn-action" onclick="tambahBarisKIR()">+ Tambah Baris Barang</button>
                                 <button class="btn-action btn-save" onclick="simpanKIRSementara()">💾 Simpan Sementara</button>
@@ -754,6 +835,53 @@
                         </div>
                     </div>
                     <!-- AKHIR KIR DISPLAY AREA -->
+
+                    <!-- DISPLAY AREA INVENTARIS OBHP/BMHP -->
+                    <div id="obhpBmhpDisplayArea" style="display: none;">
+                        <div class="obhp-container">
+                            <div class="obhp-kop-header">
+                                <h2>KARTU STOK OBHP/BMHP RUANG TINDAKAN DAN GAWAT DARURAT</h2>
+                                <h3>UPTD PUSKESMAS LANJUT</h3>
+                            </div>
+                            
+                            <hr class="obhp-garis-kop">
+
+                            <div id="obhpStatusBadge" class="obhp-status-badge obhp-status-mode-edit">
+                                Status: Mode Edit (Silakan isi atau ubah data)
+                            </div>
+
+                            <div class="obhp-btn-container">
+                                <button type="button" class="obhp-btn obhp-btn-add" id="obhpBtnAdd" onclick="tambahBarisOBHP()">+ Tambah Baris</button>
+                                <button type="button" class="obhp-btn obhp-btn-save" onclick="simpanSementaraOBHP()">💾 Simpan Sementara</button>
+                                <button type="button" class="obhp-btn obhp-btn-edit" onclick="aktifkanModeEditOBHP()">✏️ Edit Data</button>
+                                <button type="button" class="obhp-btn obhp-btn-print" onclick="window.print()">🖨️ Cetak</button>
+                            </div>
+
+                            <div class="obhp-table-responsive">
+                                <table id="obhpStokTable" class="obhp-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-no">No</th>
+                                            <th class="col-nama">Nama OBHP / BMHP</th>
+                                            <th class="col-batch">No Batch / LOT</th>
+                                            <th class="col-satuan">Satuan</th>
+                                            <th class="col-exp">Tgl Expired</th>
+                                            <th class="col-jumlah">Jumlah (Masuk)</th>
+                                            <th class="col-tgl-terima">Tanggal Terima</th>
+                                            <th class="col-pemakaian">Pemakaian</th>
+                                            <th class="col-tgl-pakai">Tanggal Pemakaian</th>
+                                            <th class="col-sisa">Sisa Stok</th>
+                                            <th class="col-aksi btn-delete-col">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="obhpTableBody">
+                                        <!-- Baris diisi otomatis via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AKHIR OBHP/BMHP DISPLAY AREA -->
 
                     <div id="calendarDisplayArea" style="display: none;">
                         <div class="full-year-calendar" id="fullYearCalendarGrid"></div>
@@ -1682,6 +1810,355 @@
         }
         /* ---------------- AKHIR SCRIPT KIR ---------------- */
 
+        /* ---------------- SCRIPT OBHP / BMHP ---------------- */
+        let obatTabletList = [
+            "Acyclovir 200 mg Tablet", "Acyclovir 400 mg Tablet", "Albendazole 400 mg Tablet", 
+            "Allopurinol 100 mg Tablet", "Allopurinol 300 mg Tablet", "Ambroxol 30 mg Tablet", 
+            "Amlodipine 5 mg Tablet", "Amlodipine 10 mg Tablet", "Amoxicillin 500 mg Kaplet", 
+            "Antasida Doen Kunyah Tablet", "Asam Mefenamat 500 mg Kaplet", "Atorvastatin 10 mg Tablet", 
+            "Atorvastatin 20 mg Tablet", "Captopril 12.5 mg Tablet", "Captopril 25 mg Tablet", 
+            "Captopril 50 mg Tablet", "Cefadroxil 500 mg Kapsul", "Cetirizine 10 mg Tablet", 
+            "Ciprofloxacin 500 mg Kaplet", "Clindamycin 150 mg Kapsul", "Clindamycin 300 mg Kapsul", 
+            "Clopidogrel 75 mg Tablet", "Cotrimoxazole 480 mg Tablet", "Cotrimoxazole 960 mg Tablet (Forte)", 
+            "CTM (Klorfeniramin Maleat) 4 mg Tablet", "Dexamethasone 0.5 mg Tablet", "Diazepam 2 mg Tablet", 
+            "Diazepam 5 mg Tablet", "Domperidone 10 mg Tablet", "Eritromisin 500 mg Kaplet", 
+            "Ethambutol 400 mg Tablet", "Fitomenadion (Vitamin K1) 10 mg Tablet", "Fluconazole 150 mg Kapsul", 
+            "Furosemide 40 mg Tablet", "Glibenclamide 5 mg Tablet", "Glimepiride 1 mg Tablet", 
+            "Glimepiride 2 mg Tablet", "Glimepiride 3 mg Tablet", "Guaifenesin (GG) 100 mg Tablet", 
+            "Haloperidol 0.5 mg Tablet", "Haloperidol 1.5 mg Tablet", "Haloperidol 5 mg Tablet", 
+            "Ibuprofen 200 mg Tablet", "Ibuprofen 400 mg Tablet", "Isoniazid (INH) 100 mg Tablet", 
+            "Isoniazid (INH) 300 mg Tablet", "Isosorbid Dinitrat (ISDN) 5 mg Tablet Sublingual", 
+            "Kalsium Laktat (Kalk) 500 mg Tablet", "Ketoconazole 200 mg Tablet", "Lansoprazole 30 mg Kapsul", 
+            "Loperamide 2 mg Tablet", "Loratadine 10 mg Tablet", "Metformin 500 mg Tablet", 
+            "Metformin 850 mg Tablet", "Methylprednisolone 4 mg Tablet", "Methylprednisolone 8 mg Tablet", 
+            "Methylprednisolone 16 mg Tablet", "Metronidazole 250 mg Tablet", "Metronidazole 500 mg Tablet", 
+            "Nifedipine 10 mg Tablet", "Nystatin 100.000 IU Tablet Vaginal", "Omeprazole 20 mg Kapsul", 
+            "Oralit Saset", "Paracetamol 500 mg Tablet", "Pirantel Pamoat 125 mg Tablet", 
+            "Pyrazinamide 500 mg Tablet", "Prednison 5 mg Tablet", "Propiltiourasil (PTU) 100 mg Tablet", 
+            "Rifampicin 300 mg Kapsul", "Rifampicin 450 mg Kaplet", "Rifampicin 600 mg Kaplet", 
+            "Ranitidine 150 mg Tablet", "Salbutamol 2 mg Tablet", "Salbutamol 4 mg Tablet", 
+            "Simvastatin 10 mg Tablet", "Simvastatin 20 mg Tablet", "Spironolactone 25 mg Tablet", 
+            "Tablet Tambah Darah (TTD) / Fe Fumarat", "Trihexyphenidyl 2 mg Tablet", "Vitamin B Complex Tablet", 
+            "Vitamin B1 (Tiamin) 50 mg Tablet", "Vitamin B6 (Piridoksin) 10 mg Tablet", 
+            "Vitamin B12 (Sianokobalamin) Tablet", "Vitamin C 50 mg Tablet", "Vitamin C 250 mg Tablet", 
+            "Vitamin C 500 mg Tablet", "Zinc 20 mg Tablet Dispersible"
+        ];
+
+        let obatInjeksiList = [
+            "Aminofilin 24 mg/ml Injeksi (Ampul)", "Ampicillin 1 gram Injeksi (Vial)", 
+            "Asam Traneksamat 50 mg/ml Injeksi (Ampul)", "Asam Traneksamat 100 mg/ml Injeksi (Ampul)", 
+            "Atracurium Besylate 10 mg/ml Injeksi", "Atropin Sulfat 0.25 mg/ml Injeksi (Ampul)", 
+            "Cefotaxime 1 gram Injeksi (Vial)", "Ceftriaxone 1 gram Injeksi (Vial)", 
+            "Dexamethasone 5 mg/ml Injeksi (Ampul)", "Diazepam 5 mg/ml Injeksi (Ampul)", 
+            "Diazepam Rectal Tube 5 mg / 2.5 ml", "Diazepam Rectal Tube 10 mg / 2.5 ml", 
+            "Diphenhydramine 10 mg/ml Injeksi (Ampul)", "Epinefrin / Adrenalin 0.1% Injeksi (Ampul)", 
+            "Furosemide 10 mg/ml Injeksi (Ampul)", "Gentamicin 40 mg/ml Injeksi (Ampul)", 
+            "Infus Dextrose 5% 500 ml", "Infus Dextrose 10% 500 ml", "Infus KA-EN 1B / 3B / 3A / 4B 500 ml", 
+            "Infus Manitol 20% 500 ml", "Infus NaCl 0.9% 100 ml / 500 ml", "Infus Ringer Laktat (RL) 500 ml", 
+            "Ketorolac 30 mg/ml Injeksi (Ampul)", "Lidocaine HCl 2% Injeksi (Ampul)", 
+            "MgSO4 (Magnesium Sulfat) 20% Injeksi", "MgSO4 (Magnesium Sulfat) 40% Injeksi", 
+            "Metoclopramide 5 mg/ml Injeksi (Ampul)", "Oksitosin 10 IU/ml Injeksi (Ampul)", 
+            "Ondansetron 2 mg/ml Injeksi (Ampul)", "Phytomenadione (Vitamin K1) 2 mg/ml Injeksi", 
+            "Phytomenadione (Vitamin K1) 10 mg/ml Injeksi", "Ranitidine 25 mg/ml Injeksi (Ampul)", 
+            "Tramadol 50 mg/ml Injeksi (Ampul)", "Vaksin BCG + Pelarut", "Vaksin DPT-HB-Hib", 
+            "Vaksin Hepatitis B Uniject", "Vaksin IPV (Inactivated Polio Vaccine)", "Vaksin JE (Japanese Encephalitis)", 
+            "Vaksin MR (Measles Rubella) + Pelarut", "Vaksin OPV (Oral Polio Vaccine)", "Vaksin PCV (Pneumococcal)", 
+            "Vaksin Td (Tetanus Diphtheria)", "Vaksin TT (Tetanus Toxoid)", "Water for Injection 25 ml / 500 ml"
+        ];
+
+        let bmhpList = [
+            "Abocath / IV Catheter 16G", "Abocath / IV Catheter 18G", "Abocath / IV Catheter 20G", 
+            "Abocath / IV Catheter 22G", "Abocath / IV Catheter 24G", "Abocath / IV Catheter 26G", 
+            "Alkohol Swab 70% Pad", "Autoclave Tape 19 mm x 50 m", 
+            "Bandage Elastic 2 inch", "Bandage Elastic 3 inch", "Bandage Elastic 4 inch", "Bandage Elastic 6 inch", 
+            "Benang Chromic Catgut + Needle 2-0", "Benang Chromic Catgut + Needle 3-0", "Benang Chromic Catgut + Needle 4-0", 
+            "Benang Plain Catgut + Needle 2-0", "Benang Plain Catgut + Needle 3-0", "Benang Plain Catgut + Needle 4-0", 
+            "Benang Silk (Sutera) + Needle 2-0", "Benang Silk (Sutera) + Needle 3-0", "Benang Silk (Sutera) + Needle 4-0", 
+            "Bisturi / Pisau Bedah No. 10", "Bisturi / Pisau Bedah No. 11", "Bisturi / Pisau Bedah No. 12", 
+            "Bisturi / Pisau Bedah No. 15", "Bisturi / Pisau Bedah No. 20", "Bisturi / Pisau Bedah No. 21", 
+            "Blood Lancet 21G", "Blood Lancet 28G", "Blood Lancet 30G", "Blood Transfusion Set", 
+            "Catheter Folley 2-Way No. 8 Fr", "Catheter Folley 2-Way No. 10 Fr", "Catheter Folley 2-Way No. 12 Fr", 
+            "Catheter Folley 2-Way No. 14 Fr", "Catheter Folley 2-Way No. 16 Fr", "Catheter Folley 2-Way No. 18 Fr", 
+            "Catheter Folley 3-Way No. 18 Fr", "Catheter Folley 3-Way No. 20 Fr", "Catheter Folley 3-Way No. 22 Fr", 
+            "ETT (Endotracheal Tube) No. 2.5", "ETT (Endotracheal Tube) No. 3.0", "ETT (Endotracheal Tube) No. 4.0", 
+            "ETT (Endotracheal Tube) No. 5.0", "ETT (Endotracheal Tube) No. 6.0", "ETT (Endotracheal Tube) No. 7.0", 
+            "Gagang Pisau Bedah (Scalpel Handle) No. 3", "Gagang Pisau Bedah (Scalpel Handle) No. 4", 
+            "Gel EKG / USG 250 ml", "Gel EKG / USG 5 Liter", 
+            "Gelang Identitas Pasien Dewasa (Biru)", "Gelang Identitas Pasien Dewasa (Pink)", 
+            "Gelang Identitas Pasien Anak (Biru)", "Gelang Identitas Pasien Anak (Pink)", 
+            "Handscoon Latex Non-Steril Size XS", "Handscoon Latex Non-Steril Size S", "Handscoon Latex Non-Steril Size M", "Handscoon Latex Non-Steril Size L", 
+            "Handscoon Nitrile Powder Free Size S", "Handscoon Nitrile Powder Free Size M", "Handscoon Nitrile Powder Free Size L", 
+            "Handscoon Steril Surgical No. 6.0", "Handscoon Steril Surgical No. 6.5", "Handscoon Steril Surgical No. 7.0", 
+            "Handscoon Steril Surgical No. 7.5", "Handscoon Steril Surgical No. 8.0", 
+            "Infus Set Anak (Micro Drip 60 drop/ml)", "Infus Set Dewasa (Macro Drip 20 drop/ml)", 
+            "Jarum Suntik (Needle) 18G", "Jarum Suntik (Needle) 21G", "Jarum Suntik (Needle) 23G", 
+            "Jarum Suntik (Needle) 24G", "Jarum Suntik (Needle) 25G", "Jarum Suntik (Needle) 26G", 
+            "Kantong Plastik Klip Obat 5x8 cm", "Kantong Plastik Klip Obat 7x10 cm", "Kantong Plastik Klip Obat 10x15 cm", 
+            "Kantong Plastik Limbah Kuning Infeksius", "Kantong Plastik Limbah Hitam Non-Infeksius", 
+            "Kapas Medis / Pembalut 250 gr", "Kapas Medis / Pembalut 500 gr", "Kapas Medis / Pembalut 1000 gr", 
+            "Kasa Hydrophil Roll 40m x 80cm", "Kasa Roll 4 yard x 5 cm", "Kasa Roll 4 yard x 10 cm", "Kasa Roll 4 yard x 15 cm", 
+            "Kasa Steril 10x10 cm", "Kasa Steril 16x16 cm", "Kertas Label / Etiket Obat (Putih & Biru)", 
+            "Kertas Record EKG (Paper ECG) 3 Channel", "Kertas Record EKG (Paper ECG) 6 Channel", 
+            "Masker Medis 3-Ply Earloop", "Masker Medis 3-Ply Headloop", "Masker N95 / KN95 Medis", 
+            "Mucus Extractor / Suction Catheter No. 6 Fr", "Mucus Extractor / Suction Catheter No. 8 Fr", "Mucus Extractor / Suction Catheter No. 10 Fr", 
+            "Nasal Cannula Oksigen Neonatus", "Nasal Cannula Oksigen Pediatric", "Nasal Cannula Oksigen Adult", 
+            "NGT (Nasogastric Tube) No. 5 Fr", "NGT (Nasogastric Tube) No. 8 Fr", "NGT (Nasogastric Tube) No. 12 Fr", "NGT (Nasogastric Tube) No. 16 Fr", 
+            "Plester Kain / Leukoplast 5 cm", "Plester Hypafix / Fixomull 5 cm x 5m", "Plester Hypafix / Fixomull 10 cm x 5m", 
+            "Plester Non-Woven / Micropore 1/2 inch", "Plester Non-Woven / Micropore 1 inch", 
+            "Pot Dahak / Sputum Container 50 ml", "Pot Urine Steril 30 ml", "Pot Urine Non-Steril 50 ml", 
+            "Rapid Test Dengue IgG/IgM / NS1", "Rapid Test HBsAg", "Rapid Test HIV / Syphilis / Malaria", 
+            "Safety Box Limbah Medis 2.5L", "Safety Box Limbah Medis 5L", "Safety Box Limbah Medis 12.5L", 
+            "Spatel Lidah Kayu Steril", "Spatel Lidah Stainless", 
+            "Spuit / Syringe Insulin 1 cc 30G", "Spuit / Syringe Tuberculin 1 cc 27G", 
+            "Spuit / Syringe 3 cc 23G", "Spuit / Syringe 5 cc 22G", "Spuit / Syringe 10 cc 21G", 
+            "Spuit / Syringe 20 cc", "Spuit / Syringe 50 cc Catheter Tip", 
+            "Strip Asam Urat (Uric Acid Test Strip)", "Strip Gula Darah (Blood Glucose Test Strip)", 
+            "Strip Hemoglobin (HB Test Strip)", "Strip Kolesterol (Cholesterol Test Strip)", 
+            "Sungkup Oksigen NRM / RM Dewasa", "Sungkup Oksigen NRM / RM Anak", "Three-Way Stopcock / Extension Tubing", 
+            "Umbilical Cord Clamp (Penjepit Tali Pusat)", "Underpad Non-Steril 60x90 cm", "Urine Bag 2000 ml", 
+            "Wing Needle / Butterfly Needle 23G", "Wing Needle / Butterfly Needle 25G"
+        ];
+
+        obatTabletList.sort((a, b) => a.localeCompare(b, 'id'));
+        obatInjeksiList.sort((a, b) => a.localeCompare(b, 'id'));
+        bmhpList.sort((a, b) => a.localeCompare(b, 'id'));
+
+        function getRealtimeTimestampOBHP() {
+            const now = new Date();
+            const date = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${date}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function generateOptionsHTMLOBHP() {
+            let options = `<option value="">-- Pilih Barang --</option>`;
+            
+            options += `<optgroup label="--- OBAT TABLET / KAPLET / KAPSUL (OBHP) ---">`;
+            obatTabletList.forEach(item => options += `<option value="${item}">${item}</option>`);
+            options += `</optgroup>`;
+
+            options += `<optgroup label="--- OBAT INJEKSI / AMPUL / VIAL / VAKSIN (OBHP) ---">`;
+            obatInjeksiList.forEach(item => options += `<option value="${item}">${item}</option>`);
+            options += `</optgroup>`;
+
+            options += `<optgroup label="--- BAHAN MEDIS HABIS PAKAI (BMHP) ---">`;
+            bmhpList.forEach(item => options += `<option value="${item}">${item}</option>`);
+            options += `</optgroup>`;
+
+            return options;
+        }
+
+        function resizeTextareaOBHP(el) {
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight) + 'px';
+        }
+
+        function tambahBarisOBHP(data = null) {
+            const tbody = document.getElementById('obhpTableBody');
+            const tr = document.createElement('tr');
+
+            tr.innerHTML = `
+                <td class="row-no"></td>
+                <td class="col-nama">
+                    <select class="nama-barang">
+                        ${generateOptionsHTMLOBHP()}
+                    </select>
+                </td>
+                <td>
+                    <textarea class="no-batch auto-expand" rows="1" placeholder="Batch/LOT" oninput="resizeTextareaOBHP(this)"></textarea>
+                </td>
+                <td>
+                    <select class="satuan">
+                        <option value="Tablet">Tablet</option>
+                        <option value="Kaplet">Kaplet</option>
+                        <option value="Kapsul">Kapsul</option>
+                        <option value="Ampul">Ampul</option>
+                        <option value="Vial">Vial</option>
+                        <option value="Botol">Botol</option>
+                        <option value="Tube">Tube</option>
+                        <option value="Pcs">Pcs</option>
+                        <option value="Box">Box</option>
+                        <option value="Strip">Strip</option>
+                        <option value="Roll">Roll</option>
+                        <option value="Set">Set</option>
+                        <option value="Saset">Saset</option>
+                        <option value="Pkt">Pkt</option>
+                    </select>
+                </td>
+                <td><input type="date" class="exp-date" onchange="hitungExpiredOBHP(this)"></td>
+                <td><input type="number" min="0" class="input-jumlah" placeholder="0" oninput="prosesKalkulasiOBHP(this, 'jumlah')"></td>
+                <td><input type="text" class="tgl-terima" readonly placeholder="-"></td>
+                <td><input type="number" min="0" class="input-pemakaian" placeholder="0" oninput="prosesKalkulasiOBHP(this, 'pemakaian')"></td>
+                <td><input type="text" class="tgl-pemakaian" readonly placeholder="-"></td>
+                <td><input type="number" class="sisa-stok" value="0" readonly></td>
+                <td class="btn-delete-col">
+                    <button class="obhp-btn-delete" onclick="hapusBarisOBHP(this)">Hapus</button>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+
+            if (data) {
+                tr.querySelector('.nama-barang').value = data.namaBarang || '';
+                const batchEl = tr.querySelector('.no-batch');
+                batchEl.value = data.noBatch || '';
+                resizeTextareaOBHP(batchEl);
+
+                tr.querySelector('.satuan').value = data.satuan || 'Tablet';
+                tr.querySelector('.exp-date').value = data.expDate || '';
+                tr.querySelector('.input-jumlah').value = data.jumlah || '';
+                tr.querySelector('.tgl-terima').value = data.tglTerima || '';
+                tr.querySelector('.input-pemakaian').value = data.pemakaian || '';
+                tr.querySelector('.tgl-pemakaian').value = data.tglPemakaian || '';
+                tr.querySelector('.sisa-stok').value = data.sisaStok || 0;
+                
+                if (data.expDate) {
+                    hitungExpiredOBHP(tr.querySelector('.exp-date'));
+                }
+            }
+
+            updateNoOBHP();
+        }
+
+        function updateNoOBHP() {
+            const rows = document.querySelectorAll('#obhpTableBody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('.row-no').innerText = index + 1;
+            });
+        }
+
+        function hapusBarisOBHP(btn) {
+            const row = btn.closest('tr');
+            row.remove();
+            updateNoOBHP();
+        }
+
+        function prosesKalkulasiOBHP(element, tipe) {
+            const row = element.closest('tr');
+            const inputJumlah = row.querySelector('.input-jumlah');
+            const inputPemakaian = row.querySelector('.input-pemakaian');
+            const inputSisaStok = row.querySelector('.sisa-stok');
+            const inputTglTerima = row.querySelector('.tgl-terima');
+            const inputTglPemakaian = row.querySelector('.tgl-pemakaian');
+
+            const jumlah = parseFloat(inputJumlah.value) || 0;
+            const pemakaian = parseFloat(inputPemakaian.value) || 0;
+
+            inputSisaStok.value = jumlah - pemakaian;
+
+            if (tipe === 'jumlah' && inputJumlah.value.trim() !== '') {
+                inputTglTerima.value = getRealtimeTimestampOBHP();
+            } else if (tipe === 'jumlah' && inputJumlah.value.trim() === '') {
+                inputTglTerima.value = '';
+            }
+
+            if (tipe === 'pemakaian' && inputPemakaian.value.trim() !== '') {
+                inputTglPemakaian.value = getRealtimeTimestampOBHP();
+            } else if (tipe === 'pemakaian' && inputPemakaian.value.trim() === '') {
+                inputTglPemakaian.value = '';
+            }
+        }
+
+        function hitungExpiredOBHP(element) {
+            const expValue = element.value;
+            if (!expValue) {
+                element.className = "exp-date exp-normal";
+                return;
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const expDate = new Date(expValue);
+            expDate.setHours(0, 0, 0, 0);
+
+            const diffTime = expDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            element.classList.remove('exp-merah', 'exp-kuning', 'exp-hijau', 'exp-normal');
+
+            if (diffDays <= 30) {
+                element.classList.add('exp-merah');
+            } else if (diffDays > 30 && diffDays <= 90) {
+                element.classList.add('exp-kuning');
+            } else if (diffDays > 180) {
+                element.classList.add('exp-hijau');
+            } else {
+                element.classList.add('exp-normal');
+            }
+        }
+
+        function simpanSementaraOBHP() {
+            const rows = document.querySelectorAll('#obhpTableBody tr');
+            const dataStok = [];
+
+            rows.forEach(row => {
+                dataStok.push({
+                    namaBarang: row.querySelector('.nama-barang').value,
+                    noBatch: row.querySelector('.no-batch').value,
+                    satuan: row.querySelector('.satuan').value,
+                    expDate: row.querySelector('.exp-date').value,
+                    jumlah: row.querySelector('.input-jumlah').value,
+                    tglTerima: row.querySelector('.tgl-terima').value,
+                    pemakaian: row.querySelector('.input-pemakaian').value,
+                    tglPemakaian: row.querySelector('.tgl-pemakaian').value,
+                    sisaStok: row.querySelector('.sisa-stok').value
+                });
+            });
+
+            localStorage.setItem('stokPuskesmasLanjutA4', JSON.stringify(dataStok));
+
+            const table = document.getElementById('obhpStokTable');
+            table.classList.add('obhp-locked');
+            document.getElementById('obhpBtnAdd').style.display = 'none';
+            document.querySelectorAll('.obhp-btn-delete').forEach(btn => btn.style.display = 'none');
+
+            const badge = document.getElementById('obhpStatusBadge');
+            badge.className = "obhp-status-badge obhp-status-mode-tersimpan";
+            badge.innerText = "Status: Tersimpan Sementara (Tabel dikunci. Klik 'Edit Data' untuk mengubah)";
+
+            alert("Data Kartu Stok OBHP/BMHP Berhasil Disimpan Sementara!");
+        }
+
+        function aktifkanModeEditOBHP() {
+            const table = document.getElementById('obhpStokTable');
+            table.classList.remove('obhp-locked');
+            document.getElementById('obhpBtnAdd').style.display = 'inline-flex';
+            document.querySelectorAll('.obhp-btn-delete').forEach(btn => btn.style.display = 'inline-block');
+
+            const badge = document.getElementById('obhpStatusBadge');
+            badge.className = "obhp-status-badge obhp-status-mode-edit";
+            badge.innerText = "Status: Mode Edit (Silakan isi atau ubah data)";
+        }
+
+        function initOBHPBMHP() {
+            const tbody = document.getElementById('obhpTableBody');
+            tbody.innerHTML = ''; // reset
+
+            const savedData = localStorage.getItem('stokPuskesmasLanjutA4');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                if (parsedData.length > 0) {
+                    parsedData.forEach(item => tambahBarisOBHP(item));
+                    simpanSementaraOBHP();
+                    return;
+                }
+            }
+            tambahBarisOBHP();
+            tambahBarisOBHP();
+            tambahBarisOBHP();
+        }
+
+        // Initialize OBHP on load
+        window.addEventListener('DOMContentLoaded', (event) => {
+            initOBHPBMHP();
+        });
+        /* ---------------- AKHIR SCRIPT OBHP / BMHP ---------------- */
+
         function simpanUrlRujukan() {
             const urlInput = document.getElementById('inputUrlRujukan1').value;
             localStorage.setItem('url_rujukan_' + currentMenuId + '_1', urlInput);
@@ -1871,6 +2348,7 @@
             const rujukanInternalArea = document.getElementById('rujukanInternalDisplayArea');
             const pwsArea = document.getElementById('pwsDisplayArea');
             const inventarisKirArea = document.getElementById('inventarisKirDisplayArea');
+            const obhpBmhpArea = document.getElementById('obhpBmhpDisplayArea');
 
             if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
 
@@ -1885,6 +2363,7 @@
             rujukanInternalArea.style.display = 'none';
             pwsArea.style.display = 'none';
             inventarisKirArea.style.display = 'none';
+            obhpBmhpArea.style.display = 'none';
 
             if (categoryCode === 'jadwal') {
                 calArea.style.display = 'block';
@@ -1900,6 +2379,8 @@
                 initRujukanInternalDateTime();
             } else if (categoryCode === 'inventaris' && periodIdentifier === 'kir') {
                 inventarisKirArea.style.display = 'block';
+            } else if (categoryCode === 'inventaris' && periodIdentifier === 'obhp_bmhp') {
+                obhpBmhpArea.style.display = 'block';
             } else if (categoryCode === 'rujukan' || categoryCode === 'inventaris') {
                 formArea.style.display = 'block';
                 document.getElementById('formTitleLabel').innerText = "Tautan - " + subTitle;
@@ -1923,7 +2404,7 @@
             document.getElementById('dynamicFileList').innerHTML = '';
             document.getElementById('slideshowContainerImages').innerHTML = '';
             
-            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && categoryCode !== 'pws' && categoryCode !== 'inventaris' && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
+            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && categoryCode !== 'pws' && !(categoryCode === 'inventaris' && (periodIdentifier === 'obhp_bmhp' || periodIdentifier === 'kir')) && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
                 loadFilesForCurrentMenu(categoryCode);
             }
         }
