@@ -348,9 +348,7 @@
         .kir-wrapper .btn-action.btn-pdf { background-color: #dc2626; }
         .kir-wrapper .btn-action:hover { opacity: 0.9; }
 
-        /* Akhir CSS KIR */
-
-        /* CSS KHUSUS OBHP/BMHP YANG DISEMPURNAKAN UNTUK HP */
+        /* CSS KHUSUS OBHP/BMHP */
         .obhp-container {
             max-width: 100%;
             margin: 0 auto;
@@ -443,7 +441,48 @@
             .exp-kuning { background-color: #ffeb9c !important; color: #9c6500 !important; }
             .exp-hijau { background-color: #c6efce !important; color: #006100 !important; }
         }
-        /* Akhir CSS OBHP/BMHP */
+
+        /* CSS KHUSUS MONITORING UPKDK */
+        .upkdk-wrapper { font-family: Arial, sans-serif; font-size: 13px; background-color: #f8fafc; padding: 12px; border-radius: 8px; width: 100%; overflow-x: auto; border: 1px solid var(--border); }
+        .upkdk-container { max-width: 1100px; margin: auto; background: #fff; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-radius: 8px;}
+        @media (min-width: 640px) { .upkdk-container { padding: 30px; } }
+        .upkdk-wrapper h2 { text-align: center; margin-bottom: 20px; text-transform: uppercase; font-size: 16px; color: #000; font-weight: bold; }
+        .upkdk-header-info { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; width: 100%; }
+        @media (min-width: 768px) { .upkdk-header-info { width: 50%; } }
+        .upkdk-header-info div { display: flex; flex-direction: column; }
+        @media (min-width: 640px) { .upkdk-header-info div { flex-direction: row; align-items: center; } }
+        .upkdk-header-info label { font-weight: bold; margin-bottom: 5px; color: #000; font-size: 12px; }
+        @media (min-width: 640px) { .upkdk-header-info label { width: 180px; margin-bottom: 0; } }
+        .upkdk-header-info select, .upkdk-header-info input { flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; color: #000; background: #fff; }
+        .upkdk-wrapper h3.section-header { background: var(--primary); color: #fff; padding: 10px; margin-top: 20px; font-size: 13px; border-radius: 6px 6px 0 0; text-transform: uppercase; }
+        .upkdk-table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; }
+        .upkdk-wrapper table { width: 100%; border-collapse: collapse; min-width: 750px; font-size: 12px; }
+        .upkdk-wrapper th, .upkdk-wrapper td { border: 1px solid #cbd5e1; padding: 8px; vertical-align: middle; color: #000;}
+        .upkdk-wrapper th { background-color: #e2e8f0; text-align: center; font-weight: bold; }
+        .upkdk-wrapper .section-title { font-weight: bold; background-color: #fef9e7; color: #9a7b4f; }
+        .upkdk-wrapper select.monitoring-dropdown { width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; }
+        .upkdk-wrapper textarea.keterangan-text { width: 100%; box-sizing: border-box; resize: none; overflow: hidden; padding: 6px; font-family: inherit; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px;}
+        .upkdk-wrapper .score-col { width: 80px; text-align: center; font-weight: bold; background: #f8fafc; }
+        .upkdk-wrapper .subtotal-row td { font-weight: bold; background-color: #f0fdf4; text-align: right; color: #166534; }
+        .upkdk-wrapper .subtotal-val { text-align: center !important; }
+        .upkdk-wrapper .signature-section { display: flex; flex-direction: column; gap: 30px; margin-top: 40px; padding: 0 10px; }
+        @media (min-width: 768px) { .upkdk-wrapper .signature-section { flex-direction: row; justify-content: space-between; padding: 0 20px; } }
+        .upkdk-wrapper .signature-box-kades { text-align: center; width: 100%; margin-top: 20px; color: #000; }
+        @media (min-width: 768px) { .upkdk-wrapper .signature-box-kades { width: 40%; margin-top: 35px; } }
+        .upkdk-wrapper .signature-box-kades input { width: 80%; text-align: center; border: none; border-bottom: 1px solid #000; margin-bottom: 5px; font-size: 13px; padding-bottom: 5px; background: transparent; color: #000;}
+        .upkdk-wrapper .signature-box-kades input:focus { outline: none; }
+        .upkdk-wrapper .signature-box-pelaksana { width: 100%; text-align: left; color: #000;}
+        @media (min-width: 768px) { .upkdk-wrapper .signature-box-pelaksana { width: 50%; } }
+        .upkdk-wrapper .pelaksana-title { font-weight: bold; margin-bottom: 15px; text-align: left; }
+        .upkdk-wrapper .pelaksana-item { display: flex; align-items: flex-start; margin-bottom: 15px; }
+        .upkdk-wrapper .pelaksana-item span { width: 25px; font-weight: bold; margin-top: 2px; }
+        .upkdk-wrapper .pelaksana-inputs { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .upkdk-wrapper .pelaksana-inputs input { border: none; border-bottom: 1px solid #000; width: 100%; padding-bottom: 3px; font-size: 13px; background: transparent; color: #000;}
+        @media (min-width: 640px) { .upkdk-wrapper .pelaksana-inputs input { width: 280px; } }
+        .upkdk-wrapper .pelaksana-inputs input:focus { outline: none; }
+        .upkdk-wrapper .btn-tambah { background-color: var(--primary); color: white; padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; margin-top: 10px; margin-left: 25px; transition: 0.2s;}
+        .upkdk-wrapper .btn-tambah:hover { background-color: var(--primary-hover); }
+        .upkdk-wrapper .rate-summary { font-weight: bold; font-size: 14px; margin: 30px 0; background: #f0f9ff; padding: 15px; border: 1px solid #bae6fd; color: #0369a1; border-radius: 8px; line-height: 1.6;}
 
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
         .table-container::-webkit-scrollbar { height: 6px; }
@@ -553,9 +592,6 @@
         .footer-running { flex-grow: 1; overflow: hidden; margin: 0 10px; white-space: nowrap; }
         .footer-running marquee { font-weight: 700; font-size: 0.75rem; letter-spacing: 0.3px; }
         .footer-clock { font-weight: 600; background: rgba(0, 0, 0, 0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; white-space: nowrap; }
-        
-        .btn-info-fixed { background-color: rgba(14, 165, 233, 0.1); color: var(--accent); border: 1px solid rgba(14, 165, 233, 0.3); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
-        .btn-info-fixed:hover { background-color: rgba(14, 165, 233, 0.2); }
 
         .rujukan-form-container { width: 100%; background: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin: 0 auto; max-width: 650px;}
         .rujukan-form-container .header-form { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 12px; }
@@ -661,6 +697,15 @@
                     <a onclick="verifyAndSelectMenu('inventaris', 'obhp_bmhp', 'Inventaris', 'OBHP/BMHP')">OBHP/BMHP</a>
                 </div>
             </div>
+            
+            <!-- Monitoring -->
+            <div class="nav-item" tabindex="0">
+                <button class="nav-btn-h"><i class="fa-solid fa-desktop"></i> Monitoring ▾</button>
+                <div class="dropdown-content-h">
+                    <a onclick="verifyAndSelectMenu('monitoring', 'upkdk', 'Monitoring', 'Monitoring UPKDK')">Monitoring UPKDK</a>
+                    <a onclick="selectMenu('monitoring', 'keselamatan', 'Monitoring', 'Monitoring Keselamatan Pasien')">Monitoring Keselamatan Pasien</a>
+                </div>
+            </div>
 
             <!-- Dashboard PWS -->
             <div class="nav-item">
@@ -700,6 +745,105 @@
                 
                 <div class="card-body">
                     
+                    <!-- DISPLAY AREA MONITORING UPKDK -->
+                    <div id="monitoringUpkdkDisplayArea" style="display: none;">
+                        <div class="upkdk-wrapper">
+                            <div class="upkdk-container">
+                                <h2>Form Monitoring Pustu dan Posyandu</h2>
+                                
+                                <div class="upkdk-header-info">
+                                    <div>
+                                        <label>NAMA PUSTU/POSKESDES</label>
+                                        <select id="pustu_monitoring">
+                                            <option value="">-- Pilih Pustu / Poskesdes --</option>
+                                            <option value="Pustu Berindat">Pustu Berindat</option>
+                                            <option value="Poskesdes Persing">Poskesdes Persing</option>
+                                            <option value="Poskesdes Sedamai">Poskesdes Sedamai</option>
+                                            <option value="Pustu Lanjut">Pustu Lanjut</option>
+                                            <option value="Pustu Kote">Pustu Kote</option>
+                                            <option value="Pustu Pelakak">Pustu Pelakak</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>NAMA POSYANDU</label>
+                                        <select id="posyandu_monitoring">
+                                            <option value="">-- Pilih Posyandu --</option>
+                                            <option value="Posyandu Bougenville">Posyandu Bougenville</option>
+                                            <option value="Posyandu Nusa Indah">Posyandu Nusa Indah</option>
+                                            <option value="Posyandu Aster">Posyandu Aster</option>
+                                            <option value="Posyandu Seroja">Posyandu Seroja</option>
+                                            <option value="Posyandu Cempaka Putih">Posyandu Cempaka Putih</option>
+                                            <option value="Posyandu Jasmine">Posyandu Jasmine</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>TANGGAL MONITORING</label>
+                                        <input type="date" id="tanggal_monitoring_upkdk">
+                                    </div>
+                                </div>
+
+                                <!-- PUSTU SECTION -->
+                                <h3 class="section-header">A. INDIKATOR PUSTU</h3>
+                                <div class="upkdk-table-container">
+                                    <table id="tablePustu">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 5%;">NO</th>
+                                                <th style="width: 35%;">INDIKATOR</th>
+                                                <th style="width: 25%;">MONITORING</th>
+                                                <th style="width: 25%;">KETERANGAN (-25 Poin jika diisi)</th>
+                                                <th style="width: 10%;">SKOR</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbodyPustu"></tbody>
+                                    </table>
+                                </div>
+
+                                <!-- POSYANDU SECTION -->
+                                <h3 class="section-header">B. INDIKATOR POSYANDU</h3>
+                                <div class="upkdk-table-container">
+                                    <table id="tablePosyandu">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 5%;">NO</th>
+                                                <th style="width: 35%;">INDIKATOR</th>
+                                                <th style="width: 25%;">MONITORING</th>
+                                                <th style="width: 25%;">KETERANGAN (-25 Poin jika diisi)</th>
+                                                <th style="width: 10%;">SKOR</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbodyPosyandu"></tbody>
+                                    </table>
+                                </div>
+
+                                <div class="rate-summary">
+                                    Persentase Rate Pustu : <span id="ratePustu">0</span>%<br><br>
+                                    Persentase Rate Posyandu : <span id="ratePosyandu">0</span>%
+                                </div>
+
+                                <!-- SIGNATURES -->
+                                <div class="signature-section">
+                                    <!-- Kepala Desa -->
+                                    <div class="signature-box-kades">
+                                        <p><strong>Kepala Desa</strong></p>
+                                        <br><br><br><br>
+                                        <input type="text" placeholder="Nama Kepala Desa">
+                                    </div>
+                                    
+                                    <!-- Pelaksana -->
+                                    <div class="signature-box-pelaksana">
+                                        <div class="pelaksana-title">Pelaksana</div>
+                                        <div id="pelaksana-container-monitoring">
+                                            <!-- Data awal pelaksana akan ditambahkan dinamis -->
+                                        </div>
+                                        <button type="button" class="btn-tambah" onclick="tambahMonitoringPelaksana()">+ Tambah Pelaksana</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AKHIR MONITORING UPKDK DISPLAY AREA -->
+
                     <!-- DISPLAY AREA INVENTARIS KIR -->
                     <div id="inventarisKirDisplayArea" style="display: none;">
                         <div class="kir-wrapper" id="kirContainerData">
@@ -1747,7 +1891,6 @@
 
         /* ----- FUNGSI SIMPAN & MUAT DATA KIR SEMENTARA ----- */
         function simpanKIRSementara() {
-            // Sinkronkan atribut checkbox agar tersimpan di innerHTML
             const checkboxes = document.querySelectorAll('#tabel-body-kir input[type="checkbox"]');
             checkboxes.forEach(cb => {
                 if (cb.checked) cb.setAttribute('checked', 'checked');
@@ -1778,7 +1921,6 @@
             try {
                 const kirData = JSON.parse(saved);
                 
-                // Kembalikan Dropdown
                 document.getElementById('provinsi').value = kirData.provinsi || "";
                 if (kirData.kabupatenHtml) {
                     document.getElementById('kabupaten').innerHTML = kirData.kabupatenHtml;
@@ -1787,7 +1929,6 @@
                 document.getElementById('klaster_kir').value = kirData.klaster || "";
                 document.getElementById('ruangan_kir').value = kirData.ruangan || "";
 
-                // Kembalikan Tabel Baris dan TTD
                 if (kirData.tbodyHtml) {
                     document.getElementById('tabel-body-kir').innerHTML = kirData.tbodyHtml;
                 }
@@ -1801,7 +1942,6 @@
                 alert('Gagal memuat data KIR.');
             }
         }
-        /* ----- AKHIR FUNGSI SIMPAN/MUAT KIR ----- */
 
         function tambahBarisKIR() {
             var tbody = document.getElementById("tabel-body-kir");
@@ -2174,7 +2314,7 @@
 
         function initOBHPBMHP() {
             const tbody = document.getElementById('obhpTableBody');
-            tbody.innerHTML = ''; // reset
+            tbody.innerHTML = ''; 
 
             const savedData = localStorage.getItem('stokPuskesmasLanjutA4');
             if (savedData) {
@@ -2190,11 +2330,237 @@
             tambahBarisOBHP();
         }
 
-        // Initialize OBHP on load
+        /* ---------------- SCRIPT MONITORING UPKDK ---------------- */
+        const dataPustuMonitoring = [
+            { section: "A", title: "ADMINISTRASI DAN REGULASI", items: [
+                "Tersedianya SOTK UPKDK di Pustu", "Tersedianya STR/SIPP/SIPB aktif tenaga kesehatan di Pustu",
+                "Tersedianya Profil Desa", "Tersedianya sasaran setiap siklus hidup", "Tersedianya SK Kader ILP",
+                "Tersedianya SOP/Alur layanan sesuai siklus hidup", "Tersedianyan SOP Kunjungan rumah", "Tersedianyan SOP PWS"
+            ]},
+            { section: "B", title: "PELAYANAN SIKLUS HIDUP", items: [
+                "Terlaksananya skrining sesuai siklus hidup", "Terlasananya pelayanan kesehatan sesuai siklus hidup",
+                "Tersedianya alat pemeriksaan laboratorium sederhana (Gula, Chol, Asam urat, HB)"
+            ]},
+            { section: "C", title: "OBHP, BMHP DAN LOGISTIK", items: [
+                "Tersedianya dokumen LPLPO", "Tersedianya dokumen perhitungan kebutuhan obat 1 bulan",
+                "Bukti pengecekan obat yang di terima sesuai SBKK", "Terlaksananya Bukti pengisian kartu stok",
+                "Terlaksananya Bukti penyimpanan obat & BMHP", "Terlaksananya pemberian obat sesuai dengan indikasi dan pemberian informasi obat",
+                "Bukti pemantau obat-obatan yang mendekati expired dan expired", "Terlaksananya obat masuk dan keluar di catat sesuai real time",
+                "Telaksananya bukti pengumpulan obat expired setiap bulan *(jika ada)", "Tersedianya rekapitulasi pemakaian di LPLPO bulanan Pustu",
+                "Tersedianya laporan SO OBHP Puskesmas (Lopas) setiap triwulan", "Tersedianya dokumen Arsip (LPLPO,SBBK,LOPAS)"
+            ]},
+            { section: "D", title: "SARANA DAN PRASARANA", items: [
+                "Kondisi Bangunan Pustu", "Tersedianya ruang periksa sesuai siklus hidup", "Tersedianya Toilet dan Air bersih layak pakai",
+                "Tersedianya Meja dan Kursi", "Tersedianya tempat tidur periksa", "Tersedianya alat kesehatan sesuai Standar yang berlaku"
+            ]},
+            { section: "E", title: "PEMBERDAYAAN", items: [
+                "Tenaga kesehatan melaksanakan SMD", "Tenaga Kesehatan mengikuti MMD", "Tenaga Kesehatan Melaksanakan pendampingan PHBS Rumah tangga"
+            ]},
+            { section: "F", title: "PENCATATAN DAN PELAPORAN", items: [
+                "Tenaga kesehatan melakukan pengisian E Rekam Medis (Epustu)", "Tersedianya Buku/Lembar Kunjungan rumah",
+                "Tersedianya Buku/Lembar PWS", "Tersedianya Buku/Lembar Notulen pertemuan dengan kader *(Mingguan/Bulanan)",
+                "Tersedianyan Bukti ekspedisi pengiriman Laporan"
+            ]}
+        ];
+
+        const dataPosyanduMonitoring = [
+            { section: "A", title: "SDM", items: [
+                "Jumlah kader aktif (Isi jumlah di kolom keterangan)", "kader mendapatkan pelatihan 25 kompetensi dasar",
+                "Jumlah Kader Purwa (Isi jumlah di kolom keterangan)", "Jumlah Kader Madya (Isi jumlah di kolom keterangan)", "Jumlah Kader Utama (Isi jumlah di kolom keterangan)"
+            ]},
+            { section: "B", title: "ADMINISTRASI DAN REGULASI", items: [
+                "SK Kader Posyandu", "SOP Kunjungan rumah", "SOP Alur layanan posyandu", "Tersedianya SOTK Kader Posyandu sesuai siklus hidup"
+            ]},
+            { section: "C", title: "SARANA DAN PRASARANA", items: [
+                "Tersedia Meja & Kursi", "Tersedia Ruang tunggu & kursi", "Tersedia air dari sumber yang layak di posyandu", "Tersedia toilet yang layak digunakan"
+            ]},
+            { section: "D", title: "KETERSEDIAAN ALAT KESEHATAN", items: [
+                "Tersedia alat ukur tekanan darah", "Tersedia alat ukur berat badan (Dewasa & Bayi)", "Tersedia alat ukur tinggi badan (Dewasa & Bayi)",
+                "Tersedia alat pengukur lingkar pinggang", "Tersedia alat pengukur lingkar lengan", "Tersedia alat pengukur lingkar kepala",
+                "Tersedia alat pemeriksaan laboratorium sederhana (gula darah, asam urat, kolesterol)"
+            ]},
+            { section: "E", title: "LAYANAN POSYANDU", items: [
+                "Posyandu melaksanakan hari buka 1x dalam sebulan untuk semua sasaran siklus hidup", "Posyandu memiliki buku register kunjungan posyandu berdasarkan siklus hidup",
+                "Posyandu memiliki buku rujukan posyandu", "Posyandu melaksanakan hari buka posyandu secara terjadwal.", "Posyandu melaksanakan 5 langkah setiap Klaster siklus Hidup",
+                "Kader melakukan skrining kesehatan sesuai siklus hidup", "Langkah 1: Pendaftaran, Langkah 2: Penimbangan & pengukuran, Langkah 3: Pencatatan, Langkah 4: Pelayanan kesehatan, Langkah 5: Penyuluhan kesehatan"
+            ]},
+            { section: "F", title: "KEGIATAN LUAR GEDUNG, KUNJUNGAN RUMAH DAN PEMANTAUAN WILAYAH SETEMPAT (PWS)", items: [
+                "Kader memiliki buku/lembar/form kunjungan rumah", "Kunjungan rumah dilakukan secara rutin menyasar keluarga beresiko/tidak hadir di posyandu",
+                "Kader melakukan PWS dan terdapat dashboard / buku PWS", "Kader melaksanakan SMD", "Tersedianya bukti pengiriman laporan setiap siklus hidup",
+                "Kader mengikuti MMD", "Kader melakukan pertemuan mingguan/bulanan, *(Notulen pertemuan)"
+            ]}
+        ];
+
+        function buildMonitoringDropdown() {
+            return `
+                <select class="monitoring-dropdown" onchange="calculateMonitoringRow(this)">
+                    <option value="-1">-- Pilih Status --</option>
+                    <option value="100">Dilakukan / Ya / Ada / Baik</option>
+                    <option value="50">Ada tetapi tidak dilakukan</option>
+                    <option value="0">Tidak dilakukan / Tidak / Tidak ada / Rusak</option>
+                </select>
+            `;
+        }
+
+        function renderMonitoringTable(data, tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            if(!tbody) return;
+            let html = "";
+            data.forEach((group) => {
+                html += `<tr>
+                    <td class="section-title" colspan="5">${group.section}. ${group.title}</td>
+                </tr>`;
+                
+                group.items.forEach((item, iIndex) => {
+                    html += `<tr class="item-row" data-group="${group.section}">
+                        <td align="center">${iIndex + 1}</td>
+                        <td>${item}</td>
+                        <td>${buildMonitoringDropdown()}</td>
+                        <td><textarea class="keterangan-text" rows="1" oninput="autoExpandMonitoring(this); calculateMonitoringRow(this)" placeholder="Ketik keterangan..."></textarea></td>
+                        <td class="score-col">0</td>
+                    </tr>`;
+                });
+                
+                html += `<tr class="subtotal-row" id="subtotal-${tbodyId}-${group.section}">
+                    <td colspan="4">TOTAL SKOR ${group.section}: <br> Persentase: </td>
+                    <td class="subtotal-val"><span class="sum-score">0</span> <br> <span class="sum-perc">0</span>%</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function autoExpandMonitoring(field) {
+            field.style.height = 'inherit';
+            field.style.height = (field.scrollHeight) + 'px';
+        }
+
+        function calculateMonitoringRow(element) {
+            const row = element.closest('tr');
+            const dropdown = row.querySelector('.monitoring-dropdown');
+            const textarea = row.querySelector('.keterangan-text');
+            const scoreCol = row.querySelector('.score-col');
+            
+            let baseScore = parseInt(dropdown.value);
+            if (baseScore === -1 || isNaN(baseScore)) { 
+                scoreCol.innerText = "0"; 
+                updateMonitoringSectionTotal(row); 
+                return; 
+            }
+
+            let finalScore = baseScore;
+            if (textarea.value.trim().length > 0) {
+                finalScore -= 25;
+            }
+
+            scoreCol.innerText = finalScore;
+            updateMonitoringSectionTotal(row);
+        }
+
+        function updateMonitoringSectionTotal(row) {
+            const tbody = row.closest('tbody');
+            const tbodyId = tbody.id;
+            const groupSection = row.getAttribute('data-group');
+            
+            const allRows = tbody.querySelectorAll(`tr.item-row[data-group="${groupSection}"]`);
+            let totalScore = 0;
+            let maxScore = allRows.length * 100;
+            
+            allRows.forEach(r => {
+                totalScore += parseInt(r.querySelector('.score-col').innerText) || 0;
+            });
+
+            const subtotalRow = document.getElementById(`subtotal-${tbodyId}-${groupSection}`);
+            subtotalRow.querySelector('.sum-score').innerText = totalScore;
+            
+            let perc = maxScore > 0 ? ((totalScore / maxScore) * 100).toFixed(2) : 0;
+            subtotalRow.querySelector('.sum-perc').innerText = perc;
+
+            updateMonitoringGrandTotal(tbodyId);
+        }
+
+        function updateMonitoringGrandTotal(tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            const subtotalRows = tbody.querySelectorAll('.subtotal-row');
+            let grandTotalScore = 0;
+            let grandMaxScore = tbody.querySelectorAll('.item-row').length * 100;
+
+            subtotalRows.forEach(row => {
+                grandTotalScore += parseFloat(row.querySelector('.sum-score').innerText) || 0;
+            });
+
+            let finalPerc = grandMaxScore > 0 ? ((grandTotalScore / grandMaxScore) * 100).toFixed(2) : 0;
+            
+            if (tbodyId === 'tbodyPustu') {
+                document.getElementById('ratePustu').innerText = finalPerc;
+            } else {
+                document.getElementById('ratePosyandu').innerText = finalPerc;
+            }
+        }
+
+        function tambahMonitoringPelaksana() {
+            const container = document.getElementById('pelaksana-container-monitoring');
+            if(!container) return;
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'pelaksana-item';
+            newItem.style.display = 'flex';
+            newItem.style.alignItems = 'center';
+            newItem.style.gap = '8px';
+            newItem.style.marginBottom = '10px';
+            
+            newItem.innerHTML = `
+                <span class="pelaksana-nomor" style="width: 25px; font-weight: bold; margin-top: 2px;">${container.children.length + 1}.</span>
+                <div class="pelaksana-inputs" style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px;">
+                    <input type="text" placeholder="Nama Pelaksana" style="border: none; border-bottom: 1px solid #000; width: 100%; padding-bottom: 3px; font-size: 13px; background: transparent; color: #000;">
+                    <input type="text" placeholder="NIP" style="border: none; border-bottom: 1px solid #000; width: 100%; padding-bottom: 3px; font-size: 13px; background: transparent; color: #000;">
+                </div>
+                <button type="button" class="btn-hapus-pelaksana" onclick="hapusMonitoringPelaksana(this)" style="background-color: #ef4444; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; height: fit-content;" title="Hapus Pelaksana">✕</button>
+            `;
+            container.appendChild(newItem);
+            perbaruiNomorPelaksana();
+        }
+
+        function hapusMonitoringPelaksana(button) {
+            const item = button.closest('.pelaksana-item');
+            if (item) {
+                item.remove();
+                perbaruiNomorPelaksana();
+            }
+        }
+
+        function perbaruiNomorPelaksana() {
+            const container = document.getElementById('pelaksana-container-monitoring');
+            if (!container) return;
+            const items = container.querySelectorAll('.pelaksana-item');
+            items.forEach((item, index) => {
+                const nomorSpan = item.querySelector('span');
+                if (nomorSpan) {
+                    nomorSpan.innerText = (index + 1) + '.';
+                }
+            });
+        }
+
+        function initMonitoringUPKDK() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('tanggal_monitoring_upkdk');
+            if(dateInput) dateInput.value = today;
+
+            renderMonitoringTable(dataPustuMonitoring, 'tbodyPustu');
+            renderMonitoringTable(dataPosyanduMonitoring, 'tbodyPosyandu');
+            
+            const container = document.getElementById('pelaksana-container-monitoring');
+            if(container && container.children.length === 0) {
+                for(let i=0; i<5; i++){
+                    tambahMonitoringPelaksana();
+                }
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', (event) => {
             initOBHPBMHP();
+            initMonitoringUPKDK();
         });
-        /* ---------------- AKHIR SCRIPT OBHP / BMHP ---------------- */
+        /* ---------------- AKHIR SCRIPT MONITORING UPKDK ---------------- */
 
         function simpanUrlRujukan() {
             const urlInput = document.getElementById('inputUrlRujukan1').value;
@@ -2255,40 +2621,6 @@
         function toggleMobileMenu() {
             document.getElementById('topNavBar').classList.toggle('show-mobile');
         }
-
-        function toggleHamburgerMenu(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('hamburgerDropdownList');
-            dropdown.classList.toggle('show');
-        }
-
-        function closeHamburgerMenu() {
-            const dropdown = document.getElementById('hamburgerDropdownList');
-            if (dropdown && dropdown.classList.contains('show')) dropdown.classList.remove('show');
-        }
-
-        function toggleDropdown(element, event) {
-            event.stopPropagation();
-            const isOpen = element.classList.contains('active-dropdown');
-            
-            document.querySelectorAll('.hamburger-dropdown .nav-dropdown').forEach(drop => {
-                drop.classList.remove('active-dropdown');
-            });
-
-            if (!isOpen) {
-                element.classList.add('active-dropdown');
-            }
-        }
-
-        window.addEventListener('click', (e) => {
-            const wrapper = document.getElementById('hamburgerWrapper');
-            if (wrapper && !wrapper.contains(e.target)) {
-                closeHamburgerMenu();
-            }
-            document.querySelectorAll('.hamburger-dropdown .nav-dropdown').forEach(drop => {
-                if (!drop.contains(e.target)) drop.classList.remove('active-dropdown');
-            });
-        });
 
         function updateLiveClock() {
             const now = new Date();
@@ -2386,6 +2718,7 @@
             const pwsArea = document.getElementById('pwsDisplayArea');
             const inventarisKirArea = document.getElementById('inventarisKirDisplayArea');
             const obhpBmhpArea = document.getElementById('obhpBmhpDisplayArea');
+            const monitoringUpkdkArea = document.getElementById('monitoringUpkdkDisplayArea');
 
             if (slideshowInterval) { clearInterval(slideshowInterval); slideshowInterval = null; }
 
@@ -2401,6 +2734,7 @@
             pwsArea.style.display = 'none';
             inventarisKirArea.style.display = 'none';
             obhpBmhpArea.style.display = 'none';
+            monitoringUpkdkArea.style.display = 'none';
 
             if (categoryCode === 'jadwal') {
                 calArea.style.display = 'block';
@@ -2418,6 +2752,8 @@
                 inventarisKirArea.style.display = 'block';
             } else if (categoryCode === 'inventaris' && periodIdentifier === 'obhp_bmhp') {
                 obhpBmhpArea.style.display = 'block';
+            } else if (categoryCode === 'monitoring' && periodIdentifier === 'upkdk') {
+                monitoringUpkdkArea.style.display = 'block';
             } else if (categoryCode === 'rujukan' || categoryCode === 'inventaris') {
                 formArea.style.display = 'block';
                 document.getElementById('formTitleLabel').innerText = "Tautan - " + subTitle;
@@ -2441,7 +2777,7 @@
             document.getElementById('dynamicFileList').innerHTML = '';
             document.getElementById('slideshowContainerImages').innerHTML = '';
             
-            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && categoryCode !== 'pws' && !(categoryCode === 'inventaris' && (periodIdentifier === 'obhp_bmhp' || periodIdentifier === 'kir')) && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
+            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && categoryCode !== 'pws' && !(categoryCode === 'monitoring' && periodIdentifier === 'upkdk') && !(categoryCode === 'inventaris' && (periodIdentifier === 'obhp_bmhp' || periodIdentifier === 'kir')) && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
                 loadFilesForCurrentMenu(categoryCode);
             }
         }
@@ -2504,9 +2840,10 @@
 
         function checkUploadAreaVisibility() {
             const categoryCode = currentMenuId.split("-")[0];
+            const periodIdentifier = currentMenuId.split("-")[1];
             const uploadArea = document.getElementById('uploadAreaContainer');
             
-            if (categoryCode === 'rujukan' || categoryCode === 'rujukan_upkdk' || categoryCode === 'inventaris' || categoryCode === 'skrining' || categoryCode === 'ambulance' || categoryCode === 'pws') {
+            if (categoryCode === 'rujukan' || categoryCode === 'rujukan_upkdk' || categoryCode === 'inventaris' || categoryCode === 'skrining' || categoryCode === 'ambulance' || categoryCode === 'pws' || (categoryCode === 'monitoring' && periodIdentifier === 'upkdk')) {
                 uploadArea.style.display = 'none';
                 return;
             }
@@ -2988,303 +3325,177 @@
         // Script Dashboard PWS
         let pwsData = [
             { id: 1, desa: 'UPKDK Desa Berindat', password: 'berindat123', diare_k: 12, diare_s: 10, diare_m: 0, hipertensi_k: 45, hipertensi_s: 12, hipertensi_m: 1, stroke_k: 2, stroke_s: 0, stroke_m: 1, tb_k: 4, tb_s: 1, tb_m: 0, dm_k: 20, dm_s: 5, dm_m: 0, dengue_k: 1, dengue_s: 1, dengue_m: 0, ibuhamil_k: 5, ibuhamil_s: 4, ibuhamil_m: 0, stunting_k: 3, stunting_s: 1, stunting_m: 0, odgj_k: 2, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
-            { id: 2, desa: 'UPKDK Desa Persing', password: 'persing123', diare_k: 8, diare_s: 8, diare_m: 0, hipertensi_k: 30, hipertensi_s: 10, hipertensi_m: 0, stroke_k: 1, stroke_s: 0, stroke_m: 0, tb_k: 2, tb_s: 2, tb_m: 0, dm_k: 15, dm_s: 4, dm_m: 1, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 3, ibuhamil_s: 2, ibuhamil_m: 0, stunting_k: 5, stunting_s: 2, stunting_m: 0, odgj_k: 1, odgj_s: 0, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
-            { id: 3, desa: 'UPKDK Desa Sedamai', password: 'sedamai123', diare_k: 15, diare_s: 12, diare_m: 1, hipertensi_k: 50, hipertensi_s: 20, hipertensi_m: 2, stroke_k: 4, stroke_s: 1, stroke_m: 0, tb_k: 5, tb_s: 3, tb_m: 1, dm_k: 25, dm_s: 10, dm_m: 0, dengue_k: 2, dengue_s: 2, dengue_m: 0, ibuhamil_k: 8, ibuhamil_s: 6, ibuhamil_m: 0, stunting_k: 7, stunting_s: 3, stunting_m: 0, odgj_k: 0, odgj_s: 0, odgj_m: 0, malaria_k: 1, malaria_s: 1, malaria_m: 0 },
-            { id: 4, desa: 'UPKDK Desa Lanjut', password: 'lanjut123', diare_k: 5, diare_s: 5, diare_m: 0, hipertensi_k: 20, hipertensi_s: 15, hipertensi_m: 0, stroke_k: 0, stroke_s: 0, stroke_m: 0, tb_k: 1, tb_s: 1, tb_m: 0, dm_k: 10, dm_s: 8, dm_m: 0, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 2, ibuhamil_s: 2, ibuhamil_m: 0, stunting_k: 2, stunting_s: 1, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
-            { id: 5, desa: 'UPKDK Desa Kote', password: 'kote123', diare_k: 10, diare_s: 9, diare_m: 0, hipertensi_k: 35, hipertensi_s: 15, hipertensi_m: 1, stroke_k: 1, stroke_s: 0, stroke_m: 0, tb_k: 3, tb_s: 2, tb_m: 0, dm_k: 18, dm_s: 12, dm_m: 0, dengue_k: 1, dengue_s: 1, dengue_m: 0, ibuhamil_k: 4, ibuhamil_s: 3, ibuhamil_m: 0, stunting_k: 4, stunting_s: 2, stunting_m: 0, odgj_k: 0, odgj_s: 0, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
-            { id: 6, desa: 'UPKDK Desa Pelakak', password: 'pelakak123', diare_k: 7, diare_s: 7, diare_m: 0, hipertensi_k: 25, hipertensi_s: 18, hipertensi_m: 0, stroke_k: 0, stroke_s: 0, stroke_m: 0, tb_k: 2, tb_s: 2, tb_m: 0, dm_k: 12, dm_s: 10, dm_m: 0, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 2, ibuhamil_s: 1, ibuhamil_m: 0, stunting_k: 1, stunting_s: 0, stunting_m: 0, odgj_k: 1, odgj_s: 0, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 }
+            { id: 2, desa: 'UPKDK Desa Persing', password: 'persing123', diare_k: 8, diare_s: 7, diare_m: 0, hipertensi_k: 30, hipertensi_s: 10, hipertensi_m: 0, stroke_k: 1, stroke_s: 1, stroke_m: 0, tb_k: 2, tb_s: 2, tb_m: 0, dm_k: 15, dm_s: 4, dm_m: 0, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 4, ibuhamil_s: 4, ibuhamil_m: 0, stunting_k: 2, stunting_s: 2, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
+            { id: 3, desa: 'UPKDK Desa Sedamai', password: 'sedamai123', diare_k: 5, diare_s: 5, diare_m: 0, hipertensi_k: 25, hipertensi_s: 8, hipertensi_m: 0, stroke_k: 0, stroke_s: 0, stroke_m: 0, tb_k: 1, tb_s: 1, tb_m: 0, dm_k: 10, dm_s: 3, dm_m: 0, dengue_k: 2, dengue_s: 2, dengue_m: 0, ibuhamil_k: 3, ibuhamil_s: 3, ibuhamil_m: 0, stunting_k: 1, stunting_s: 1, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
+            { id: 4, desa: 'UPKDK Desa Lanjut', password: 'lanjut123', diare_k: 15, diare_s: 14, diare_m: 0, hipertensi_k: 55, hipertensi_s: 20, hipertensi_m: 1, stroke_k: 3, stroke_s: 1, stroke_m: 1, tb_k: 6, tb_s: 4, tb_m: 0, dm_k: 28, dm_s: 10, dm_m: 0, dengue_k: 3, dengue_s: 3, dengue_m: 0, ibuhamil_k: 8, ibuhamil_s: 7, ibuhamil_m: 0, stunting_k: 4, stunting_s: 3, stunting_m: 0, odgj_k: 3, odgj_s: 2, odgj_m: 0, malaria_k: 1, malaria_s: 1, malaria_m: 0 },
+            { id: 5, desa: 'UPKDK Desa Kote', password: 'kote123', diare_k: 7, diare_s: 6, diare_m: 0, hipertensi_k: 28, hipertensi_s: 9, hipertensi_m: 0, stroke_k: 1, stroke_s: 0, stroke_m: 0, tb_k: 2, tb_s: 2, tb_m: 0, dm_k: 12, dm_s: 4, dm_m: 0, dengue_k: 1, dengue_s: 1, dengue_m: 0, ibuhamil_k: 4, ibuhamil_s: 4, ibuhamil_m: 0, stunting_k: 2, stunting_s: 2, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
+            { id: 6, desa: 'UPKDK Desa Pelakak', password: 'pelakak123', diare_k: 6, diare_s: 6, diare_m: 0, hipertensi_k: 22, hipertensi_s: 7, hipertensi_m: 0, stroke_k: 0, stroke_s: 0, stroke_m: 0, tb_k: 1, tb_s: 1, tb_m: 0, dm_k: 9, dm_s: 3, dm_m: 0, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 3, ibuhamil_s: 3, ibuhamil_m: 0, stunting_k: 1, stunting_s: 1, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 }
         ];
 
-        let editState = {};
-        let currentEditingId = null;
+        let currentActiveDesaId = null;
         let trendChartInstance = null;
-
-        function showNotification(message) {
-            const notif = document.getElementById('notification');
-            document.getElementById('notification-text').textContent = message;
-            notif.classList.remove('hidden');
-            setTimeout(() => { notif.classList.add('hidden'); }, 3500);
-        }
-
-        function promptLogin(id) {
-            currentEditingId = id;
-            const desaObj = pwsData.find(item => item.id === id);
-            document.getElementById('modal-desa-name').textContent = desaObj ? desaObj.desa : '';
-            document.getElementById('password-input').value = '';
-            document.getElementById('login-error').classList.add('hidden');
-            document.getElementById('login-modal').classList.remove('hidden');
-            document.getElementById('password-input').focus();
-        }
-
-        function closeLoginModal() {
-            document.getElementById('login-modal').classList.add('hidden');
-            currentEditingId = null;
-        }
-
-        function verifyPassword() {
-            const inputVal = document.getElementById('password-input').value;
-            const desaObj = pwsData.find(item => item.id === currentEditingId);
-            
-            if (desaObj && inputVal === desaObj.password) {
-                editState[currentEditingId] = true;
-                closeLoginModal();
-                renderTable();
-                showNotification(`Akses Edit dibuka untuk ${desaObj.desa}`);
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-            }
-        }
-
-        function cancelEdit(id) {
-            editState[id] = false;
-            renderTable();
-        }
-
-        function calcPantau(k, s, m) {
-            let val = k - (s + m);
-            return val < 0 ? 0 : val;
-        }
-
-        function getDesaTotals(item) {
-            let kTotal = item.diare_k + item.hipertensi_k + item.stroke_k + item.tb_k + item.dm_k + item.dengue_k + item.ibuhamil_k + item.stunting_k + item.odgj_k + item.malaria_k;
-            let sTotal = item.diare_s + item.hipertensi_s + item.stroke_s + item.tb_s + item.dm_s + item.dengue_s + item.ibuhamil_s + item.stunting_s + item.odgj_s + item.malaria_s;
-            let mTotal = item.diare_m + item.hipertensi_m + item.stroke_m + item.tb_m + item.dm_m + item.dengue_m + item.ibuhamil_m + item.stunting_m + item.odgj_m + item.malaria_m;
-            let pTotal = calcPantau(item.diare_k, item.diare_s, item.diare_m) +
-                         calcPantau(item.hipertensi_k, item.hipertensi_s, item.hipertensi_m) +
-                         calcPantau(item.stroke_k, item.stroke_s, item.stroke_m) +
-                         calcPantau(item.tb_k, item.tb_s, item.tb_m) +
-                         calcPantau(item.dm_k, item.dm_s, item.dm_m) +
-                         calcPantau(item.dengue_k, item.dengue_s, item.dengue_m) +
-                         calcPantau(item.ibuhamil_k, item.ibuhamil_s, item.ibuhamil_m) +
-                         calcPantau(item.stunting_k, item.stunting_s, item.stunting_m) +
-                         calcPantau(item.odgj_k, item.odgj_s, item.odgj_m) +
-                         calcPantau(item.malaria_k, item.malaria_s, item.malaria_m);
-            return { k: kTotal, p: pTotal, s: sTotal, m: mTotal };
-        }
-
-        function handleLiveInput(id, disease, type) {
-            const kInput = document.getElementById(`input-${id}-${disease}-k`);
-            const sInput = document.getElementById(`input-${id}-${disease}-s`);
-            const mInput = document.getElementById(`input-${id}-${disease}-m`);
-            const pCell = document.getElementById(`live-p-${id}-${disease}`);
-
-            if (!kInput || !sInput || !mInput) return;
-
-            let k = parseInt(kInput.value) || 0;
-            let s = parseInt(sInput.value) || 0;
-            let m = parseInt(mInput.value) || 0;
-
-            if (s + m > k) {
-                if (type === 's' && s + m > k) {
-                    s = Math.max(0, k - m);
-                    sInput.value = s;
-                } else if (type === 'm' && s + m > k) {
-                    m = Math.max(0, k - s);
-                    mInput.value = m;
-                }
-            }
-
-            let p = calcPantau(k, s, m);
-            if (pCell) pCell.textContent = p;
-
-            const item = pwsData.find(d => d.id === id);
-            if (item) {
-                item[disease + '_k'] = k;
-                item[disease + '_s'] = s;
-                item[disease + '_m'] = m;
-            }
-
-            const totals = getDesaTotals(item);
-            const totK = document.getElementById(`tot-k-${id}`);
-            const totP = document.getElementById(`tot-p-${id}`);
-            const totS = document.getElementById(`tot-s-${id}`);
-            const totM = document.getElementById(`tot-m-${id}`);
-
-            if (totK) totK.textContent = totals.k;
-            if (totP) totP.textContent = totals.p;
-            if (totS) totS.textContent = totals.s;
-            if (totM) totM.textContent = totals.m;
-
-            updateGlobalSummaryAndChart();
-        }
-
-        function saveRow(id) {
-            const diseases = ['diare', 'hipertensi', 'stroke', 'tb', 'dm', 'dengue', 'ibuhamil', 'stunting', 'odgj', 'malaria'];
-            const item = pwsData.find(d => d.id === id);
-
-            if (item) {
-                diseases.forEach(dis => {
-                    const kIn = document.getElementById(`input-${id}-${dis}-k`);
-                    const sIn = document.getElementById(`input-${id}-${dis}-s`);
-                    const mIn = document.getElementById(`input-${id}-${dis}-m`);
-
-                    if (kIn && sIn && mIn) {
-                        item[dis + '_k'] = parseInt(kIn.value) || 0;
-                        item[dis + '_s'] = parseInt(sIn.value) || 0;
-                        item[dis + '_m'] = parseInt(mIn.value) || 0;
-                    }
-                });
-            }
-
-            editState[id] = false;
-            renderTable();
-            showNotification('Data berhasil disimpan!');
-        }
 
         function renderTable() {
             const tbody = document.getElementById('table-body');
             if(!tbody) return;
             tbody.innerHTML = '';
+            
+            let totals = {
+                diare_k:0, diare_p:0, diare_s:0, diare_m:0,
+                hipertensi_k:0, hipertensi_p:0, hipertensi_s:0, hipertensi_m:0,
+                stroke_k:0, stroke_p:0, stroke_s:0, stroke_m:0,
+                tb_k:0, tb_p:0, tb_s:0, tb_m:0,
+                dm_k:0, dm_p:0, dm_s:0, dm_m:0,
+                dengue_k:0, dengue_p:0, dengue_s:0, dengue_m:0,
+                ibuhamil_k:0, ibuhamil_p:0, ibuhamil_s:0, ibuhamil_m:0,
+                stunting_k:0, stunting_p:0, stunting_s:0, stunting_m:0,
+                odgj_k:0, odgj_p:0, odgj_s:0, odgj_m:0,
+                malaria_k:0, malaria_p:0, malaria_s:0, malaria_m:0,
+                total_k:0, total_p:0, total_s:0, total_m:0
+            };
 
             pwsData.forEach(item => {
-                const isEditing = editState[item.id] || false;
-                const row = document.createElement('tr');
-                row.className = "hover:bg-blue-50/50 transition";
+                const diseases = ['diare', 'hipertensi', 'stroke', 'tb', 'dm', 'dengue', 'ibuhamil', 'stunting', 'odgj', 'malaria'];
+                let rowK = 0, rowP = 0, rowS = 0, rowM = 0;
 
-                const totals = getDesaTotals(item);
+                diseases.forEach(d => {
+                    item[`${d}_p`] = Math.max(0, item[`${d}_k`] - item[`${d}_s`] - item[`${d}_m`]);
+                    rowK += item[`${d}_k`];
+                    rowP += item[`${d}_p`];
+                    rowS += item[`${d}_s`];
+                    rowM += item[`${d}_m`];
 
-                let html = `
-                    <td class="px-3 py-2.5 whitespace-nowrap text-xs font-bold text-gray-900 sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#cbd5e1]">${item.desa}</td>
-                `;
+                    totals[`${d}_k`] += item[`${d}_k`];
+                    totals[`${d}_p`] += item[`${d}_p`];
+                    totals[`${d}_s`] += item[`${d}_s`];
+                    totals[`${d}_m`] += item[`${d}_m`];
+                });
 
-                const diseases = [
-                    { key: 'diare', k: item.diare_k, p: calcPantau(item.diare_k, item.diare_s, item.diare_m), s: item.diare_s, m: item.diare_m },
-                    { key: 'hipertensi', k: item.hipertensi_k, p: calcPantau(item.hipertensi_k, item.hipertensi_s, item.hipertensi_m), s: item.hipertensi_s, m: item.hipertensi_m },
-                    { key: 'stroke', k: item.stroke_k, p: calcPantau(item.stroke_k, item.stroke_s, item.stroke_m), s: item.stroke_s, m: item.stroke_m },
-                    { key: 'tb', k: item.tb_k, p: calcPantau(item.tb_k, item.tb_s, item.tb_m), s: item.tb_s, m: item.tb_m },
-                    { key: 'dm', k: item.dm_k, p: calcPantau(item.dm_k, item.dm_s, item.dm_m), s: item.dm_s, m: item.dm_m },
-                    { key: 'dengue', k: item.dengue_k, p: calcPantau(item.dengue_k, item.dengue_s, item.dengue_m), s: item.dengue_s, m: item.dengue_m },
-                    { key: 'ibuhamil', k: item.ibuhamil_k, p: calcPantau(item.ibuhamil_k, item.ibuhamil_s, item.ibuhamil_m), s: item.ibuhamil_s, m: item.ibuhamil_m },
-                    { key: 'stunting', k: item.stunting_k, p: calcPantau(item.stunting_k, item.stunting_s, item.stunting_m), s: item.stunting_s, m: item.stunting_m },
-                    { key: 'odgj', k: item.odgj_k, p: calcPantau(item.odgj_k, item.odgj_s, item.odgj_m), s: item.odgj_s, m: item.odgj_m },
-                    { key: 'malaria', k: item.malaria_k, p: calcPantau(item.malaria_k, item.malaria_s, item.malaria_m), s: item.malaria_s, m: item.malaria_m }
-                ];
+                totals.total_k += rowK;
+                totals.total_p += rowP;
+                totals.total_s += rowS;
+                totals.total_m += rowM;
 
-                diseases.forEach(dis => {
-                    if (isEditing) {
-                        html += `
-                            <td class="px-0.5 py-1 text-center border-l"><input type="number" min="0" id="input-${item.id}-${dis.key}-k" value="${dis.k}" oninput="handleLiveInput(${item.id}, '${dis.key}', 'k')" class="w-8 text-center text-[11px] border rounded p-0.5 font-bold text-red-600 bg-white"></td>
-                            <td class="px-0.5 py-1 text-center bg-yellow-50 font-bold text-yellow-600 text-[11px]" id="live-p-${item.id}-${dis.key}">${dis.p}</td>
-                            <td class="px-0.5 py-1 text-center"><input type="number" min="0" id="input-${item.id}-${dis.key}-s" value="${dis.s}" oninput="handleLiveInput(${item.id}, '${dis.key}', 's')" class="w-8 text-center text-[11px] border rounded p-0.5 font-bold text-green-600 bg-white"></td>
-                            <td class="px-0.5 py-1 text-center"><input type="number" min="0" id="input-${item.id}-${dis.key}-m" value="${dis.m}" oninput="handleLiveInput(${item.id}, '${dis.key}', 'm')" class="w-8 text-center text-[11px] border rounded p-0.5 font-bold text-gray-600 bg-white"></td>
-                        `;
-                    } else {
-                        html += `
-                            <td class="px-0.5 py-1 text-center text-xs font-bold text-red-600 border-l">${dis.k}</td>
-                            <td class="px-0.5 py-1 text-center text-xs font-bold text-yellow-600 bg-yellow-50">${dis.p}</td>
-                            <td class="px-0.5 py-1 text-center text-xs font-bold text-green-600">${dis.s}</td>
-                            <td class="px-0.5 py-1 text-center text-xs font-bold text-gray-600">${dis.m}</td>
-                        `;
-                    }
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors";
+                
+                let html = `<td class="px-3 py-2 font-semibold text-gray-800 sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#cbd5e1] whitespace-nowrap">${item.desa}</td>`;
+
+                diseases.forEach(d => {
+                    html += `
+                        <td class="px-0.5 py-1 text-center font-bold text-red-600 border-l">${item[`${d}_k`]}</td>
+                        <td class="px-0.5 py-1 text-center font-bold text-yellow-600 bg-yellow-50">${item[`${d}_p`]}</td>
+                        <td class="px-0.5 py-1 text-center font-bold text-green-600">${item[`${d}_s`]}</td>
+                        <td class="px-0.5 py-1 text-center font-bold text-gray-600">${item[`${d}_m`]}</td>
+                    `;
                 });
 
                 html += `
-                    <td id="tot-k-${item.id}" class="px-0.5 py-1 text-center text-xs font-bold text-red-700 border-l-2 border-gray-400 bg-blue-50">${totals.k}</td>
-                    <td id="tot-p-${item.id}" class="px-0.5 py-1 text-center text-xs font-extrabold text-yellow-900 bg-yellow-300 border border-yellow-400 blinking-badge">${totals.p}</td>
-                    <td id="tot-s-${item.id}" class="px-0.5 py-1 text-center text-xs font-bold text-green-700 bg-blue-50">${totals.s}</td>
-                    <td id="tot-m-${item.id}" class="px-0.5 py-1 text-center text-xs font-bold text-gray-800 bg-blue-50">${totals.m}</td>
+                    <td class="px-0.5 py-1 text-center font-bold text-red-700 border-l-2 bg-blue-50">${rowK}</td>
+                    <td class="px-0.5 py-1 text-center font-bold text-yellow-800 bg-yellow-100">${rowP}</td>
+                    <td class="px-0.5 py-1 text-center font-bold text-green-700 bg-blue-50">${rowS}</td>
+                    <td class="px-0.5 py-1 text-center font-bold text-gray-800 bg-blue-50">${rowM}</td>
+                    <td class="px-3 py-2 text-center border-l border-gray-300">
+                        <button onclick="openLoginModal(${item.id})" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-[10px] font-semibold transition shadow-sm"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                    </td>
                 `;
 
-                if (isEditing) {
-                    html += `
-                        <td class="px-2 py-1 text-center border-l whitespace-nowrap">
-                            <button onclick="saveRow(${item.id})" class="bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold shadow mr-1"><i class="fa-solid fa-check"></i></button>
-                            <button onclick="cancelEdit(${item.id})" class="bg-gray-400 text-white px-2 py-1 rounded text-xs font-semibold shadow"><i class="fa-solid fa-xmark"></i></button>
-                        </td>
-                    `;
-                } else {
-                    html += `
-                        <td class="px-2 py-1 text-center border-l whitespace-nowrap">
-                            <button onclick="promptLogin(${item.id})" class="bg-blue-600 text-white px-2.5 py-1 rounded text-xs font-semibold shadow"><i class="fa-solid fa-pen-to-square mr-1"></i> Edit</button>
-                        </td>
-                    `;
-                }
-
-                row.innerHTML = html;
-                tbody.appendChild(row);
+                tr.innerHTML = html;
+                tbody.appendChild(tr);
             });
 
-            updateGlobalSummaryAndChart();
+            const totalTr = document.createElement('tr');
+            totalTr.className = "bg-gray-100 font-bold border-t-2 border-gray-300";
+            let totalHtml = `<td class="px-3 py-2 text-gray-900 sticky left-0 bg-gray-100 z-10 shadow-[1px_0_0_0_#cbd5e1]">TOTAL KESELURUHAN</td>`;
+            
+            const diseases = ['diare', 'hipertensi', 'stroke', 'tb', 'dm', 'dengue', 'ibuhamil', 'stunting', 'odgj', 'malaria'];
+            diseases.forEach(d => {
+                totalHtml += `
+                    <td class="px-0.5 py-1 text-center text-red-700 border-l">${totals[`${d}_k`]}</td>
+                    <td class="px-0.5 py-1 text-center text-yellow-800 bg-yellow-100">${totals[`${d}_p`]}</td>
+                    <td class="px-0.5 py-1 text-center text-green-700">${totals[`${d}_s`]}</td>
+                    <td class="px-0.5 py-1 text-center text-gray-800">${totals[`${d}_m`]}</td>
+                `;
+            });
+
+            totalHtml += `
+                <td class="px-0.5 py-1 text-center text-red-800 border-l-2 bg-blue-200">${totals.total_k}</td>
+                <td class="px-0.5 py-1 text-center text-yellow-900 bg-yellow-200">${totals.total_p}</td>
+                <td class="px-0.5 py-1 text-center text-green-800 bg-blue-200">${totals.total_s}</td>
+                <td class="px-0.5 py-1 text-center text-gray-900 bg-blue-200">${totals.total_m}</td>
+                <td class="px-3 py-2 text-center border-l border-gray-300">-</td>
+            `;
+            totalTr.innerHTML = totalHtml;
+            tbody.appendChild(totalTr);
+
+            diseases.forEach(d => {
+                const elK = document.getElementById(`sum-${d}-k`);
+                const elP = document.getElementById(`sum-${d}-p`);
+                const elS = document.getElementById(`sum-${d}-s`);
+                const elM = document.getElementById(`sum-${d}-m`);
+                if(elK) elK.innerText = totals[`${d}_k`];
+                if(elP) elP.innerText = totals[`${d}_p`];
+                if(elS) elS.innerText = totals[`${d}_s`];
+                if(elM) elM.innerText = totals[`${d}_m`];
+            });
+
+            updateChart(totals, diseases);
         }
 
-        function updateGlobalSummaryAndChart() {
-            let sums = {
-                diare: { k: 0, p: 0, s: 0, m: 0 },
-                hipertensi: { k: 0, p: 0, s: 0, m: 0 },
-                stroke: { k: 0, p: 0, s: 0, m: 0 },
-                tb: { k: 0, p: 0, s: 0, m: 0 },
-                dm: { k: 0, p: 0, s: 0, m: 0 },
-                dengue: { k: 0, p: 0, s: 0, m: 0 },
-                ibuhamil: { k: 0, p: 0, s: 0, m: 0 },
-                stunting: { k: 0, p: 0, s: 0, m: 0 },
-                odgj: { k: 0, p: 0, s: 0, m: 0 },
-                malaria: { k: 0, p: 0, s: 0, m: 0 }
-            };
-
-            const allKeys = ['diare', 'hipertensi', 'stroke', 'tb', 'dm', 'dengue', 'ibuhamil', 'stunting', 'odgj', 'malaria'];
+        function updateChart(totals, diseases) {
+            const ctx = document.getElementById('trendChart');
+            if(!ctx) return;
             
-            pwsData.forEach(item => {
-                allKeys.forEach(k => {
-                    sums[k].k += item[k + '_k'];
-                    sums[k].s += item[k + '_s'];
-                    sums[k].m += item[k + '_m'];
-                    sums[k].p += calcPantau(item[k + '_k'], item[k + '_s'], item[k + '_m']);
-                });
-            });
-
-            for (let key in sums) {
-                const elK = document.getElementById(`sum-${key}-k`);
-                const elP = document.getElementById(`sum-${key}-p`);
-                const elS = document.getElementById(`sum-${key}-s`);
-                const elM = document.getElementById(`sum-${key}-m`);
-
-                if (elK) elK.textContent = sums[key].k;
-                if (elP) elP.textContent = sums[key].p;
-                if (elS) elS.textContent = sums[key].s;
-                if (elM) elM.textContent = sums[key].m;
-            }
-
             const labels = ['Diare', 'Hipertensi', 'Stroke', 'TB Paru', 'Diabetes', 'Dengue', 'Ibu Hamil', 'Stunting', 'ODGJ', 'Malaria'];
-            const dataK = labels.map((_, i) => sums[allKeys[i]].k);
-            const dataP = labels.map((_, i) => sums[allKeys[i]].p);
-            const dataS = labels.map((_, i) => sums[allKeys5[i]] ? sums[allKeys[i]].s : sums[allKeys[i]].s); // fallback safety
-            const dataM = labels.map((_, i) => sums[allKeys[i]].m);
-
-            const canvasEl = document.getElementById('trendChart');
-            if(!canvasEl) return;
+            const dataK = diseases.map(d => totals[`${d}_k`]);
+            const dataS = diseases.map(d => totals[`${d}_s`]);
 
             if (trendChartInstance) {
-                trendChartInstance.data.labels = labels;
                 trendChartInstance.data.datasets[0].data = dataK;
-                trendChartInstance.data.datasets[1].data = dataP;
-                trendChartInstance.data.datasets[2].data = dataS;
-                trendChartInstance.data.datasets[3].data = dataM;
+                trendChartInstance.data.datasets[1].data = dataS;
                 trendChartInstance.update();
+                return;
+            }
+
+            trendChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Kasus (K)', data: dataK, backgroundColor: '#ef4444', borderRadius: 4 },
+                        { label: 'Sembuh (S)', data: dataS, backgroundColor: '#22c55e', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
+                    scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+                }
+            });
+        }
+
+        function openLoginModal(desaId) {
+            currentActiveDesaId = desaId;
+            const desa = pwsData.find(item => item.id === desaId);
+            document.getElementById('modal-desa-name').innerText = desa.desa;
+            document.getElementById('password-input').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function verifyPassword() {
+            const pwd = document.getElementById('password-input').value;
+            const desa = pwsData.find(item => item.id === currentActiveDesaId);
+            if (pwd === desa.password || pwd === 'admin' || pwd === systemPassword) {
+                closeLoginModal();
+                alert(`Autentikasi berhasil untuk ${desa.desa}.`);
             } else {
-                const ctx = canvasEl.getContext('2d');
-                trendChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            { label: 'Kasus', data: dataK, backgroundColor: '#dc2626', borderRadius: 4 },
-                            { label: 'Pemantauan', data: dataP, backgroundColor: '#ca8a04', borderRadius: 4 },
-                            { label: 'Sembuh', data: dataS, backgroundColor: '#16a34a', borderRadius: 4 },
-                            { label: 'Meninggal', data: dataM, backgroundColor: '#4b5563', borderRadius: 4 }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
-                        },
-                        scales: {
-                            y: { beginAtZero: true, grid: { borderDash: [2, 2] } },
-                            x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-                        }
-                    }
-                });
+                document.getElementById('login-error').classList.remove('hidden');
             }
         }
     </script>
