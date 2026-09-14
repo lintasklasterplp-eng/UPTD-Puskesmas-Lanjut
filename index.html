@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -12,6 +11,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ChartDataLabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -630,6 +631,34 @@
         .sbar-btn-pdf:hover { background-color: #b91c1c; }
         .sbar-btn-reset { background-color: #64748b; color: white; }
         .pdf-wrapper { position: absolute; left: -9999px; top: -9999px; width: 800px; }
+
+        /* CSS KHUSUS SKRINING RESIKO JATUH GET UP AND GO */
+        .gug-container { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        @media(min-width: 768px) { .gug-container { grid-template-columns: 1fr 1fr; } .gug-full-width { grid-column: span 2; } }
+        .gug-card { background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 20px; border: 1px solid var(--border); }
+        .gug-card h2, .gug-card h3 { color: #004D40; margin-top: 0; border-bottom: 2px solid #00897B; padding-bottom: 8px; }
+        .gug-form-group { margin-bottom: 15px; }
+        .gug-flex-row { display: flex; gap: 10px; }
+        .gug-container label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        .gug-container input[type="text"], .gug-container input[type="date"], .gug-container input[type="time"], .gug-container input[type="number"], .gug-container select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; color: #333;}
+        .gug-container input[readonly] { background-color: #e9ecef; cursor: not-allowed; }
+        .gug-info-box { background-color: #e3f2fd; border-left: 5px solid #1e88e5; padding: 12px; margin-bottom: 20px; border-radius: 4px; font-size: 13px; color: #333; }
+        .gug-info-box ul { margin: 5px 0 0 0; padding-left: 18px; }
+        .gug-sub-kriteria { background: #e0f2f1; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid #00897B; color: #333;}
+        .gug-radio-group { display: flex; gap: 20px; margin-top: 8px; }
+        .gug-radio-group label { font-weight: normal; display: inline-flex; align-items: center; cursor: pointer; margin: 0; font-size: 15px; color: #333;}
+        .gug-radio-group input[type="radio"] { margin-right: 6px; cursor: pointer; width: 20px; height: 20px; }
+        .gug-btn { background-color: #00897B; color: white; border: none; padding: 14px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        .gug-btn:hover { background-color: #004D40; }
+        .gug-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; color: #333; }
+        .gug-table th, .gug-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .gug-table th { background-color: #00897B; color: white; text-align: center; }
+        .gug-table td.center { text-align: center; }
+        .gug-chart-container { width: 100%; max-width: 360px; margin: auto; }
+        .gug-badge-tinggi { background-color: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
+        .gug-badge-rendah { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
+        .gug-badge-tidak { background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
+        @media (max-width: 576px) { .gug-card { padding: 15px; } .gug-flex-row { flex-direction: column; gap: 10px; } .gug-table { font-size: 11px; } .gug-table th, .gug-table td { padding: 6px 4px; } }
     </style>
 </head>
 <body>
@@ -749,7 +778,7 @@
                     <div id="monitoringUpkdkDisplayArea" style="display: none;">
                         <div class="upkdk-wrapper">
                             <div class="upkdk-container">
-                                <h2>Form Monitoring Pustu dan Posyandu</h2>
+                                <h2>INSTRUMEN PENILAIAN UPKDK</h2>
                                 
                                 <div class="upkdk-header-info">
                                     <div>
@@ -911,8 +940,7 @@
                                                     <option value="Ruang Pantry">Ruang Pantry</option>
                                                     <option value="Ruang Laboratorium">Ruang Laboratorium</option>
                                                     <option value="Ruang Pertemuan">Ruang Pertemuan</option>
-                                                    <option value="Ruang Promkes">Ruang Promkes</option>
-                                                    <option value="Ruang Konseling">Ruang Konseling</option>
+                                                    <option value="Ruang Promkes">Ruang Konseling</option>
                                                     <option value="Ruang Klaster 4">Ruang Klaster 4</option>
                                                     <option value="Ruang Tindakan & Gawat Darurat">Ruang Tindakan & Gawat Darurat</option>
                                                     <option value="Ruang Sterilisasi">Ruang Sterilisasi</option>
@@ -1087,6 +1115,19 @@
                     <div id="formSkriningArea" style="display: none;">
                         <div class="form-area-container">
                             <h3 style="color: var(--primary);" id="formSkriningTitleLabel">Form Skrining</h3>
+                            
+                            <!-- Tambahan Tanggal dan Waktu Otomatis -->
+                            <div class="sbar-row">
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Tanggal (Otomatis):</label>
+                                    <input type="date" id="tgl_skrining_auto" readonly style="background: #e2e8f0; cursor: not-allowed; border-color: #cbd5e1;">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Waktu (Otomatis):</label>
+                                    <input type="time" id="jam_skrining_auto" readonly style="background: #e2e8f0; cursor: not-allowed; border-color: #cbd5e1;">
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <label>Link:</label>
                                 <div style="display: flex; gap: 8px;">
@@ -1097,6 +1138,150 @@
                             <button class="btn-submit-form" type="button" onclick="simpanUrlSkrining()" style="margin-top: 5px; width: 100%;">Simpan Tautan</button>
                         </div>
                     </div>
+
+                    <!-- GUG SKRINING DISPLAY AREA -->
+                    <div id="skriningGetUpAndGoDisplayArea" style="display: none; width: 100%;">
+                        <div class="gug-container">
+                            <!-- Judul Utama & Garis Panjang -->
+                            <div class="main-header gug-full-width">
+                                <h2 style="text-align:center; color:#004D40; border:none; font-size: 22px; font-weight: 800; margin: 0 0 10px 0; text-transform: uppercase;">SKRINING RESIKO JATUH GET UP AND GO</h2>
+                                <hr style="border: 0; height: 4px; background: linear-gradient(to right, #00897B, #004D40); border-radius: 2px; margin: 0 0 10px 0;">
+                            </div>
+
+                            <!-- Kolom 1: Form Input -->
+                            <div class="gug-card">
+                                <h2>1. Data Pasien & Skrining</h2>
+                                <form id="formSkriningGUG">
+                                    
+                                    <div class="gug-form-group gug-flex-row">
+                                        <div style="flex: 1;">
+                                            <label>Tanggal (Real-Time Otomatis)</label>
+                                            <input type="date" id="tglKunjunganGUG" readonly>
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <label>Waktu (Real-Time Otomatis)</label>
+                                            <input type="time" id="waktuKunjunganGUG" readonly>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="gug-form-group">
+                                        <label>Nama Pasien</label>
+                                        <input type="text" id="namaPasienGUG" placeholder="Masukkan Nama Lengkap" required>
+                                    </div>
+
+                                    <div class="gug-form-group gug-flex-row">
+                                        <div style="flex: 1;">
+                                            <label>Tanggal Lahir (Opsional)</label>
+                                            <input type="date" id="tglLahirGUG" onchange="hitungUmurGUG()">
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <label>Umur (Tahun)</label>
+                                            <input type="number" id="umurPasienGUG" placeholder="Ketik umur..." required>
+                                        </div>
+                                    </div>
+
+                                    <div class="gug-form-group">
+                                        <label>Alamat</label>
+                                        <select id="alamatPasienGUG" onchange="cekAlamatGUG()" required>
+                                            <option value="">-- Pilih Wilayah / Desa --</option>
+                                            <option value="Berindat">Berindat</option>
+                                            <option value="Persing">Persing</option>
+                                            <option value="Sedamai">Sedamai</option>
+                                            <option value="Neraca">Neraca</option>
+                                            <option value="Air Merah">Air Merah</option>
+                                            <option value="Lanjut">Lanjut</option>
+                                            <option value="Kote">Kote</option>
+                                            <option value="Pelakak">Pelakak</option>
+                                            <option value="Jagoh">Jagoh</option>
+                                            <option value="Dabo Singkep">Dabo Singkep</option>
+                                            <option value="Lainnya">Lainnya</option>
+                                        </select>
+                                        <input type="text" id="alamatLainnyaGUG" placeholder="Tuliskan nama alamat..." style="display: none; margin-top: 10px;">
+                                    </div>
+
+                                    <h3 style="font-size: 16px; margin-top: 25px;">Penilaian Kriteria "Get Up & Go"</h3>
+                                    
+                                    <!-- Kotak Keterangan Penilaian -->
+                                    <div class="gug-info-box">
+                                        <strong>Keterangan Hasil Skrining:</strong>
+                                        <ul>
+                                            <li><strong>Tidak Berisiko:</strong> Jika poin (a) dan (b) tidak ditemukan.</li>
+                                            <li><strong>Risiko Rendah:</strong> Jika ditemukan salah satu dari poin (a) atau (b).</li>
+                                            <li><strong>Risiko Tinggi:</strong> Jika ditemukan kedua poin (a) dan (b).</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Pertanyaan Kriteria -->
+                                    <div class="gug-form-group">
+                                        <label style="font-size: 15px; color: #004D40;">a. Kriteria Berjalan:</label>
+                                        
+                                        <div class="gug-sub-kriteria">
+                                            <label>1. Tidak seimbang / sempoyongan / limbung</label>
+                                            <div class="gug-radio-group">
+                                                <label><input type="radio" name="kriteriaA1" id="a1_ya" value="ya"> Ya</label>
+                                                <label><input type="radio" name="kriteriaA1" id="a1_tidak" value="tidak" checked> Tidak</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="gug-sub-kriteria">
+                                            <label>2. Berjalan menggunakan alat bantu (kruk, kursi roda, dll)</label>
+                                            <div class="gug-radio-group">
+                                                <label><input type="radio" name="kriteriaA2" id="a2_ya" value="ya"> Ya</label>
+                                                <label><input type="radio" name="kriteriaA2" id="a2_tidak" value="tidak" checked> Tidak</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="gug-form-group">
+                                        <label style="font-size: 15px; color: #004D40;">b. Kriteria Duduk:</label>
+                                        
+                                        <div class="gug-sub-kriteria">
+                                            <label>1. Menopang saat akan duduk (tampak memegang pinggiran kursi/meja)</label>
+                                            <div class="gug-radio-group">
+                                                <label><input type="radio" name="kriteriaB" id="b_ya" value="ya"> Ya</label>
+                                                <label><input type="radio" name="kriteriaB" id="b_tidak" value="tidak" checked> Tidak</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="button" class="gug-btn" onclick="simpanDataGUG()">Simpan Data & Hitung Risiko</button>
+                                </form>
+                            </div>
+
+                            <!-- Kolom 2: Diagram (Chart) -->
+                            <div class="gug-card">
+                                <h2>2. Diagram Distribusi Risiko</h2>
+                                <div class="gug-chart-container">
+                                    <canvas id="risikoChart"></canvas>
+                                </div>
+                                <p style="text-align: center; font-size: 13px; color: #666; margin-top:15px;">Diagram terupdate otomatis setiap data disimpan.</p>
+                                <button type="button" class="gug-btn" onclick="hapusSemuaDataGUG()" style="background-color: #dc3545; margin-top: 15px; font-size: 14px;">Hapus Data Pasien (Admin)</button>
+                            </div>
+
+                            <!-- Kolom Bawah: Tabel Riwayat Pasien -->
+                            <div class="gug-card gug-full-width">
+                                <h2>3. Riwayat Pasien Tersimpan</h2>
+                                <div style="overflow-x:auto;">
+                                    <table class="gug-table" id="tabelPasienGUG">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 35px;">No.</th>
+                                                <th>Tgl & Waktu</th>
+                                                <th>Nama</th>
+                                                <th>Umur</th>
+                                                <th>Alamat</th>
+                                                <th>Tingkat Risiko</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbodyPasienGUG">
+                                            <!-- Data dimuat lewat JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AKHIR GUG SKRINING DISPLAY AREA -->
 
                     <div id="rujukanInternalDisplayArea" style="display: none;">
                         <div class="sbar-container" id="sbarFormContainer">
@@ -1297,11 +1482,11 @@
 
                                 <div class="form-group">
                                     <label>Alasan Rujukan:</label>
-                                    <div class="checkbox-container">
-                                        <div class="checkbox-item"><input type="checkbox" name="alasan" value="Tindaklanjut Skrining"> Tindaklanjut Skrining</div>
-                                        <div class="checkbox-item"><input type="checkbox" name="alasan" value="Perlu perawatan khusus"> Perlu perawatan khusus</div>
-                                        <div class="checkbox-item"><input type="checkbox" name="alasan" value="Keterbatasan alat/obat"> Keterbatasan alat/obat</div>
-                                        <div class="checkbox-item"><input type="checkbox" name="alasan" id="cbLainnya" value="Lainnya" onchange="toggleLainnya()"> Lainnya</div>
+                                    <div class="checkbox-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                        <label class="checkbox-item" style="cursor: pointer;"><input type="checkbox" name="alasan" value="Tindaklanjut Skrining" style="margin-right: 8px;"> Tindaklanjut Skrining</label>
+                                        <label class="checkbox-item" style="cursor: pointer;"><input type="checkbox" name="alasan" value="Perlu perawatan khusus" style="margin-right: 8px;"> Perlu perawatan khusus</label>
+                                        <label class="checkbox-item" style="cursor: pointer;"><input type="checkbox" name="alasan" value="Keterbatasan alat/obat" style="margin-right: 8px;"> Keterbatasan alat/obat</label>
+                                        <label class="checkbox-item" style="cursor: pointer;"><input type="checkbox" name="alasan" id="cbLainnya" value="Lainnya" onchange="toggleLainnya()" style="margin-right: 8px;"> Lainnya</label>
                                     </div>
                                 </div>
 
@@ -2562,6 +2747,185 @@
         });
         /* ---------------- AKHIR SCRIPT MONITORING UPKDK ---------------- */
 
+        /* ================= SCRIPT SKRINING GET UP AND GO (GUG) ================= */
+        let risikoChartInstance = null;
+
+        function setWaktuOtomatisGUG() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+
+            const tglEl = document.getElementById('tglKunjunganGUG');
+            const waktuEl = document.getElementById('waktuKunjunganGUG');
+
+            if (tglEl) tglEl.value = `${year}-${month}-${day}`;
+            if (waktuEl) waktuEl.value = `${hours}:${minutes}`;
+        }
+
+        function hitungUmurGUG() {
+            const tglLahir = document.getElementById('tglLahirGUG').value;
+            if (!tglLahir) return;
+            const birthDate = new Date(tglLahir);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            document.getElementById('umurPasienGUG').value = age >= 0 ? age : 0;
+        }
+
+        function cekAlamatGUG() {
+            const alamat = document.getElementById('alamatPasienGUG').value;
+            const alamatLainnya = document.getElementById('alamatLainnyaGUG');
+            if (alamat === 'Lainnya') {
+                alamatLainnya.style.display = 'block';
+                alamatLainnya.required = true;
+            } else {
+                alamatLainnya.style.display = 'none';
+                alamatLainnya.required = false;
+                alamatLainnya.value = '';
+            }
+        }
+
+        function simpanDataGUG() {
+            const nama = document.getElementById('namaPasienGUG').value.trim();
+            const umur = document.getElementById('umurPasienGUG').value.trim();
+            let alamat = document.getElementById('alamatPasienGUG').value;
+            if (alamat === 'Lainnya') {
+                alamat = document.getElementById('alamatLainnyaGUG').value.trim();
+            }
+
+            if (!nama || !umur || !alamat) {
+                alert("Harap lengkapi Nama, Umur, dan Alamat Pasien terlebih dahulu!");
+                return;
+            }
+
+            const tgl = document.getElementById('tglKunjunganGUG').value;
+            const waktu = document.getElementById('waktuKunjunganGUG').value;
+            const tglWaktuStr = `${tgl} ${waktu}`;
+
+            const a1 = document.querySelector('input[name="kriteriaA1"]:checked').value === 'ya';
+            const a2 = document.querySelector('input[name="kriteriaA2"]:checked').value === 'ya';
+            const b = document.querySelector('input[name="kriteriaB"]:checked').value === 'ya';
+
+            const kriteriaACount = (a1 ? 1 : 0) + (a2 ? 1 : 0);
+            const kriteriaBVal = b ? 1 : 0;
+
+            let tingkatRisiko = "Tidak Berisiko";
+            let badgeClass = "gug-badge-tidak";
+
+            if (kriteriaACount > 0 && kriteriaBVal > 0) {
+                tingkatRisiko = "Risiko Tinggi";
+                badgeClass = "gug-badge-tinggi";
+            } else if (kriteriaACount > 0 || kriteriaBVal > 0) {
+                tingkatRisiko = "Risiko Rendah";
+                badgeClass = "gug-badge-rendah";
+            }
+
+            const newData = {
+                tglWaktu: tglWaktuStr,
+                nama: nama,
+                umur: umur,
+                alamat: alamat,
+                risiko: tingkatRisiko,
+                badge: badgeClass
+            };
+
+            let riwayat = JSON.parse(localStorage.getItem('riwayatSkriningGUG')) || [];
+            riwayat.unshift(newData); // Masukkan ke urutan paling atas
+            localStorage.setItem('riwayatSkriningGUG', JSON.stringify(riwayat));
+
+            alert(`Data berhasil disimpan!\nHasil Skrining: ${tingkatRisiko}`);
+            
+            // Reset form input ringan & perbarui tampilan
+            document.getElementById('formSkriningGUG').reset();
+            setWaktuOtomatisGUG();
+            renderDataGUG();
+        }
+
+        function renderDataGUG() {
+            const riwayat = JSON.parse(localStorage.getItem('riwayatSkriningGUG')) || [];
+            const tbody = document.getElementById('tbodyPasienGUG');
+            tbody.innerHTML = '';
+
+            if (riwayat.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="center" style="padding: 15px; color: #666;">Belum ada data riwayat pasien skrining.</td></tr>`;
+                updateChartGUG(0, 0, 0);
+                return;
+            }
+
+            let countTinggi = 0;
+            let countRendah = 0;
+            let countTidak = 0;
+
+            riwayat.forEach((item, index) => {
+                if (item.risiko === "Risiko Tinggi") countTinggi++;
+                else if (item.risiko === "Risiko Rendah") countRendah++;
+                else countTidak++;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="center">${index + 1}</td>
+                    <td>${item.tglWaktu}</td>
+                    <td><strong>${item.nama}</strong></td>
+                    <td class="center">${item.umur} Thn</td>
+                    <td>${item.alamat}</td>
+                    <td class="center"><span class="${item.badge}">${item.risiko}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateChartGUG(countTinggi, countRendah, countTidak);
+        }
+
+        function updateChartGUG(tinggi, rendah, tidak) {
+            const ctx = document.getElementById('risikoChart').getContext('2d');
+            
+            if (risikoChartInstance) {
+                risikoChartInstance.destroy();
+            }
+
+            risikoChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Risiko Tinggi', 'Risiko Rendah', 'Tidak Berisiko'],
+                    datasets: [{
+                        data: [tinggi, rendah, tidak],
+                        backgroundColor: ['#dc3545', '#ffc107', '#28a745'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function hapusSemuaDataGUG() {
+            showPasswordPrompt("Hapus Riwayat GUG", "Masukkan password untuk menghapus seluruh data riwayat skrining Get Up & Go:", (success, pwd) => {
+                if (success) {
+                    if (pwd === systemPassword || pwd === 'admin') {
+                        localStorage.removeItem('riwayatSkriningGUG');
+                        renderDataGUG();
+                        alert("Semua data riwayat skrining Get Up & Go berhasil dihapus.");
+                    } else if (pwd !== "") {
+                        alert("Password salah!");
+                    }
+                }
+            });
+        }
+        /* ================= AKHIR SCRIPT GUG ================= */
+
         function simpanUrlRujukan() {
             const urlInput = document.getElementById('inputUrlRujukan1').value;
             localStorage.setItem('url_rujukan_' + currentMenuId + '_1', urlInput);
@@ -2590,10 +2954,18 @@
         }
 
         function simpanUrlSkrining() {
-            const urlInput = document.getElementById('inputUrlSkrining').value;
-            localStorage.setItem('url_skrining_' + currentMenuId, urlInput);
-            alert("Tautan skrining berhasil disimpan!");
-            muatUrlSkrining();
+            showPasswordPrompt("Otorisasi Penyimpanan", "Masukkan password untuk menyimpan tautan skrining:", (success, pwd) => {
+                if (success) {
+                    if (pwd === "admin" || pwd === systemPassword) {
+                        const urlInput = document.getElementById('inputUrlSkrining').value;
+                        localStorage.setItem('url_skrining_' + currentMenuId, urlInput);
+                        alert("Tautan skrining berhasil disimpan!");
+                        muatUrlSkrining();
+                    } else {
+                        alert("Gagal menyimpan! Password yang dimasukkan salah.");
+                    }
+                }
+            });
         }
 
         function muatUrlSkrining() {
@@ -2712,6 +3084,7 @@
             const fileListArea = document.getElementById('fileListContainerArea');
             const formArea = document.getElementById('formDisplayArea');
             const formSkriningArea = document.getElementById('formSkriningArea');
+            const skriningGugArea = document.getElementById('skriningGetUpAndGoDisplayArea');
             const ambulanceArea = document.getElementById('ambulanceDisplayArea');
             const rujukanUpkdkArea = document.getElementById('rujukanUpkdkDisplayArea');
             const rujukanInternalArea = document.getElementById('rujukanInternalDisplayArea');
@@ -2728,6 +3101,7 @@
             fileListArea.style.display = 'none';
             formArea.style.display = 'none';
             formSkriningArea.style.display = 'none';
+            skriningGugArea.style.display = 'none';
             ambulanceArea.style.display = 'none';
             rujukanUpkdkArea.style.display = 'none';
             rujukanInternalArea.style.display = 'none';
@@ -2759,9 +3133,26 @@
                 document.getElementById('formTitleLabel').innerText = "Tautan - " + subTitle;
                 fileListArea.style.display = 'block';
                 muatUrlRujukan();
+            } else if (categoryCode === 'skrining' && periodIdentifier === 'get_up_and_go') {
+                skriningGugArea.style.display = 'block';
+                setWaktuOtomatisGUG();
+                renderDataGUG();
             } else if (categoryCode === 'skrining') {
                 formSkriningArea.style.display = 'block';
                 document.getElementById('formSkriningTitleLabel').innerText = subTitle;
+                
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                
+                const tglEl = document.getElementById('tgl_skrining_auto');
+                const jamEl = document.getElementById('jam_skrining_auto');
+                if(tglEl) tglEl.value = `${year}-${month}-${day}`;
+                if(jamEl) jamEl.value = `${hours}:${minutes}`;
+
                 muatUrlSkrining();
             } else if (categoryCode === 'ambulance') {
                 ambulanceArea.style.display = 'flex';
@@ -2777,7 +3168,7 @@
             document.getElementById('dynamicFileList').innerHTML = '';
             document.getElementById('slideshowContainerImages').innerHTML = '';
             
-            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && categoryCode !== 'pws' && !(categoryCode === 'monitoring' && periodIdentifier === 'upkdk') && !(categoryCode === 'inventaris' && (periodIdentifier === 'obhp_bmhp' || periodIdentifier === 'kir')) && !(categoryCode === 'rujukan' && periodIdentifier === 'internal')) {
+            if(categoryCode !== 'ambulance' && categoryCode !== 'rujukan_upkdk' && categoryCode !== 'pws' && !(categoryCode === 'monitoring' && periodIdentifier === 'upkdk') && !(categoryCode === 'inventaris' && (periodIdentifier === 'obhp_bmhp' || periodIdentifier === 'kir')) && !(categoryCode === 'rujukan' && periodIdentifier === 'internal') && !(categoryCode === 'skrining' && periodIdentifier === 'get_up_and_go')) {
                 loadFilesForCurrentMenu(categoryCode);
             }
         }
@@ -3209,294 +3600,7 @@
 
         function populatePDFData() {
             const jenisPelayanan = document.getElementById('jenisPelayanan').value;
-            const tujuanSelect = document.getElementById('tujuanWA');
-            const tujuanText = tujuanSelect.options[tujuanSelect.selectedIndex].text;
-            const nama = document.getElementById('namaPasien').value.trim();
-            const umur = document.getElementById('umur').value.trim();
-            const kelamin = document.getElementById('kelamin').value;
-            const alamat = document.getElementById('alamat').value.trim();
-            const tanggal = document.getElementById('tanggalRujukan').value;
-            const petugas = document.getElementById('petugas').value.trim();
-
-            if (!jenisPelayanan || !tujuanSelect.value || !nama || !umur || !kelamin || !alamat || !tanggal || !petugas) {
-                alert('Mohon lengkapi seluruh kolom formulir!');
-                return false;
-            }
-
-            document.getElementById('pdfJenisPelayanan').innerText = jenisPelayanan;
-            document.getElementById('pdfTujuan').innerText = tujuanText;
-            document.getElementById('pdfNama').innerText = nama;
-            document.getElementById('pdfUmur').innerText = umur + " Tahun";
-            document.getElementById('pdfKelamin').innerText = kelamin;
-            document.getElementById('pdfAlamat').innerText = alamat;
-            document.getElementById('pdfHasil').innerText = document.getElementById('hasilPemeriksaan').value || '-';
-            document.getElementById('pdfTindakan').innerText = document.getElementById('tindakanAwal').value || '-';
-            
-            let alasanList = [];
-            document.querySelectorAll('input[name="alasan"]:checked').forEach(c => {
-                if (c.value === 'Lainnya') {
-                    const ketLain = document.getElementById('keteranganLainnya').value.trim();
-                    alasanList.push(ketLain ? 'Lainnya: ' + ketLain : 'Lainnya');
-                } else {
-                    alasanList.push(c.value);
-                }
-            });
-            document.getElementById('pdfAlasan').innerText = alasanList.join(', ') || '-';
-            
-            document.getElementById('pdfTanggal').innerText = "Tanggal: " + tanggal;
-            document.getElementById('pdfPetugas').innerText = petugas;
-
-            return true;
-        }
-
-        function unduhPDF() {
-            if (!populatePDFData()) return;
-
-            const element = document.getElementById('pdfContent');
-            const nama = document.getElementById('namaPasien').value.trim();
-
-            const opt = {
-                margin:       [15, 15, 15, 15],
-                filename:     'Surat_Rujukan_' + nama.replace(/\s+/g, '_') + '.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save().catch(err => {
-                console.error('Error:', err);
-                alert('Terjadi kesalahan saat membuat PDF.');
-            });
-        }
-
-        function kirimWhatsApp() {
-            if (!populatePDFData()) return;
-
-            const nomorWhatsApp = document.getElementById('tujuanWA').value;
-            const jenisPelayanan = document.getElementById('jenisPelayanan').value;
-            const nama = document.getElementById('namaPasien').value.trim();
-            const umur = document.getElementById('umur').value.trim();
-            const kelamin = document.getElementById('kelamin').value;
-            const alamat = document.getElementById('alamat').value.trim();
-            const hasilPemeriksaan = document.getElementById('hasilPemeriksaan').value.trim() || '-';
-            const tindakanAwal = document.getElementById('tindakanAwal').value.trim() || '-';
-            const tanggal = document.getElementById('tanggalRujukan').value;
-            const petugas = document.getElementById('petugas').value.trim();
-
-            let alasanList = [];
-            document.querySelectorAll('input[name="alasan"]:checked').forEach(c => {
-                if (c.value === 'Lainnya') {
-                    const ketLain = document.getElementById('keteranganLainnya').value.trim();
-                    alasanList.push(ketLain ? 'Lainnya: ' + ketLain : 'Lainnya');
-                } else {
-                    alasanList.push(c.value);
-                }
-            });
-            const alasanRujukan = alasanList.join(', ') || '-';
-
-            const pesan = `*SURAT RUJUKAN UPKD/K KE PUSKESMAS*` +
-                          `\n*WILAYAH KERJA UPTD PUSKESMAS LANJUT*` +
-                          `\n----------------------------------------` +
-                          `\n\n*A. LAYANAN & TUJUAN*` +
-                          `\n- Jenis Pelayanan: ${jenisPelayanan}` +
-                          `\n\n*B. DATA PASIEN*` +
-                          `\n- Nama: ${nama}` +
-                          `\n- Umur: ${umur} Tahun` +
-                          `\n- Jenis Kelamin: ${kelamin}` +
-                          `\n- Alamat: ${alamat}` +
-                          `\n\n*C. PEMERIKSAAN & PENANGANAN*` +
-                          `\n- Hasil Pemeriksaan: ${hasilPemeriksaan}` +
-                          `\n- Tindakan Awal: ${tindakanAwal}` +
-                          `\n- Alasan Rujukan: ${alasanRujukan}` +
-                          `\n\n*D. KETERANGAN PENGIRIM*` +
-                          `\n- Tanggal: ${tanggal}` +
-                          `\n- Petugas Pengirim: ${petugas}`;
-
-            const urlWhatsApp = `https://wa.me/${nomorWhatsApp}?text=${encodeURIComponent(pesan)}`;
-            window.open(urlWhatsApp, '_blank');
-        }
-
-        function resetFormRujukan() {
-            document.getElementById('rujukanForm').reset();
-            document.getElementById('groupLainnya').style.display = 'none';
-            document.getElementById('tanggalRujukan').valueAsDate = new Date();
-        }
-
-        // Script Dashboard PWS
-        let pwsData = [
-            { id: 1, desa: 'UPKDK Desa Berindat', password: 'berindat123', diare_k: 12, diare_s: 10, diare_m: 0, hipertensi_k: 45, hipertensi_s: 12, hipertensi_m: 1, stroke_k: 2, stroke_s: 0, stroke_m: 1, tb_k: 4, tb_s: 1, tb_m: 0, dm_k: 20, dm_s: 5, dm_m: 0, dengue_k: 1, dengue_s: 1, dengue_m: 0, ibuhamil_k: 5, ibuhamil_s: 4, ibuhamil_m: 0, stunting_k: 3, stunting_s: 1, stunting_m: 0, odgj_k: 2, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
-            { id: 2, desa: 'UPKDK Desa Persing', password: 'persing123', diare_k: 8, diare_s: 7, diare_m: 0, hipertensi_k: 30, hipertensi_s: 10, hipertensi_m: 0, stroke_k: 1, stroke_s: 1, stroke_m: 0, tb_k: 2, tb_s: 2, tb_m: 0, dm_k: 15, dm_s: 4, dm_m: 0, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 4, ibuhamil_s: 4, ibuhamil_m: 0, stunting_k: 2, stunting_s: 2, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
-            { id: 3, desa: 'UPKDK Desa Sedamai', password: 'sedamai123', diare_k: 5, diare_s: 5, diare_m: 0, hipertensi_k: 25, hipertensi_s: 8, hipertensi_m: 0, stroke_k: 0, stroke_s: 0, stroke_m: 0, tb_k: 1, tb_s: 1, tb_m: 0, dm_k: 10, dm_s: 3, dm_m: 0, dengue_k: 2, dengue_s: 2, dengue_m: 0, ibuhamil_k: 3, ibuhamil_s: 3, ibuhamil_m: 0, stunting_k: 1, stunting_s: 1, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
-            { id: 4, desa: 'UPKDK Desa Lanjut', password: 'lanjut123', diare_k: 15, diare_s: 14, diare_m: 0, hipertensi_k: 55, hipertensi_s: 20, hipertensi_m: 1, stroke_k: 3, stroke_s: 1, stroke_m: 1, tb_k: 6, tb_s: 4, tb_m: 0, dm_k: 28, dm_s: 10, dm_m: 0, dengue_k: 3, dengue_s: 3, dengue_m: 0, ibuhamil_k: 8, ibuhamil_s: 7, ibuhamil_m: 0, stunting_k: 4, stunting_s: 3, stunting_m: 0, odgj_k: 3, odgj_s: 2, odgj_m: 0, malaria_k: 1, malaria_s: 1, malaria_m: 0 },
-            { id: 5, desa: 'UPKDK Desa Kote', password: 'kote123', diare_k: 7, diare_s: 6, diare_m: 0, hipertensi_k: 28, hipertensi_s: 9, hipertensi_m: 0, stroke_k: 1, stroke_s: 0, stroke_m: 0, tb_k: 2, tb_s: 2, tb_m: 0, dm_k: 12, dm_s: 4, dm_m: 0, dengue_k: 1, dengue_s: 1, dengue_m: 0, ibuhamil_k: 4, ibuhamil_s: 4, ibuhamil_m: 0, stunting_k: 2, stunting_s: 2, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 },
-            { id: 6, desa: 'UPKDK Desa Pelakak', password: 'pelakak123', diare_k: 6, diare_s: 6, diare_m: 0, hipertensi_k: 22, hipertensi_s: 7, hipertensi_m: 0, stroke_k: 0, stroke_s: 0, stroke_m: 0, tb_k: 1, tb_s: 1, tb_m: 0, dm_k: 9, dm_s: 3, dm_m: 0, dengue_k: 0, dengue_s: 0, dengue_m: 0, ibuhamil_k: 3, ibuhamil_s: 3, ibuhamil_m: 0, stunting_k: 1, stunting_s: 1, stunting_m: 0, odgj_k: 1, odgj_s: 1, odgj_m: 0, malaria_k: 0, malaria_s: 0, malaria_m: 0 }
-        ];
-
-        let currentActiveDesaId = null;
-        let trendChartInstance = null;
-
-        function renderTable() {
-            const tbody = document.getElementById('table-body');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            
-            let totals = {
-                diare_k:0, diare_p:0, diare_s:0, diare_m:0,
-                hipertensi_k:0, hipertensi_p:0, hipertensi_s:0, hipertensi_m:0,
-                stroke_k:0, stroke_p:0, stroke_s:0, stroke_m:0,
-                tb_k:0, tb_p:0, tb_s:0, tb_m:0,
-                dm_k:0, dm_p:0, dm_s:0, dm_m:0,
-                dengue_k:0, dengue_p:0, dengue_s:0, dengue_m:0,
-                ibuhamil_k:0, ibuhamil_p:0, ibuhamil_s:0, ibuhamil_m:0,
-                stunting_k:0, stunting_p:0, stunting_s:0, stunting_m:0,
-                odgj_k:0, odgj_p:0, odgj_s:0, odgj_m:0,
-                malaria_k:0, malaria_p:0, malaria_s:0, malaria_m:0,
-                total_k:0, total_p:0, total_s:0, total_m:0
-            };
-
-            pwsData.forEach(item => {
-                const diseases = ['diare', 'hipertensi', 'stroke', 'tb', 'dm', 'dengue', 'ibuhamil', 'stunting', 'odgj', 'malaria'];
-                let rowK = 0, rowP = 0, rowS = 0, rowM = 0;
-
-                diseases.forEach(d => {
-                    item[`${d}_p`] = Math.max(0, item[`${d}_k`] - item[`${d}_s`] - item[`${d}_m`]);
-                    rowK += item[`${d}_k`];
-                    rowP += item[`${d}_p`];
-                    rowS += item[`${d}_s`];
-                    rowM += item[`${d}_m`];
-
-                    totals[`${d}_k`] += item[`${d}_k`];
-                    totals[`${d}_p`] += item[`${d}_p`];
-                    totals[`${d}_s`] += item[`${d}_s`];
-                    totals[`${d}_m`] += item[`${d}_m`];
-                });
-
-                totals.total_k += rowK;
-                totals.total_p += rowP;
-                totals.total_s += rowS;
-                totals.total_m += rowM;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition-colors";
-                
-                let html = `<td class="px-3 py-2 font-semibold text-gray-800 sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#cbd5e1] whitespace-nowrap">${item.desa}</td>`;
-
-                diseases.forEach(d => {
-                    html += `
-                        <td class="px-0.5 py-1 text-center font-bold text-red-600 border-l">${item[`${d}_k`]}</td>
-                        <td class="px-0.5 py-1 text-center font-bold text-yellow-600 bg-yellow-50">${item[`${d}_p`]}</td>
-                        <td class="px-0.5 py-1 text-center font-bold text-green-600">${item[`${d}_s`]}</td>
-                        <td class="px-0.5 py-1 text-center font-bold text-gray-600">${item[`${d}_m`]}</td>
-                    `;
-                });
-
-                html += `
-                    <td class="px-0.5 py-1 text-center font-bold text-red-700 border-l-2 bg-blue-50">${rowK}</td>
-                    <td class="px-0.5 py-1 text-center font-bold text-yellow-800 bg-yellow-100">${rowP}</td>
-                    <td class="px-0.5 py-1 text-center font-bold text-green-700 bg-blue-50">${rowS}</td>
-                    <td class="px-0.5 py-1 text-center font-bold text-gray-800 bg-blue-50">${rowM}</td>
-                    <td class="px-3 py-2 text-center border-l border-gray-300">
-                        <button onclick="openLoginModal(${item.id})" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-[10px] font-semibold transition shadow-sm"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                    </td>
-                `;
-
-                tr.innerHTML = html;
-                tbody.appendChild(tr);
-            });
-
-            const totalTr = document.createElement('tr');
-            totalTr.className = "bg-gray-100 font-bold border-t-2 border-gray-300";
-            let totalHtml = `<td class="px-3 py-2 text-gray-900 sticky left-0 bg-gray-100 z-10 shadow-[1px_0_0_0_#cbd5e1]">TOTAL KESELURUHAN</td>`;
-            
-            const diseases = ['diare', 'hipertensi', 'stroke', 'tb', 'dm', 'dengue', 'ibuhamil', 'stunting', 'odgj', 'malaria'];
-            diseases.forEach(d => {
-                totalHtml += `
-                    <td class="px-0.5 py-1 text-center text-red-700 border-l">${totals[`${d}_k`]}</td>
-                    <td class="px-0.5 py-1 text-center text-yellow-800 bg-yellow-100">${totals[`${d}_p`]}</td>
-                    <td class="px-0.5 py-1 text-center text-green-700">${totals[`${d}_s`]}</td>
-                    <td class="px-0.5 py-1 text-center text-gray-800">${totals[`${d}_m`]}</td>
-                `;
-            });
-
-            totalHtml += `
-                <td class="px-0.5 py-1 text-center text-red-800 border-l-2 bg-blue-200">${totals.total_k}</td>
-                <td class="px-0.5 py-1 text-center text-yellow-900 bg-yellow-200">${totals.total_p}</td>
-                <td class="px-0.5 py-1 text-center text-green-800 bg-blue-200">${totals.total_s}</td>
-                <td class="px-0.5 py-1 text-center text-gray-900 bg-blue-200">${totals.total_m}</td>
-                <td class="px-3 py-2 text-center border-l border-gray-300">-</td>
-            `;
-            totalTr.innerHTML = totalHtml;
-            tbody.appendChild(totalTr);
-
-            diseases.forEach(d => {
-                const elK = document.getElementById(`sum-${d}-k`);
-                const elP = document.getElementById(`sum-${d}-p`);
-                const elS = document.getElementById(`sum-${d}-s`);
-                const elM = document.getElementById(`sum-${d}-m`);
-                if(elK) elK.innerText = totals[`${d}_k`];
-                if(elP) elP.innerText = totals[`${d}_p`];
-                if(elS) elS.innerText = totals[`${d}_s`];
-                if(elM) elM.innerText = totals[`${d}_m`];
-            });
-
-            updateChart(totals, diseases);
-        }
-
-        function updateChart(totals, diseases) {
-            const ctx = document.getElementById('trendChart');
-            if(!ctx) return;
-            
-            const labels = ['Diare', 'Hipertensi', 'Stroke', 'TB Paru', 'Diabetes', 'Dengue', 'Ibu Hamil', 'Stunting', 'ODGJ', 'Malaria'];
-            const dataK = diseases.map(d => totals[`${d}_k`]);
-            const dataS = diseases.map(d => totals[`${d}_s`]);
-
-            if (trendChartInstance) {
-                trendChartInstance.data.datasets[0].data = dataK;
-                trendChartInstance.data.datasets[1].data = dataS;
-                trendChartInstance.update();
-                return;
-            }
-
-            trendChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Kasus (K)', data: dataK, backgroundColor: '#ef4444', borderRadius: 4 },
-                        { label: 'Sembuh (S)', data: dataS, backgroundColor: '#22c55e', borderRadius: 4 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
-                    scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
-                }
-            });
-        }
-
-        function openLoginModal(desaId) {
-            currentActiveDesaId = desaId;
-            const desa = pwsData.find(item => item.id === desaId);
-            document.getElementById('modal-desa-name').innerText = desa.desa;
-            document.getElementById('password-input').value = '';
-            document.getElementById('login-error').classList.add('hidden');
-            document.getElementById('login-modal').classList.remove('hidden');
-        }
-
-        function closeLoginModal() {
-            document.getElementById('login-modal').classList.add('hidden');
-        }
-
-        function verifyPassword() {
-            const pwd = document.getElementById('password-input').value;
-            const desa = pwsData.find(item => item.id === currentActiveDesaId);
-            if (pwd === desa.password || pwd === 'admin' || pwd === systemPassword) {
-                closeLoginModal();
-                alert(`Autentikasi berhasil untuk ${desa.desa}.`);
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-            }
+            const tujuanSelect = document.getElementById('tujuanWA').value;
         }
     </script>
 </body>
