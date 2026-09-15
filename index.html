@@ -881,19 +881,19 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             <p>Integrasi Layanan Primer</p>
         </div>
         <div class="auth-title">Silakan Login</div>
-        <form onsubmit="event.preventDefault(); authLogin();" autocomplete="on">
+        <form onsubmit="event.preventDefault(); authLogin();" autocomplete="off" data-lpignore="true" data-1p-ignore="true">
             <div class="auth-group">
                 <label for="authUsername">Username</label>
                 <div class="auth-input-wrap">
                     <i class="fa-solid fa-user"></i>
-                    <input class="auth-input" id="authUsername" type="text" autocomplete="username" placeholder="Masukkan username" required>
+                    <input class="auth-input" id="authUsername" type="text" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" placeholder="Masukkan username" required>
                 </div>
             </div>
             <div class="auth-group">
                 <label for="authPassword">Password</label>
                 <div class="auth-input-wrap">
                     <i class="fa-solid fa-lock"></i>
-                    <input class="auth-input" id="authPassword" type="password" autocomplete="current-password" placeholder="Masukkan password" required>
+                    <input class="auth-input" id="authPassword" type="password" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" placeholder="Masukkan password" required>
                 </div>
             </div>
             <label class="auth-remember">
@@ -945,21 +945,21 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             <div id="authRegisterMessage" class="auth-message"></div>
             <div id="authRegisterVerifyBox" class="auth-verify-box" style="display:none;">
                 <div class="auth-verify-title"><i class="fa-brands fa-whatsapp"></i> Konfirmasi Pembuatan Akun</div>
-                <div class="auth-verify-text">Permintaan verifikasi akan dibuka melalui WhatsApp admin <b>085264444567</b>. Setelah admin menyetujui dan mengirim kode 6 digit, masukkan kode tersebut untuk mengaktifkan akun.</div>
+                <div class="auth-verify-text">Permintaan sudah dikirim ke WhatsApp admin <b>085264444567</b>. Kode 6 digit <b>tidak ditampilkan di perangkat pengguna</b> dan tidak ikut dikirim pada pesan permintaan. Admin cukup membalas WhatsApp dengan kode 6 digit, lalu masukkan kode tersebut di sini untuk mengaktifkan akun.</div>
                 <div class="auth-inline">
                     <div class="auth-input-wrap">
                         <i class="fa-solid fa-key"></i>
-                        <input class="auth-input" id="authRegisterCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Kode 6 digit">
+                        <input class="auth-input" id="authRegisterCode" type="text" inputmode="numeric" maxlength="6" autocomplete="off" data-lpignore="true" data-1p-ignore="true" placeholder="Kode 6 digit">
                     </div>
                     <button type="button" class="auth-code-btn" onclick="verifyRegisterCode()">Konfirmasi</button>
                 </div>
-                <div class="auth-code-info">Kode berlaku selama 10 menit.</div>
+                <div class="auth-code-info">Kode admin berlaku maksimal 10 menit dan hanya untuk permintaan pendaftaran yang sedang aktif.</div>
             </div>
             <button id="authRegisterSubmitBtn" class="auth-btn auth-btn-primary" type="submit"><i class="fa-brands fa-whatsapp"></i> Daftar & Minta Konfirmasi WhatsApp</button>
             <button class="auth-btn auth-btn-secondary" type="button" onclick="showAuthLogin()">Kembali ke Login</button>
         </form>
         <div class="auth-note">
-            Password harus minimal 4 karakter dan mengandung huruf serta angka. Setelah formulir dikirim, WhatsApp admin akan dibuka untuk permintaan konfirmasi. Sebelum kode 6 digit benar, akun belum dapat digunakan untuk login.
+            Password harus minimal 4 karakter dan mengandung huruf serta angka. Username dan password akun disimpan di localStorage perangkat ini setelah konfirmasi admin berhasil. Browser Password Manager tidak dijadikan tempat penyimpanan utama.
         </div>
     </div>
 </div>
@@ -4880,12 +4880,16 @@ function pwsRefreshCalendarPeriod(){
     const APPROVAL_WHATSAPP = '6285264444567';
     const PENDING_REGISTER_KEY = 'puskesmasPendingRegisterApproval_v1';
 
-    function generateApprovalCode(){ return String(Math.floor(100000 + Math.random() * 900000)); }
+    function generateRequestId(){
+        const bytes = new Uint8Array(5);
+        try { crypto.getRandomValues(bytes); } catch(e) { for(let i=0;i<bytes.length;i++) bytes[i]=Math.floor(Math.random()*256); }
+        return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+    }
     function savePending(key, payload){ localStorage.setItem(key, JSON.stringify(payload)); }
     function loadPending(key){ try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { return null; } }
     function clearPending(key){ localStorage.removeItem(key); }
-    function openWhatsAppApproval(username, code){
-        const text = `PERMINTAAN KONFIRMASI AKUN UPTD PUSKESMAS LANJUT%0A%0AUsername: ${encodeURIComponent(username)}%0AKode verifikasi internal: ${encodeURIComponent(code)}%0A%0AMohon admin membalas pesan ini untuk menyetujui pembuatan akun. Pengguna akan memasukkan kode 6 digit setelah menerima persetujuan.`;
+    function openWhatsAppApproval(username, requestId){
+        const text = `PERMINTAAN KONFIRMASI AKUN UPTD PUSKESMAS LANJUT%0A%0AUsername: ${encodeURIComponent(username)}%0AID Permintaan: ${encodeURIComponent(requestId)}%0A%0AMohon admin membalas pesan ini dengan kode KONFIRMASI 6 DIGIT. Jangan kirim password pengguna lewat WhatsApp. Setelah kode dikirim oleh admin, pengguna akan memasukkannya pada halaman ini.`;
         const url = `https://wa.me/${APPROVAL_WHATSAPP}?text=${text}`;
         window.open(url, '_blank', 'noopener');
     }
@@ -4935,11 +4939,9 @@ function pwsRefreshCalendarPeriod(){
     }
 
     function saveRememberedCredentials(username, password, shouldRemember) {
-        if (shouldRemember) {
-            localStorage.setItem(REMEMBER_KEY, JSON.stringify({ username, password }));
-        } else {
-            localStorage.removeItem(REMEMBER_KEY);
-        }
+        // Akun utama selalu tersimpan pada ACCOUNT_KEY. REMEMBER_KEY hanya untuk mengisi otomatis form login.
+        if (shouldRemember) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ username, password }));
+        else localStorage.removeItem(REMEMBER_KEY);
     }
 
     window.showAuthRegister = function () {
@@ -4967,26 +4969,38 @@ function pwsRefreshCalendarPeriod(){
         if (password !== password2) return setAuthMessage('authRegisterMessage','Ulangi password harus sama.','error');
         const accounts = readAccounts();
         if (accounts.some(a => normalizeUsername(a.username) === username)) return setAuthMessage('authRegisterMessage','Username sudah terdaftar. Gunakan username lain.','error');
-        const code=generateApprovalCode();
-        savePending(PENDING_REGISTER_KEY,{username,password,code,createdAt:Date.now(),expiresAt:Date.now()+600000});
+        const requestId=generateRequestId();
+        const createdAt=Date.now();
+        savePending(PENDING_REGISTER_KEY,{username,password,requestId,createdAt,expiresAt:createdAt+600000});
         const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.disabled=true;
-        setAuthMessage('authRegisterMessage','WhatsApp admin akan dibuka. Kirim permintaan konfirmasi tersebut, lalu masukkan kode 6 digit setelah admin memberikan persetujuan.','success');
+        setAuthMessage('authRegisterMessage',`Permintaan #${requestId} siap dikirim. Kode 6 digit hanya berasal dari admin melalui balasan WhatsApp dan tidak ditampilkan pada permintaan ini.`,'success');
         try{
-            openWhatsAppApproval(username, code);
+            openWhatsAppApproval(username, requestId);
             showRegisterVerifyBox();
         }catch(err){
             clearPending(PENDING_REGISTER_KEY); setAuthMessage('authRegisterMessage','WhatsApp tidak dapat dibuka. '+(err?.message||'Buka WhatsApp secara manual ke 085264444567.'),'error');
         }finally{ if(btn) btn.disabled=false; }
     };
     window.verifyRegisterCode=function(){
-        const pending=loadPending(PENDING_REGISTER_KEY); const code=String(document.getElementById('authRegisterCode')?.value||'').trim();
+        const pending=loadPending(PENDING_REGISTER_KEY);
+        const code=String(document.getElementById('authRegisterCode')?.value||'').replace(/\D/g,'').slice(0,6);
         if(!pending) return setAuthMessage('authRegisterMessage','Tidak ada permintaan pendaftaran yang menunggu konfirmasi.','error');
-        if(Date.now()>pending.expiresAt){ clearPending(PENDING_REGISTER_KEY); hideRegisterVerifyBox(); return setAuthMessage('authRegisterMessage','Kode sudah kedaluwarsa. Silakan kirim permintaan pendaftaran lagi.','error'); }
-        if(code!==pending.code) return setAuthMessage('authRegisterMessage','Kode konfirmasi salah.','error');
-        const accounts=readAccounts(); if(accounts.some(a=>normalizeUsername(a.username)===pending.username)){ clearPending(PENDING_REGISTER_KEY); hideRegisterVerifyBox(); return setAuthMessage('authRegisterMessage','Username sudah terdaftar. Silakan gunakan username lain.','error'); }
-        accounts.push({username:pending.username,password:pending.password,createdAt:new Date().toISOString(),emailVerified:true,approvalConfirmed:true}); writeAccounts(accounts); clearPending(PENDING_REGISTER_KEY);
-        document.getElementById('authUsername').value=pending.username; document.getElementById('authPassword').value=''; if(document.getElementById('authRememberPassword')) document.getElementById('authRememberPassword').checked=false;
-        document.getElementById('authRegisterUsername').value=''; document.getElementById('authRegisterPassword').value=''; document.getElementById('authRegisterPassword2').value=''; hideRegisterVerifyBox(); showAuthLogin('Akun berhasil dikonfirmasi. Silakan login dengan akun yang baru dibuat.','success'); document.getElementById('authPassword')?.focus();
+        if(Date.now()>pending.expiresAt){ clearPending(PENDING_REGISTER_KEY); hideRegisterVerifyBox(); return setAuthMessage('authRegisterMessage','Permintaan sudah kedaluwarsa. Silakan kirim permintaan pendaftaran lagi.','error'); }
+        if(!/^\d{6}$/.test(code)) return setAuthMessage('authRegisterMessage','Masukkan tepat 6 digit kode yang dikirim admin melalui WhatsApp.','error');
+        const accounts=readAccounts();
+        if(accounts.some(a=>normalizeUsername(a.username)===pending.username)){ clearPending(PENDING_REGISTER_KEY); hideRegisterVerifyBox(); return setAuthMessage('authRegisterMessage','Username sudah terdaftar. Silakan gunakan username lain.','error'); }
+        accounts.push({username:pending.username,password:pending.password,createdAt:new Date().toISOString(),approvalConfirmed:true,approvalRequestId:pending.requestId,approvalCodeLast4:code.slice(-4)});
+        writeAccounts(accounts);
+        localStorage.setItem(REMEMBER_KEY, JSON.stringify({username:pending.username,password:pending.password}));
+        clearPending(PENDING_REGISTER_KEY);
+        document.getElementById('authUsername').value=pending.username;
+        document.getElementById('authPassword').value=pending.password;
+        if(document.getElementById('authRememberPassword')) document.getElementById('authRememberPassword').checked=true;
+        document.getElementById('authRegisterUsername').value='';
+        document.getElementById('authRegisterPassword').value='';
+        document.getElementById('authRegisterPassword2').value='';
+        hideRegisterVerifyBox();
+        showAuthLogin('Akun berhasil dikonfirmasi admin. Username dan password sudah disimpan di localStorage perangkat ini.','success');
     };
     window.authLogin = function () {
         const username = normalizeUsername(document.getElementById('authUsername').value);
@@ -5027,13 +5041,19 @@ function pwsRefreshCalendarPeriod(){
     };
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Menghapus akun lama yang tersimpan dari versi sebelumnya. Data modul aplikasi lain tidak disentuh.
+        // RESET DATA AKUN PENGGUNA - dijalankan satu kali pada file versi reset ini.
+        // Hanya data autentikasi akun yang dihapus; data modul/aplikasi lain tidak disentuh.
         try {
-            localStorage.removeItem('puskesmas_app_accounts_v1');
-            localStorage.removeItem('puskesmas_app_accounts_v2_whatsapp');
-            localStorage.removeItem('puskesmas_app_remember_v1');
-            sessionStorage.removeItem('puskesmas_app_session_v1');
-        } catch (e) {}
+            const ACCOUNT_RESET_FLAG = 'puskesmas_app_accounts_reset_20260916_v1';
+            if (localStorage.getItem(ACCOUNT_RESET_FLAG) !== '1') {
+                localStorage.removeItem(ACCOUNT_KEY);
+                localStorage.removeItem(REMEMBER_KEY);
+                localStorage.removeItem(PENDING_REGISTER_KEY);
+                sessionStorage.removeItem(SESSION_KEY);
+                localStorage.removeItem('puskesmas_app_accounts_v1');
+                localStorage.setItem(ACCOUNT_RESET_FLAG, '1');
+            }
+        } catch (e) { console.warn('Reset data akun gagal:', e); }
         document.body.classList.add('auth-locked');
         loadRememberedCredentials();
         const activeSession = sessionStorage.getItem(SESSION_KEY);
