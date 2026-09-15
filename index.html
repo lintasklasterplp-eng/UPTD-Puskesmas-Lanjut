@@ -124,8 +124,8 @@
 
         .hamburger-btn {
             display: none;
-            width: 44px;
-            height: 44px;
+            width: 36px;
+            height: 36px;
             background: #ffffff;
             border: 1px solid #cbd5e1;
             border-radius: 8px;
@@ -146,7 +146,7 @@
         }
         .hamburger-btn span {
             display: block;
-            width: 22px;
+            width: 18px;
             height: 2px;
             background: currentColor;
             border-radius: 2px;
@@ -158,13 +158,13 @@
 
         /* Tombol Logout di header */
         .logout-nav-btn {
-            width: 42px;
-            height: 42px;
+            width: 36px;
+            height: 36px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            flex: 0 0 42px;
-            margin-left: 8px;
+            flex: 0 0 36px;
+            margin-left: 6px;
             border: 1px solid #fecaca;
             border-radius: 8px;
             background: #fff;
@@ -172,7 +172,7 @@
             cursor: pointer;
             box-shadow: 0 1px 3px rgba(0,0,0,.08);
             transition: all .2s ease;
-            font-size: 16px;
+            font-size: 14px;
         }
         .logout-nav-btn:hover, .logout-nav-btn:focus {
             background: #dc2626;
@@ -197,8 +197,8 @@
         @media (max-width: 900px) {
             header { flex-direction: column; padding: 8px 12px; gap: 6px; align-items: stretch; }
             .navbar { justify-content: space-between; width: 100%; }
-            .logout-nav-btn { width: 42px; height: 42px; flex-basis: 42px; margin-left: 6px; }
-            .hamburger-btn { display: flex; }
+            .logout-nav-btn { width: 34px; height: 34px; flex-basis: 34px; margin-left: 5px; font-size: 13px; }
+            .hamburger-btn { display: flex; width: 34px; height: 34px; }
             .top-nav-bar { display: none; flex-direction: column; width: 100%; align-items: stretch; }
             .top-nav-bar.show-mobile { display: flex; }
             .nav-item, .nav-btn-h { width: 100%; text-align: left; justify-content: space-between; }
@@ -838,6 +838,14 @@
 .auth-code-preview { display:none; margin-top:6px; padding:7px 9px; border:1px dashed #86efac; background:#f0fdf4; color:#166534; border-radius:7px; font-size:.7rem; font-weight:800; text-align:center; letter-spacing:2px; }
 .auth-note { margin-top:14px; padding:9px 10px; border-radius:8px; background:#ecfdf5; border:1px solid #bbf7d0; color:#166534; font-size:.68rem; line-height:1.45; }
 .auth-register-only { display:none; }
+.auth-reset-box { margin-top:10px; padding:9px 10px; border:1px solid #fecaca; background:#fff7f7; border-radius:8px; text-align:center; }
+.auth-reset-title { font-size:.72rem; font-weight:800; color:#b91c1c; margin-bottom:3px; }
+.auth-reset-text { font-size:.64rem; line-height:1.35; color:#64748b; margin-bottom:6px; }
+.auth-reset-btn { border:1px solid #dc2626; background:#fff; color:#dc2626; border-radius:7px; padding:6px 10px; font-size:.68rem; font-weight:800; cursor:pointer; }
+.auth-reset-btn:hover { background:#dc2626; color:#fff; }
+.auth-verify-box { margin-top:10px; padding:10px; border:1px solid #bfdbfe; background:#eff6ff; border-radius:8px; }
+.auth-verify-title { font-size:.72rem; font-weight:800; color:#1d4ed8; margin-bottom:4px; }
+.auth-verify-text { font-size:.64rem; line-height:1.4; color:#475569; margin-bottom:7px; }
 .auth-footer { text-align:center; margin-top:15px; color:#94a3b8; font-size:.65rem; }
 body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 @media (max-width:480px) {
@@ -903,6 +911,23 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         <div class="auth-link-row">
             Belum punya akun? <span class="auth-link" onclick="showAuthRegister()">Daftar Akun di sini</span>
         </div>
+        <div class="auth-reset-box">
+            <div class="auth-reset-title"><i class="fa-solid fa-rotate"></i> Reset User</div>
+            <div class="auth-reset-text">Gunakan bila ingin menghapus akun yang tersimpan di browser ini dan membuat user baru.</div>
+            <button id="authResetRequestBtn" type="button" class="auth-reset-btn" onclick="resetStoredUsers()">Reset User</button>
+            <div id="authResetVerifyBox" class="auth-verify-box" style="display:none; margin-top:8px;">
+                <div class="auth-verify-title"><i class="fa-solid fa-envelope-circle-check"></i> Konfirmasi Reset User</div>
+                <div class="auth-verify-text">Kode reset 6 digit telah dikirim ke <b>randrean1988@gmail.com</b>. Masukkan kode dari email untuk melanjutkan reset.</div>
+                <div class="auth-inline">
+                    <div class="auth-input-wrap">
+                        <i class="fa-solid fa-key"></i>
+                        <input class="auth-input" id="authResetCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Kode 6 digit">
+                    </div>
+                    <button type="button" class="auth-code-btn" onclick="verifyResetCode()">Konfirmasi</button>
+                </div>
+                <div class="auth-code-info">Kode berlaku selama 10 menit.</div>
+            </div>
+        </div>
         <div class="auth-note">
             Akun tersimpan di browser/perangkat ini. Centang <b>Ingat Password</b> agar username dan password otomatis terisi pada kunjungan berikutnya.
         </div>
@@ -940,11 +965,23 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 </div>
             </div>
             <div id="authRegisterMessage" class="auth-message"></div>
-            <button class="auth-btn auth-btn-primary" type="submit"><i class="fa-solid fa-user-plus"></i> Daftar & Masuk ke Login</button>
+            <div id="authRegisterVerifyBox" class="auth-verify-box" style="display:none;">
+                <div class="auth-verify-title"><i class="fa-solid fa-envelope-circle-check"></i> Konfirmasi Pembuatan Akun</div>
+                <div class="auth-verify-text">Kode konfirmasi 6 digit telah dikirim ke <b>randrean1988@gmail.com</b>. Masukkan kode dari email untuk mengaktifkan akun.</div>
+                <div class="auth-inline">
+                    <div class="auth-input-wrap">
+                        <i class="fa-solid fa-key"></i>
+                        <input class="auth-input" id="authRegisterCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Kode 6 digit">
+                    </div>
+                    <button type="button" class="auth-code-btn" onclick="verifyRegisterCode()">Konfirmasi</button>
+                </div>
+                <div class="auth-code-info">Kode berlaku selama 10 menit.</div>
+            </div>
+            <button id="authRegisterSubmitBtn" class="auth-btn auth-btn-primary" type="submit"><i class="fa-solid fa-user-plus"></i> Daftar & Kirim Kode</button>
             <button class="auth-btn auth-btn-secondary" type="button" onclick="showAuthLogin()">Kembali ke Login</button>
         </form>
         <div class="auth-note">
-            Setelah akun dibuat, Anda akan langsung diarahkan kembali ke Login. Username akan otomatis terisi.
+            Setelah formulir dikirim, akun menunggu konfirmasi kode dari email administrator. Sebelum kode benar, akun belum dapat digunakan untuk login.
         </div>
     </div>
 </div>
@@ -4862,6 +4899,26 @@ function pwsRefreshCalendarPeriod(){
     const ACCOUNT_KEY = 'puskesmas_app_accounts_v1';
     const SESSION_KEY = 'puskesmas_app_session_v1';
     const REMEMBER_KEY = 'puskesmas_app_remember_v1';
+    const APPROVAL_EMAIL = 'randrean1988@gmail.com';
+    const APPROVAL_ENDPOINT = 'https://formsubmit.co/ajax/' + APPROVAL_EMAIL;
+    const PENDING_REGISTER_KEY = 'puskesmasPendingRegisterApproval_v1';
+    const PENDING_RESET_KEY = 'puskesmasPendingResetApproval_v1';
+
+    function generateApprovalCode(){ return String(Math.floor(100000 + Math.random() * 900000)); }
+    function savePending(key, payload){ localStorage.setItem(key, JSON.stringify(payload)); }
+    function loadPending(key){ try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { return null; } }
+    function clearPending(key){ localStorage.removeItem(key); }
+    async function sendApprovalEmail(subject, message){
+        const response = await fetch(APPROVAL_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({name:'UPTD Puskesmas Lanjut - Sistem Akun', email:APPROVAL_EMAIL, _subject:subject, message}) });
+        let data=null; try{ data=await response.json(); }catch(e){}
+        if(!response.ok || (data && data.success===false)) throw new Error((data && data.message) || 'Pengiriman email gagal.');
+        return data;
+    }
+    function emailApprovalWarning(){ return 'Catatan: pada penggunaan pertama, FormSubmit meminta aktivasi alamat penerima melalui email aktivasi. Setelah alamat diaktifkan, permintaan berikutnya akan diteruskan otomatis.'; }
+    function showRegisterVerifyBox(){ const box=document.getElementById('authRegisterVerifyBox'); if(box) box.style.display='block'; const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.style.display='none'; setTimeout(()=>document.getElementById('authRegisterCode')?.focus(),60); }
+    function hideRegisterVerifyBox(){ const box=document.getElementById('authRegisterVerifyBox'); if(box) box.style.display='none'; const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.style.display='flex'; const code=document.getElementById('authRegisterCode'); if(code) code.value=''; }
+    function hideResetVerifyBox(){ const box=document.getElementById('authResetVerifyBox'); if(box) box.style.display='none'; const code=document.getElementById('authResetCode'); if(code) code.value=''; const btn=document.getElementById('authResetRequestBtn'); if(btn){ btn.style.display='inline-block'; btn.disabled=false; } }
+
 
     function readAccounts() {
         try {
@@ -4928,49 +4985,55 @@ function pwsRefreshCalendarPeriod(){
         setTimeout(() => document.getElementById('authUsername')?.focus(), 50);
     };
 
-    window.authRegister = function () {
+    window.authRegister = async function () {
         const username = normalizeUsername(document.getElementById('authRegisterUsername').value);
         const password = document.getElementById('authRegisterPassword').value;
         const password2 = document.getElementById('authRegisterPassword2').value;
-
-        if (!username || username.length < 3) {
-            setAuthMessage('authRegisterMessage', 'Username minimal 3 karakter.', 'error');
-            return;
-        }
-        if (!/^[a-z0-9._-]+$/.test(username)) {
-            setAuthMessage('authRegisterMessage', 'Username hanya boleh berisi huruf, angka, titik, garis bawah, atau tanda minus.', 'error');
-            return;
-        }
-        if (password.length < 4) {
-            setAuthMessage('authRegisterMessage', 'Password minimal 4 karakter.', 'error');
-            return;
-        }
-        if (password !== password2) {
-            setAuthMessage('authRegisterMessage', 'Ulangi password harus sama.', 'error');
-            return;
-        }
-
+        if (!username || username.length < 3) return setAuthMessage('authRegisterMessage','Username minimal 3 karakter.','error');
+        if (!/^[a-z0-9._-]+$/.test(username)) return setAuthMessage('authRegisterMessage','Username hanya boleh berisi huruf, angka, titik, garis bawah, atau tanda minus.','error');
+        if (password.length < 4) return setAuthMessage('authRegisterMessage','Password minimal 4 karakter.','error');
+        if (password !== password2) return setAuthMessage('authRegisterMessage','Ulangi password harus sama.','error');
         const accounts = readAccounts();
-        if (accounts.some(a => normalizeUsername(a.username) === username)) {
-            setAuthMessage('authRegisterMessage', 'Username sudah terdaftar. Gunakan username lain.', 'error');
-            return;
-        }
-
-        accounts.push({ username, password, createdAt: new Date().toISOString() });
-        writeAccounts(accounts);
-
-        // Bersihkan form pendaftaran lalu kembali ke Login.
-        document.getElementById('authRegisterUsername').value = '';
-        document.getElementById('authRegisterPassword').value = '';
-        document.getElementById('authRegisterPassword2').value = '';
-
-        document.getElementById('authUsername').value = username;
-        document.getElementById('authPassword').value = '';
-        const remember = document.getElementById('authRememberPassword');
-        if (remember) remember.checked = false;
-
-        showAuthLogin('Akun berhasil dibuat. Silakan login dengan akun baru Anda.', 'success');
-        document.getElementById('authPassword').focus();
+        if (accounts.some(a => normalizeUsername(a.username) === username)) return setAuthMessage('authRegisterMessage','Username sudah terdaftar. Gunakan username lain.','error');
+        const code=generateApprovalCode();
+        savePending(PENDING_REGISTER_KEY,{username,password,code,createdAt:Date.now(),expiresAt:Date.now()+600000});
+        const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.disabled=true;
+        setAuthMessage('authRegisterMessage','Mengirim kode konfirmasi ke email administrator...','success');
+        try{
+            await sendApprovalEmail('[KONFIRMASI AKUN BARU] '+username,`Permintaan pembuatan akun baru UPTD Puskesmas Lanjut.\n\nUsername: ${username}\nKode Konfirmasi: ${code}\nBerlaku: 10 menit\n\nMasukkan kode ini pada layar pendaftaran untuk mengaktifkan akun.\n\n${emailApprovalWarning()}`);
+            setAuthMessage('authRegisterMessage','Kode sudah dikirim ke email administrator. Masukkan kode 6 digit untuk mengaktifkan akun.','success');
+            showRegisterVerifyBox();
+        }catch(err){
+            clearPending(PENDING_REGISTER_KEY); setAuthMessage('authRegisterMessage','Email belum terkirim. '+(err?.message||'Periksa koneksi internet dan aktivasi email FormSubmit.'),'error');
+        }finally{ if(btn) btn.disabled=false; }
+    };
+    window.verifyRegisterCode=function(){
+        const pending=loadPending(PENDING_REGISTER_KEY); const code=String(document.getElementById('authRegisterCode')?.value||'').trim();
+        if(!pending) return setAuthMessage('authRegisterMessage','Tidak ada permintaan pendaftaran yang menunggu konfirmasi.','error');
+        if(Date.now()>pending.expiresAt){ clearPending(PENDING_REGISTER_KEY); hideRegisterVerifyBox(); return setAuthMessage('authRegisterMessage','Kode sudah kedaluwarsa. Silakan kirim permintaan pendaftaran lagi.','error'); }
+        if(code!==pending.code) return setAuthMessage('authRegisterMessage','Kode konfirmasi salah.','error');
+        const accounts=readAccounts(); if(accounts.some(a=>normalizeUsername(a.username)===pending.username)){ clearPending(PENDING_REGISTER_KEY); hideRegisterVerifyBox(); return setAuthMessage('authRegisterMessage','Username sudah terdaftar. Silakan gunakan username lain.','error'); }
+        accounts.push({username:pending.username,password:pending.password,createdAt:new Date().toISOString(),emailVerified:true,approvalConfirmed:true}); writeAccounts(accounts); clearPending(PENDING_REGISTER_KEY);
+        document.getElementById('authUsername').value=pending.username; document.getElementById('authPassword').value=''; if(document.getElementById('authRememberPassword')) document.getElementById('authRememberPassword').checked=false;
+        document.getElementById('authRegisterUsername').value=''; document.getElementById('authRegisterPassword').value=''; document.getElementById('authRegisterPassword2').value=''; hideRegisterVerifyBox(); showAuthLogin('Akun berhasil dikonfirmasi. Silakan login dengan akun yang baru dibuat.','success'); document.getElementById('authPassword')?.focus();
+    };
+    window.resetStoredUsers = async function(){
+        if(!confirm('Reset User akan meminta kode konfirmasi ke email administrator, lalu menghapus akun pengguna yang tersimpan di browser ini. Data PWS, inventaris, laporan, dan data aplikasi lainnya TIDAK dihapus. Lanjutkan?')) return;
+        const code=generateApprovalCode(); savePending(PENDING_RESET_KEY,{code,createdAt:Date.now(),expiresAt:Date.now()+600000});
+        const btn=document.getElementById('authResetRequestBtn'); if(btn) btn.disabled=true; setAuthMessage('authLoginMessage','Mengirim kode reset ke email administrator...','success');
+        try{
+            await sendApprovalEmail('[KONFIRMASI RESET USER] UPTD Puskesmas Lanjut',`Permintaan reset user pada aplikasi UPTD Puskesmas Lanjut.\n\nKode Reset User: ${code}\nBerlaku: 10 menit\n\nMasukkan kode ini pada layar Login untuk mengonfirmasi penghapusan akun pengguna dan membuat akun baru.\n\n${emailApprovalWarning()}`);
+            if(btn) btn.style.display='none'; const box=document.getElementById('authResetVerifyBox'); if(box) box.style.display='block'; setAuthMessage('authLoginMessage','Kode reset sudah dikirim ke email administrator. Masukkan kode 6 digit untuk melanjutkan.','success'); setTimeout(()=>document.getElementById('authResetCode')?.focus(),60);
+        }catch(err){ clearPending(PENDING_RESET_KEY); if(btn) btn.disabled=false; setAuthMessage('authLoginMessage','Email reset belum terkirim. '+(err?.message||'Periksa koneksi internet dan aktivasi email FormSubmit.'),'error'); }
+    };
+    window.verifyResetCode=function(){
+        const pending=loadPending(PENDING_RESET_KEY); const code=String(document.getElementById('authResetCode')?.value||'').trim();
+        if(!pending) return setAuthMessage('authLoginMessage','Tidak ada permintaan reset yang menunggu konfirmasi.','error');
+        if(Date.now()>pending.expiresAt){ clearPending(PENDING_RESET_KEY); hideResetVerifyBox(); return setAuthMessage('authLoginMessage','Kode reset sudah kedaluwarsa. Silakan kirim permintaan reset lagi.','error'); }
+        if(code!==pending.code) return setAuthMessage('authLoginMessage','Kode reset salah.','error');
+        localStorage.removeItem(ACCOUNT_KEY); localStorage.removeItem(REMEMBER_KEY); sessionStorage.removeItem(SESSION_KEY); clearPending(PENDING_RESET_KEY); hideResetVerifyBox();
+        document.getElementById('authUsername').value=''; document.getElementById('authPassword').value=''; if(document.getElementById('authRememberPassword')) document.getElementById('authRememberPassword').checked=false;
+        document.body.classList.add('auth-locked'); setAuthMessage('authLoginMessage','Reset User berhasil dikonfirmasi. Silakan buat akun baru.','success'); setTimeout(()=>showAuthRegister(),350);
     };
 
     window.authLogin = function () {
