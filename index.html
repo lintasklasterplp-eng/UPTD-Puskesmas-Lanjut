@@ -122,64 +122,49 @@
             flex: 1;
         }
 
-        /* Hamburger mobile elegan */
         .hamburger-btn {
             display: none;
-            width: 46px;
-            height: 46px;
-            background: rgba(255, 255, 255, 0.92);
-            border: 1px solid rgba(4, 120, 87, 0.18);
-            border-radius: 14px;
+            width: 44px;
+            height: 44px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             color: var(--primary);
             cursor: pointer;
-            padding: 0;
+            padding: 8px;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             gap: 5px;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
             flex-shrink: 0;
-            transition: transform .2s ease, box-shadow .2s ease,
-                        background-color .2s ease, border-color .2s ease;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
-
-        .hamburger-btn:hover,
-        .hamburger-btn:focus-visible {
+        .hamburger-btn:hover, .hamburger-btn:focus {
             background: var(--primary);
             border-color: var(--primary);
-            color: #ffffff;
             outline: none;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(4, 120, 87, 0.22);
         }
-
-        .hamburger-btn:active {
-            transform: scale(.96);
-        }
-
         .hamburger-btn span {
             display: block;
             width: 22px;
-            height: 2.5px;
+            height: 2px;
             background: currentColor;
-            border-radius: 999px;
-            transition: transform .25s ease, opacity .2s ease, width .25s ease;
-            transform-origin: center;
+            border-radius: 2px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        .hamburger-btn:hover span, .hamburger-btn:focus span {
+            background: #ffffff;
         }
 
-        .hamburger-btn.is-open span:nth-child(1) {
-            transform: translateY(7.5px) rotate(45deg);
+        /* Animasi hamburger menjadi X saat menu HP terbuka */
+        .hamburger-btn.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
         }
-
-        .hamburger-btn.is-open span:nth-child(2) {
+        .hamburger-btn.active span:nth-child(2) {
             opacity: 0;
-            width: 10px;
         }
-
-        .hamburger-btn.is-open span:nth-child(3) {
-            transform: translateY(-7.5px) rotate(-45deg);
+        .hamburger-btn.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
         }
         
         @media (max-width: 900px) {
@@ -730,31 +715,6 @@
         .gug-badge-rendah { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
         .gug-badge-tidak { background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
         @media (max-width: 576px) { .gug-card { padding: 15px; } .gug-flex-row { flex-direction: column; gap: 10px; } .gug-table { font-size: 11px; } .gug-table th, .gug-table td { padding: 6px 4px; } }
-    
-        @media (max-width: 900px) {
-            .navbar {
-                min-height: 50px;
-            }
-            .logo-container {
-                min-width: 0;
-                padding-right: 8px;
-            }
-            .logo-text {
-                font-size: 1rem;
-            }
-            .logo-subtext {
-                font-size: 0.62rem;
-            }
-            .top-nav-bar.show-mobile {
-                animation: mobileMenuIn .22s ease-out;
-                transform-origin: top right;
-            }
-            @keyframes mobileMenuIn {
-                from { opacity: 0; transform: translateY(-6px) scale(.985); }
-                to { opacity: 1; transform: translateY(0) scale(1); }
-            }
-        }
-
     </style>
 
 <style id="pws-edit-mode-css">
@@ -791,7 +751,7 @@
                     <span class="logo-subtext">Integrasi Layanan Primer</span>
                 </div>
             </a>
-            <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi" title="Menu" aria-expanded="false" type="button">
+            <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi" aria-expanded="false" type="button">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -3175,12 +3135,9 @@
             const nav = document.getElementById('topNavBar');
             const btn = document.getElementById('hamburgerBtn');
             const isOpen = nav.classList.toggle('show-mobile');
+            btn.classList.toggle('active', isOpen);
             btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
             btn.setAttribute('aria-label', isOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi');
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
-            const isOpen = nav.classList.contains('show-mobile');
-            hamburgerBtn.classList.toggle('is-open', isOpen);
-        
         }
 
         document.addEventListener('click', function(e) {
@@ -3189,6 +3146,7 @@
             if (!nav || !btn || window.innerWidth > 900) return;
             if (nav.contains(e.target) && (e.target.matches('a') || e.target.matches('.nav-btn-h') || e.target.matches('.sub-nav-btn'))) {
                 nav.classList.remove('show-mobile');
+                btn.classList.remove('active');
                 btn.setAttribute('aria-expanded', 'false');
                 btn.setAttribute('aria-label', 'Buka menu navigasi');
             }
@@ -3292,6 +3250,7 @@
 
 function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             document.getElementById('topNavBar').classList.remove('show-mobile');
+            document.getElementById('hamburgerBtn')?.classList.remove('active');
             currentMenuId = categoryCode + "-" + periodIdentifier;
 
             const ikpModule = document.getElementById('ikpModule');
@@ -4563,6 +4522,7 @@ window.addEventListener('DOMContentLoaded',()=>{ pwsInitFilters(); pwsRenderTabl
         // Membuka modul IKP yang telah diintegrasikan ke index.html
         function bukaModulIKP() {
             document.getElementById('topNavBar').classList.remove('show-mobile');
+            document.getElementById('hamburgerBtn')?.classList.remove('active');
             document.getElementById('homeViewContainer').style.display = 'none';
             document.getElementById('activeUI').style.display = 'none';
             document.getElementById('btnAmbulanceFixed').style.display = 'none';
