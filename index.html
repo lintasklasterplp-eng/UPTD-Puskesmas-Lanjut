@@ -176,6 +176,36 @@
             .nav-item, .nav-btn-h { width: 100%; text-align: left; justify-content: space-between; }
             .dropdown-content-h { position: static; transform: none; width: 100%; box-shadow: none; border: 1px solid #cbd5e1; margin-top: 5px; }
             .sub-dropdown-content { position: static; width: 100%; box-shadow: none; margin-top: 5px; border-left: 3px solid var(--primary); }
+
+            /* MOBILE: dropdown dibuka berdasarkan klik, bukan hover/focus */
+            .top-nav-bar.show-mobile .nav-item.mobile-open > .dropdown-content-h {
+                display: flex;
+            }
+            .top-nav-bar.show-mobile .sub-dropdown.mobile-open > .sub-dropdown-content {
+                display: flex;
+                flex-direction: column;
+            }
+            .top-nav-bar.show-mobile .nav-btn-h::after {
+                content: '▾';
+                margin-left: auto;
+                font-size: 0.75rem;
+                transition: transform 0.2s ease;
+            }
+            .top-nav-bar.show-mobile .nav-item.mobile-open > .nav-btn-h::after {
+                transform: rotate(180deg);
+            }
+            .top-nav-bar.show-mobile .sub-dropdown > .sub-nav-btn::after {
+                content: '▾';
+                margin-left: auto;
+                font-size: 0.7rem;
+                transition: transform 0.2s ease;
+            }
+            .top-nav-bar.show-mobile .sub-dropdown.mobile-open > .sub-nav-btn::after {
+                transform: rotate(180deg);
+            }
+            .top-nav-bar.show-mobile .nav-item.no-dropdown > .nav-btn-h::after {
+                content: '';
+            }
         }
         
         .nav-item { position: relative; outline: none; }
@@ -818,12 +848,12 @@
             </div>
 
             <!-- Dashboard PWS -->
-            <div class="nav-item">
+            <div class="nav-item no-dropdown">
                 <button class="nav-btn-h" onclick="selectMenu('pws', 'all', 'Dashboard PWS Penyakit', 'Pemantauan Wilayah Setempat')">Dashboard PWS</button>
             </div>
 
             <!-- Informasi & Edukasi -->
-            <div class="nav-item">
+            <div class="nav-item no-dropdown">
                 <button class="nav-btn-h" onclick="selectMenu('informasiedukasi', 'all', 'Informasi dan Edukasi', 'Semua Data')">Info & Edukasi</button>
             </div>
 
@@ -3140,15 +3170,75 @@
             btn.setAttribute('aria-label', isOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi');
         }
 
+        function closeMobileMenu() {
+            const nav = document.getElementById('topNavBar');
+            const btn = document.getElementById('hamburgerBtn');
+            if (!nav || !btn) return;
+            nav.classList.remove('show-mobile');
+            btn.classList.remove('active');
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', 'Buka menu navigasi');
+            nav.querySelectorAll('.mobile-open').forEach(el => el.classList.remove('mobile-open'));
+        }
+
         document.addEventListener('click', function(e) {
             const nav = document.getElementById('topNavBar');
             const btn = document.getElementById('hamburgerBtn');
             if (!nav || !btn || window.innerWidth > 900) return;
-            if (nav.contains(e.target) && (e.target.matches('a') || e.target.matches('.nav-btn-h') || e.target.matches('.sub-nav-btn'))) {
-                nav.classList.remove('show-mobile');
-                btn.classList.remove('active');
-                btn.setAttribute('aria-expanded', 'false');
-                btn.setAttribute('aria-label', 'Buka menu navigasi');
+
+            /* Klik tombol menu utama: buka/tutup submenu */
+            const mainBtn = e.target.closest('.nav-btn-h');
+            if (mainBtn && nav.contains(mainBtn)) {
+                const item = mainBtn.closest('.nav-item');
+                if (!item) return;
+
+                /* Tombol yang memang menjalankan aksi langsung */
+                if (mainBtn.hasAttribute('onclick')) {
+                    closeMobileMenu();
+                    return;
+                }
+
+                e.preventDefault();
+                nav.querySelectorAll(':scope > .nav-item.mobile-open').forEach(other => {
+                    if (other !== item) other.classList.remove('mobile-open');
+                });
+                item.classList.toggle('mobile-open');
+                return;
+            }
+
+            /* Klik submenu level-2: buka/tutup submenu level-3 */
+            const subBtn = e.target.closest('.sub-nav-btn');
+            if (subBtn && nav.contains(subBtn)) {
+                e.preventDefault();
+                const subItem = subBtn.closest('.sub-dropdown');
+                if (!subItem) return;
+                const parentMenu = subItem.closest('.dropdown-content-h');
+                if (parentMenu) {
+                    parentMenu.querySelectorAll(':scope > .sub-dropdown.mobile-open').forEach(other => {
+                        if (other !== subItem) other.classList.remove('mobile-open');
+                    });
+                }
+                subItem.classList.toggle('mobile-open');
+                return;
+            }
+
+            /* Klik item aksi/link: tutup menu setelah aksi dijalankan */
+            const link = e.target.closest('a');
+            if (link && nav.contains(link)) {
+                closeMobileMenu();
+                return;
+            }
+
+            /* Klik di luar menu */
+            if (!nav.contains(e.target) && !btn.contains(e.target)) {
+                closeMobileMenu();
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 900) {
+                const nav = document.getElementById('topNavBar');
+                if (nav) nav.querySelectorAll('.mobile-open').forEach(el => el.classList.remove('mobile-open'));
             }
         });
 
