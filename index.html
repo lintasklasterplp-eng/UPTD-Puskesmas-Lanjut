@@ -156,6 +156,33 @@
             background: #ffffff;
         }
 
+        /* Tombol Logout di header */
+        .logout-nav-btn {
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 42px;
+            margin-left: 8px;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            background: #fff;
+            color: #dc2626;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,.08);
+            transition: all .2s ease;
+            font-size: 16px;
+        }
+        .logout-nav-btn:hover, .logout-nav-btn:focus {
+            background: #dc2626;
+            color: #fff;
+            border-color: #dc2626;
+            outline: none;
+            transform: translateY(-1px);
+        }
+        .logout-nav-btn:active { transform: translateY(0); }
+
         /* Animasi hamburger menjadi X saat menu HP terbuka */
         .hamburger-btn.active span:nth-child(1) {
             transform: translateY(7px) rotate(45deg);
@@ -170,6 +197,7 @@
         @media (max-width: 900px) {
             header { flex-direction: column; padding: 8px 12px; gap: 6px; align-items: stretch; }
             .navbar { justify-content: space-between; width: 100%; }
+            .logout-nav-btn { width: 42px; height: 42px; flex-basis: 42px; margin-left: 6px; }
             .hamburger-btn { display: flex; }
             .top-nav-bar { display: none; flex-direction: column; width: 100%; align-items: stretch; }
             .top-nav-bar.show-mobile { display: flex; }
@@ -668,7 +696,7 @@
         .footer-clock { font-weight: 600; background: rgba(0, 0, 0, 0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; white-space: nowrap; }
 
         .rujukan-form-container { width: 100%; background: #ffffff; padding: 18px; border-radius: 12px; border: 1px solid #dbe3ea; box-shadow: 0 6px 22px rgba(15,23,42,0.08); margin: 0 auto; max-width: 820px; }
-        .rujukan-form-container .header-form { text-align: center; margin-bottom: 18px; border-bottom: 2px solid #047857; padding-bottom: 12px; }
+        .rujukan-form-container .header-form { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #047857; padding-bottom: 12px; }
         .rujukan-form-container .header-form h2 { margin: 0 0 5px 0; color: #047857; font-size: 18px; font-weight: 800; }
         .rujukan-form-container .header-form h3 { margin: 0; color: #16a085; font-size: 12px; letter-spacing: 0.5px; }
         .rujukan-form-container .info-note { background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; padding: 10px 12px; font-size: 12px; color: #1e40af; border-radius: 7px; margin-bottom: 16px; line-height: 1.45; }
@@ -745,7 +773,78 @@
         .gug-badge-rendah { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
         .gug-badge-tidak { background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
         @media (max-width: 576px) { .gug-card { padding: 15px; } .gug-flex-row { flex-direction: column; gap: 10px; } .gug-table { font-size: 11px; } .gug-table th, .gug-table td { padding: 6px 4px; } }
-    </style>
+    
+/* ================= LOGIN APLIKASI ================= */
+.auth-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background:
+        linear-gradient(135deg, rgba(4,120,87,.94), rgba(15,118,110,.92)),
+        url('WhatsApp Image 2026-08-23 at 19.22.56.jpeg') center/cover no-repeat;
+}
+.auth-card {
+    width: 330px;
+    max-width: min(92vw, 330px);
+    aspect-ratio: 1 / 1;
+    background: rgba(255,255,255,.97);
+    border: 1px solid rgba(255,255,255,.7);
+    border-radius: 0;
+    box-shadow: 0 25px 70px rgba(0,0,0,.25);
+    padding: 22px;
+    animation: authFadeIn .35s ease-out;
+}
+@keyframes authFadeIn {
+    from { opacity: 0; transform: translateY(14px) scale(.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.auth-brand { text-align: center; margin-bottom: 18px; }
+.auth-brand h1 { color: var(--primary); font-size: 1.05rem; font-weight: 800; margin: 0; }
+.auth-brand p { color: var(--text-muted); font-size: .78rem; margin-top: 4px; font-weight: 600; }
+.auth-title { font-size: .95rem; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 16px; }
+.auth-group { margin-bottom: 12px; }
+.auth-group label { display:block; font-size:.78rem; font-weight:700; color:#334155; margin-bottom:6px; }
+.auth-input-wrap { position:relative; }
+.auth-input-wrap i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#64748b; }
+.auth-input {
+    width:100%; padding:11px 12px 11px 38px; border:1px solid #cbd5e1;
+    border-radius:9px; background:#f8fafc; outline:none; font-size:.88rem; color:#0f172a;
+}
+.auth-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(4,120,87,.10); background:#fff; }
+.auth-btn {
+    width:100%; border:none; border-radius:9px; padding:11px 14px; cursor:pointer;
+    font-weight:800; font-size:.88rem; transition:.2s; margin-top:4px;
+}
+.auth-btn-primary { background:var(--primary); color:#fff; }
+.auth-btn-primary:hover { background:var(--primary-hover); }
+.auth-btn-secondary { background:#e2e8f0; color:#334155; }
+.auth-btn-secondary:hover { background:#cbd5e1; }
+.auth-link-row { text-align:center; margin-top:14px; font-size:.76rem; color:#64748b; line-height:1.5; }
+.auth-remember { display:flex; align-items:center; gap:8px; margin:2px 0 8px; font-size:.75rem; font-weight:700; color:#475569; cursor:pointer; user-select:none; }
+.auth-remember input { width:16px; height:16px; accent-color:var(--primary); cursor:pointer; }
+.auth-link { color:var(--primary); font-weight:800; cursor:pointer; text-decoration:underline; }
+.auth-message { min-height:18px; margin:8px 0 2px; font-size:.74rem; font-weight:700; text-align:center; }
+.auth-message.error { color:#dc2626; }
+.auth-message.success { color:#15803d; }
+.auth-inline { display:flex; gap:7px; align-items:stretch; }
+.auth-inline .auth-input-wrap { flex:1; }
+.auth-code-btn { width:auto; min-width:95px; padding:0 10px; border:1px solid var(--primary); border-radius:9px; background:#ecfdf5; color:var(--primary); font-weight:800; cursor:pointer; font-size:.72rem; }
+.auth-code-btn:hover { background:#d1fae5; }
+.auth-code-info { font-size:.68rem; color:#64748b; margin-top:5px; line-height:1.35; }
+.auth-code-preview { display:none; margin-top:6px; padding:7px 9px; border:1px dashed #86efac; background:#f0fdf4; color:#166534; border-radius:7px; font-size:.7rem; font-weight:800; text-align:center; letter-spacing:2px; }
+.auth-note { margin-top:14px; padding:9px 10px; border-radius:8px; background:#ecfdf5; border:1px solid #bbf7d0; color:#166534; font-size:.68rem; line-height:1.45; }
+.auth-register-only { display:none; }
+.auth-footer { text-align:center; margin-top:15px; color:#94a3b8; font-size:.65rem; }
+body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
+@media (max-width:480px) {
+    .auth-card { width: min(92vw, 310px); max-width:310px; padding:18px 16px; }
+}
+
+</style>
 
 <style id="pws-edit-mode-css">
 .pws-edit-input{width:42px;min-width:42px;text-align:center;padding:4px 2px;border:1px solid #cbd5e1;border-radius:5px;background:#f8fafc;font-size:11px;font-weight:600;color:#0f172a}
@@ -771,6 +870,86 @@
 </head>
 <body>
 
+<!-- ================= LAYAR LOGIN AWAL ================= -->
+<div id="authLoginScreen" class="auth-screen">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <h1>UPTD PUSKESMAS LANJUT</h1>
+            <p>Integrasi Layanan Primer</p>
+        </div>
+        <div class="auth-title">Silakan Login</div>
+        <form onsubmit="event.preventDefault(); authLogin();" autocomplete="on">
+            <div class="auth-group">
+                <label for="authUsername">Username</label>
+                <div class="auth-input-wrap">
+                    <i class="fa-solid fa-user"></i>
+                    <input class="auth-input" id="authUsername" type="text" autocomplete="username" placeholder="Masukkan username" required>
+                </div>
+            </div>
+            <div class="auth-group">
+                <label for="authPassword">Password</label>
+                <div class="auth-input-wrap">
+                    <i class="fa-solid fa-lock"></i>
+                    <input class="auth-input" id="authPassword" type="password" autocomplete="current-password" placeholder="Masukkan password" required>
+                </div>
+            </div>
+            <label class="auth-remember">
+                <input type="checkbox" id="authRememberPassword">
+                <span>Ingat Password</span>
+            </label>
+            <div id="authLoginMessage" class="auth-message"></div>
+            <button class="auth-btn auth-btn-primary" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Masuk</button>
+        </form>
+        <div class="auth-link-row">
+            Belum punya akun? <span class="auth-link" onclick="showAuthRegister()">Daftar Akun di sini</span>
+        </div>
+        <div class="auth-note">
+            Akun tersimpan di browser/perangkat ini. Centang <b>Ingat Password</b> agar username dan password otomatis terisi pada kunjungan berikutnya.
+        </div>
+        <div class="auth-footer">Sistem administrasi internal • Akses pengguna</div>
+    </div>
+</div>
+
+<div id="authRegisterScreen" class="auth-screen" style="display:none;">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <h1>UPTD PUSKESMAS LANJUT</h1>
+            <p>Pendaftaran Akun</p>
+        </div>
+        <div class="auth-title">Daftar Akun Baru</div>
+        <form onsubmit="event.preventDefault(); authRegister();" autocomplete="off">
+            <div class="auth-group">
+                <label for="authRegisterUsername">Username Baru</label>
+                <div class="auth-input-wrap">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <input class="auth-input" id="authRegisterUsername" type="text" autocomplete="off" placeholder="Contoh: petugas1" minlength="3" required>
+                </div>
+            </div>
+            <div class="auth-group">
+                <label for="authRegisterPassword">Password</label>
+                <div class="auth-input-wrap">
+                    <i class="fa-solid fa-lock"></i>
+                    <input class="auth-input" id="authRegisterPassword" type="password" autocomplete="new-password" placeholder="Minimal 4 karakter" minlength="4" required>
+                </div>
+            </div>
+            <div class="auth-group">
+                <label for="authRegisterPassword2">Ulangi Password</label>
+                <div class="auth-input-wrap">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <input class="auth-input" id="authRegisterPassword2" type="password" autocomplete="new-password" placeholder="Ulangi password" minlength="4" required>
+                </div>
+            </div>
+            <div id="authRegisterMessage" class="auth-message"></div>
+            <button class="auth-btn auth-btn-primary" type="submit"><i class="fa-solid fa-user-plus"></i> Daftar & Masuk ke Login</button>
+            <button class="auth-btn auth-btn-secondary" type="button" onclick="showAuthLogin()">Kembali ke Login</button>
+        </form>
+        <div class="auth-note">
+            Setelah akun dibuat, Anda akan langsung diarahkan kembali ke Login. Username akan otomatis terisi.
+        </div>
+    </div>
+</div>
+
+
     <!-- Header Atas -->
     <header>
         <div class="navbar" style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
@@ -781,11 +960,16 @@
                     <span class="logo-subtext">Integrasi Layanan Primer</span>
                 </div>
             </a>
-            <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi" aria-expanded="false" type="button">
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                <button id="topLogoutBtn" class="logout-nav-btn" onclick="authLogout()" aria-label="Logout" title="Logout" type="button">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+                <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi" aria-expanded="false" type="button">
                 <span></span>
                 <span></span>
                 <span></span>
-            </button>
+                </button>
+            </div>
         </div>
         <div class="top-nav-bar" id="topNavBar">
             <!-- Pelayanan -->
@@ -862,6 +1046,7 @@
                 <button class="nav-btn-h">Pengaturan</button>
                 <div class="dropdown-content-h">
                     <a onclick="bukaPengaturanPassword()">Ganti Password</a>
+                    <a onclick="authLogout()">Keluar dari Aplikasi</a>
                     <a onclick="checkPasswordAndOpenInfo()">Informasi Sistem</a>
                 </div>
             </div>
@@ -3448,6 +3633,7 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                 muatDataPetugasAmbulance();
             } else if (categoryCode === 'pws') {
                 pwsArea.style.display = 'flex';
+                pwsRefreshCalendarPeriod();
                 renderTable();
             } else {
                 uploadArea.style.display = 'block';
@@ -3947,10 +4133,49 @@ let pwsEditingDesa = null;
 let pwsEditingSnapshot = null;
 let pwsPendingEditDesa = null;
 
+function pwsGetWeekOfMonth(date = new Date()) {
+  // Minggu pelaporan dihitung berdasarkan minggu kalender (Senin-Minggu)
+  // yang memuat tanggal tersebut, sehingga mengikuti tampilan kalender.
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  const firstDayMondayIndex = (firstDay.getDay() + 6) % 7; // Senin=0 ... Minggu=6
+  return Math.min(5, Math.floor((date.getDate() - 1 + firstDayMondayIndex) / 7) + 1);
+}
+
+function pwsSetCurrentPeriodFromCalendar() {
+  const now = new Date();
+  const mingguEl = document.getElementById('filter-minggu');
+  const bulanEl = document.getElementById('filter-bulan');
+  const tahunEl = document.getElementById('filter-tahun');
+  if (!mingguEl || !bulanEl || !tahunEl) return;
+
+  const minggu = pwsGetWeekOfMonth(now);
+  const bulan = now.getMonth() + 1;
+  const tahun = now.getFullYear();
+
+  // Pastikan pilihan tahun mengikuti kalender, termasuk tahun saat ini
+  // bila sebelumnya belum tersedia di dropdown.
+  const yearValues = [...tahunEl.options].map(o => Number(o.value));
+  if (!yearValues.includes(tahun)) {
+    const opt = document.createElement('option');
+    opt.value = String(tahun);
+    opt.textContent = String(tahun);
+    tahunEl.appendChild(opt);
+  }
+
+  mingguEl.value = String(minggu);
+  bulanEl.value = String(bulan);
+  tahunEl.value = String(tahun);
+
+  // Tandai bahwa periode adalah periode kalender aktif.
+  mingguEl.title = `Otomatis: minggu ke-${minggu} berdasarkan kalender`;
+  bulanEl.title = `Otomatis: ${bulanEl.options[bulanEl.selectedIndex]?.text || ''} berdasarkan kalender`;
+  tahunEl.title = `Otomatis: ${tahun} berdasarkan kalender`;
+}
+
 function pwsPeriodKey(){
-  const minggu = document.getElementById('filter-minggu')?.value || '2';
-  const bulan = document.getElementById('filter-bulan')?.value || '9';
-  const tahun = document.getElementById('filter-tahun')?.value || '2026';
+  const minggu = document.getElementById('filter-minggu')?.value || String(pwsGetWeekOfMonth());
+  const bulan = document.getElementById('filter-bulan')?.value || String(new Date().getMonth()+1);
+  const tahun = document.getElementById('filter-tahun')?.value || String(new Date().getFullYear());
   return `${tahun}-${String(bulan).padStart(2,'0')}-M${minggu}`;
 }
 function pwsStorageKey(){ return `pws_dashboard_data_${pwsPeriodKey()}`; }
@@ -4084,8 +4309,14 @@ function pwsAddToolbar(){
   toolbar.innerHTML=`<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2"><div><div class="font-bold text-xs text-gray-800">Mode Edit Data per Desa</div><div class="pws-edit-note">Klik <b>Edit</b> pada desa, masukkan password desa, lalu ubah K/P/S/M. Data tersimpan berdasarkan Minggu, Bulan, dan Tahun yang dipilih.</div></div><div class="pws-edit-toolbar"><button class="pws-toolbar-btn success" onclick="pwsSaveAllUnlocked()">💾 Simpan</button><button class="pws-toolbar-btn secondary" onclick="pwsLockAll()">🔒 Kunci</button></div></div>`;
   area.insertBefore(toolbar,card);
 }
-function pwsInitFilters(){ ['filter-minggu','filter-bulan','filter-tahun'].forEach(id=>{const el=document.getElementById(id); if(el) el.addEventListener('change',()=>{pwsEditingDesa=null;pwsEditingSnapshot=null;pwsRenderTable();});}); pwsAddToolbar(); }
+function pwsInitFilters(){ pwsSetCurrentPeriodFromCalendar(); ['filter-minggu','filter-bulan','filter-tahun'].forEach(id=>{const el=document.getElementById(id); if(el) el.addEventListener('change',()=>{pwsEditingDesa=null;pwsEditingSnapshot=null;pwsRenderTable();});}); pwsAddToolbar(); }
 window.addEventListener('DOMContentLoaded',()=>{ pwsInitFilters(); pwsRenderTable(); });
+
+// Saat modul PWS dibuka kembali, selalu segarkan periode mengikuti kalender hari ini.
+function pwsRefreshCalendarPeriod(){
+  pwsSetCurrentPeriodFromCalendar();
+}
+
 </script>
 
 
@@ -4623,5 +4854,188 @@ window.addEventListener('DOMContentLoaded',()=>{ pwsInitFilters(); pwsRenderTabl
 </script>
 <!-- =============== AKHIR MODUL IKP TERINTEGRASI =============== -->
 
+
+
+<script>
+/* ================= AUTENTIKASI LOGIN APLIKASI ================= */
+(function () {
+    const ACCOUNT_KEY = 'puskesmas_app_accounts_v1';
+    const SESSION_KEY = 'puskesmas_app_session_v1';
+    const REMEMBER_KEY = 'puskesmas_app_remember_v1';
+
+    function readAccounts() {
+        try {
+            const raw = localStorage.getItem(ACCOUNT_KEY);
+            const parsed = raw ? JSON.parse(raw) : [];
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function writeAccounts(accounts) {
+        localStorage.setItem(ACCOUNT_KEY, JSON.stringify(accounts));
+    }
+
+    function normalizeUsername(value) {
+        return String(value || '').trim().toLowerCase();
+    }
+
+    function setAuthMessage(id, text, type) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = text || '';
+        el.className = 'auth-message' + (type ? ' ' + type : '');
+    }
+
+    function loadRememberedCredentials() {
+        const remember = document.getElementById('authRememberPassword');
+        const username = document.getElementById('authUsername');
+        const password = document.getElementById('authPassword');
+        if (!remember || !username || !password) return;
+        try {
+            const saved = JSON.parse(localStorage.getItem(REMEMBER_KEY) || 'null');
+            if (saved && saved.username) {
+                username.value = saved.username;
+                password.value = saved.password || '';
+                remember.checked = true;
+            }
+        } catch (e) {
+            localStorage.removeItem(REMEMBER_KEY);
+        }
+    }
+
+    function saveRememberedCredentials(username, password, shouldRemember) {
+        if (shouldRemember) {
+            localStorage.setItem(REMEMBER_KEY, JSON.stringify({ username, password }));
+        } else {
+            localStorage.removeItem(REMEMBER_KEY);
+        }
+    }
+
+    window.showAuthRegister = function () {
+        document.getElementById('authLoginScreen').style.display = 'none';
+        document.getElementById('authRegisterScreen').style.display = 'flex';
+        setAuthMessage('authRegisterMessage', '', '');
+        setTimeout(() => document.getElementById('authRegisterUsername')?.focus(), 50);
+    };
+
+    window.showAuthLogin = function (message = '', type = '') {
+        document.getElementById('authRegisterScreen').style.display = 'none';
+        document.getElementById('authLoginScreen').style.display = 'flex';
+        setAuthMessage('authLoginMessage', message, type);
+        loadRememberedCredentials();
+        setTimeout(() => document.getElementById('authUsername')?.focus(), 50);
+    };
+
+    window.authRegister = function () {
+        const username = normalizeUsername(document.getElementById('authRegisterUsername').value);
+        const password = document.getElementById('authRegisterPassword').value;
+        const password2 = document.getElementById('authRegisterPassword2').value;
+
+        if (!username || username.length < 3) {
+            setAuthMessage('authRegisterMessage', 'Username minimal 3 karakter.', 'error');
+            return;
+        }
+        if (!/^[a-z0-9._-]+$/.test(username)) {
+            setAuthMessage('authRegisterMessage', 'Username hanya boleh berisi huruf, angka, titik, garis bawah, atau tanda minus.', 'error');
+            return;
+        }
+        if (password.length < 4) {
+            setAuthMessage('authRegisterMessage', 'Password minimal 4 karakter.', 'error');
+            return;
+        }
+        if (password !== password2) {
+            setAuthMessage('authRegisterMessage', 'Ulangi password harus sama.', 'error');
+            return;
+        }
+
+        const accounts = readAccounts();
+        if (accounts.some(a => normalizeUsername(a.username) === username)) {
+            setAuthMessage('authRegisterMessage', 'Username sudah terdaftar. Gunakan username lain.', 'error');
+            return;
+        }
+
+        accounts.push({ username, password, createdAt: new Date().toISOString() });
+        writeAccounts(accounts);
+
+        // Bersihkan form pendaftaran lalu kembali ke Login.
+        document.getElementById('authRegisterUsername').value = '';
+        document.getElementById('authRegisterPassword').value = '';
+        document.getElementById('authRegisterPassword2').value = '';
+
+        document.getElementById('authUsername').value = username;
+        document.getElementById('authPassword').value = '';
+        const remember = document.getElementById('authRememberPassword');
+        if (remember) remember.checked = false;
+
+        showAuthLogin('Akun berhasil dibuat. Silakan login dengan akun baru Anda.', 'success');
+        document.getElementById('authPassword').focus();
+    };
+
+    window.authLogin = function () {
+        const username = normalizeUsername(document.getElementById('authUsername').value);
+        const password = document.getElementById('authPassword').value;
+        const remember = !!document.getElementById('authRememberPassword')?.checked;
+        const accounts = readAccounts();
+        const account = accounts.find(a => normalizeUsername(a.username) === username && a.password === password);
+
+        // Akun awal agar instalasi pertama langsung dapat digunakan.
+        const isDefaultAdmin = username === 'admin' && password === 'admin';
+        if (!account && !isDefaultAdmin) {
+            setAuthMessage('authLoginMessage', 'Username atau password salah.', 'error');
+            return;
+        }
+
+        if (isDefaultAdmin && !accounts.some(a => normalizeUsername(a.username) === 'admin')) {
+            accounts.push({ username: 'admin', password: 'admin', createdAt: new Date().toISOString(), defaultAccount: true });
+            writeAccounts(accounts);
+        }
+
+        saveRememberedCredentials(username, password, remember);
+        sessionStorage.setItem(SESSION_KEY, username);
+        document.getElementById('authLoginScreen').style.display = 'none';
+        document.getElementById('authRegisterScreen').style.display = 'none';
+        document.body.classList.remove('auth-locked');
+
+        // Pastikan setelah login pengguna langsung berada di Beranda.
+        try {
+            if (typeof window.resetToHome === 'function') window.resetToHome();
+        } catch (e) {}
+    };
+
+    window.authLogout = function () {
+        try { if (typeof closeMobileMenu === 'function') closeMobileMenu(); } catch (e) {}
+        sessionStorage.removeItem(SESSION_KEY);
+        document.body.classList.add('auth-locked');
+        const remembered = document.getElementById('authRememberPassword')?.checked;
+        document.getElementById('authPassword').value = remembered ? (document.getElementById('authPassword').value || '') : '';
+        document.getElementById('authLoginMessage').textContent = '';
+        document.getElementById('authLoginMessage').className = 'auth-message';
+        document.getElementById('authLoginScreen').style.display = 'flex';
+        document.getElementById('authRegisterScreen').style.display = 'none';
+        loadRememberedCredentials();
+        setTimeout(() => document.getElementById('authUsername')?.focus(), 50);
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.body.classList.add('auth-locked');
+        loadRememberedCredentials();
+        const activeSession = sessionStorage.getItem(SESSION_KEY);
+        if (activeSession) {
+            document.getElementById('authLoginScreen').style.display = 'none';
+            document.getElementById('authRegisterScreen').style.display = 'none';
+            document.body.classList.remove('auth-locked');
+            try {
+                if (typeof window.resetToHome === 'function') window.resetToHome();
+            } catch (e) {}
+        } else {
+            document.getElementById('authLoginScreen').style.display = 'flex';
+            setTimeout(() => document.getElementById('authUsername')?.focus(), 100);
+        }
+    });
+})();
+
+</script>
 </body>
 </html>
