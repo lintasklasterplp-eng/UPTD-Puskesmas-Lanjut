@@ -122,7 +122,39 @@
             flex: 1;
         }
 
-        .hamburger-btn { display: none; background: transparent; border: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; padding: 4px; }
+        .hamburger-btn {
+            display: none;
+            width: 44px;
+            height: 44px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 8px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+        .hamburger-btn:hover, .hamburger-btn:focus {
+            background: var(--primary);
+            border-color: var(--primary);
+            outline: none;
+        }
+        .hamburger-btn span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: currentColor;
+            border-radius: 2px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        .hamburger-btn:hover span, .hamburger-btn:focus span {
+            background: #ffffff;
+        }
         
         @media (max-width: 900px) {
             header { flex-direction: column; padding: 8px 12px; gap: 6px; align-items: stretch; }
@@ -708,8 +740,11 @@
                     <span class="logo-subtext">Integrasi Layanan Primer</span>
                 </div>
             </a>
-            <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()">
-                </button>
+            <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi" title="Menu" aria-expanded="false" type="button">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
         <div class="top-nav-bar" id="topNavBar">
             <!-- Pelayanan -->
@@ -3086,8 +3121,23 @@
         function triggerUpload() { document.getElementById('dynamicFileInput').click(); }
 
         function toggleMobileMenu() {
-            document.getElementById('topNavBar').classList.toggle('show-mobile');
+            const nav = document.getElementById('topNavBar');
+            const btn = document.getElementById('hamburgerBtn');
+            const isOpen = nav.classList.toggle('show-mobile');
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            btn.setAttribute('aria-label', isOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi');
         }
+
+        document.addEventListener('click', function(e) {
+            const nav = document.getElementById('topNavBar');
+            const btn = document.getElementById('hamburgerBtn');
+            if (!nav || !btn || window.innerWidth > 900) return;
+            if (nav.contains(e.target) && (e.target.matches('a') || e.target.matches('.nav-btn-h') || e.target.matches('.sub-nav-btn'))) {
+                nav.classList.remove('show-mobile');
+                btn.setAttribute('aria-expanded', 'false');
+                btn.setAttribute('aria-label', 'Buka menu navigasi');
+            }
+        });
 
         function updateLiveClock() {
             const now = new Date();
