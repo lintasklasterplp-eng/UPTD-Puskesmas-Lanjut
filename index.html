@@ -838,11 +838,6 @@
 .auth-code-preview { display:none; margin-top:6px; padding:7px 9px; border:1px dashed #86efac; background:#f0fdf4; color:#166534; border-radius:7px; font-size:.7rem; font-weight:800; text-align:center; letter-spacing:2px; }
 .auth-note { margin-top:14px; padding:9px 10px; border-radius:8px; background:#ecfdf5; border:1px solid #bbf7d0; color:#166534; font-size:.68rem; line-height:1.45; }
 .auth-register-only { display:none; }
-.auth-reset-box { margin-top:10px; padding:9px 10px; border:1px solid #fecaca; background:#fff7f7; border-radius:8px; text-align:center; }
-.auth-reset-title { font-size:.72rem; font-weight:800; color:#b91c1c; margin-bottom:3px; }
-.auth-reset-text { font-size:.64rem; line-height:1.35; color:#64748b; margin-bottom:6px; }
-.auth-reset-btn { border:1px solid #dc2626; background:#fff; color:#dc2626; border-radius:7px; padding:6px 10px; font-size:.68rem; font-weight:800; cursor:pointer; }
-.auth-reset-btn:hover { background:#dc2626; color:#fff; }
 .auth-verify-box { margin-top:10px; padding:10px; border:1px solid #bfdbfe; background:#eff6ff; border-radius:8px; }
 .auth-verify-title { font-size:.72rem; font-weight:800; color:#1d4ed8; margin-bottom:4px; }
 .auth-verify-text { font-size:.64rem; line-height:1.4; color:#475569; margin-bottom:7px; }
@@ -911,23 +906,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         <div class="auth-link-row">
             Belum punya akun? <span class="auth-link" onclick="showAuthRegister()">Daftar Akun di sini</span>
         </div>
-        <div class="auth-reset-box">
-            <div class="auth-reset-title"><i class="fa-solid fa-rotate"></i> Reset User</div>
-            <div class="auth-reset-text">Gunakan bila ingin menghapus akun yang tersimpan di browser ini dan membuat user baru.</div>
-            <button id="authResetRequestBtn" type="button" class="auth-reset-btn" onclick="resetStoredUsers()">Reset User</button>
-            <div id="authResetVerifyBox" class="auth-verify-box" style="display:none; margin-top:8px;">
-                <div class="auth-verify-title"><i class="fa-solid fa-envelope-circle-check"></i> Konfirmasi Reset User</div>
-                <div class="auth-verify-text">Kode reset 6 digit telah dikirim ke <b>randrean1988@gmail.com</b>. Masukkan kode dari email untuk melanjutkan reset.</div>
-                <div class="auth-inline">
-                    <div class="auth-input-wrap">
-                        <i class="fa-solid fa-key"></i>
-                        <input class="auth-input" id="authResetCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Kode 6 digit">
-                    </div>
-                    <button type="button" class="auth-code-btn" onclick="verifyResetCode()">Konfirmasi</button>
-                </div>
-                <div class="auth-code-info">Kode berlaku selama 10 menit.</div>
-            </div>
-        </div>
         <div class="auth-note">
             Akun tersimpan di browser/perangkat ini. Centang <b>Ingat Password</b> agar username dan password otomatis terisi pada kunjungan berikutnya.
         </div>
@@ -954,20 +932,20 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 <label for="authRegisterPassword">Password</label>
                 <div class="auth-input-wrap">
                     <i class="fa-solid fa-lock"></i>
-                    <input class="auth-input" id="authRegisterPassword" type="password" autocomplete="new-password" placeholder="Minimal 4 karakter" minlength="4" required>
+                    <input class="auth-input" id="authRegisterPassword" type="password" autocomplete="new-password" placeholder="Min. 4 karakter (huruf + angka)" minlength="4" pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+" title="Password minimal 4 karakter dan harus mengandung huruf serta angka." required>
                 </div>
             </div>
             <div class="auth-group">
                 <label for="authRegisterPassword2">Ulangi Password</label>
                 <div class="auth-input-wrap">
                     <i class="fa-solid fa-shield-halved"></i>
-                    <input class="auth-input" id="authRegisterPassword2" type="password" autocomplete="new-password" placeholder="Ulangi password" minlength="4" required>
+                    <input class="auth-input" id="authRegisterPassword2" type="password" autocomplete="new-password" placeholder="Ulangi password" minlength="4" pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+" title="Password minimal 4 karakter dan harus mengandung huruf serta angka." required>
                 </div>
             </div>
             <div id="authRegisterMessage" class="auth-message"></div>
             <div id="authRegisterVerifyBox" class="auth-verify-box" style="display:none;">
-                <div class="auth-verify-title"><i class="fa-solid fa-envelope-circle-check"></i> Konfirmasi Pembuatan Akun</div>
-                <div class="auth-verify-text">Kode konfirmasi 6 digit telah dikirim ke <b>randrean1988@gmail.com</b>. Masukkan kode dari email untuk mengaktifkan akun.</div>
+                <div class="auth-verify-title"><i class="fa-brands fa-whatsapp"></i> Konfirmasi Pembuatan Akun</div>
+                <div class="auth-verify-text">Permintaan verifikasi akan dibuka melalui WhatsApp admin <b>085264444567</b>. Setelah admin menyetujui dan mengirim kode 6 digit, masukkan kode tersebut untuk mengaktifkan akun.</div>
                 <div class="auth-inline">
                     <div class="auth-input-wrap">
                         <i class="fa-solid fa-key"></i>
@@ -977,11 +955,11 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 </div>
                 <div class="auth-code-info">Kode berlaku selama 10 menit.</div>
             </div>
-            <button id="authRegisterSubmitBtn" class="auth-btn auth-btn-primary" type="submit"><i class="fa-solid fa-user-plus"></i> Daftar & Kirim Kode</button>
+            <button id="authRegisterSubmitBtn" class="auth-btn auth-btn-primary" type="submit"><i class="fa-brands fa-whatsapp"></i> Daftar & Minta Konfirmasi WhatsApp</button>
             <button class="auth-btn auth-btn-secondary" type="button" onclick="showAuthLogin()">Kembali ke Login</button>
         </form>
         <div class="auth-note">
-            Setelah formulir dikirim, akun menunggu konfirmasi kode dari email administrator. Sebelum kode benar, akun belum dapat digunakan untuk login.
+            Password harus minimal 4 karakter dan mengandung huruf serta angka. Setelah formulir dikirim, WhatsApp admin akan dibuka untuk permintaan konfirmasi. Sebelum kode 6 digit benar, akun belum dapat digunakan untuk login.
         </div>
     </div>
 </div>
@@ -4896,29 +4874,23 @@ function pwsRefreshCalendarPeriod(){
 <script>
 /* ================= AUTENTIKASI LOGIN APLIKASI ================= */
 (function () {
-    const ACCOUNT_KEY = 'puskesmas_app_accounts_v1';
+    const ACCOUNT_KEY = 'puskesmas_app_accounts_v2_whatsapp';
     const SESSION_KEY = 'puskesmas_app_session_v1';
     const REMEMBER_KEY = 'puskesmas_app_remember_v1';
-    const APPROVAL_EMAIL = 'randrean1988@gmail.com';
-    const APPROVAL_ENDPOINT = 'https://formsubmit.co/ajax/' + APPROVAL_EMAIL;
+    const APPROVAL_WHATSAPP = '6285264444567';
     const PENDING_REGISTER_KEY = 'puskesmasPendingRegisterApproval_v1';
-    const PENDING_RESET_KEY = 'puskesmasPendingResetApproval_v1';
 
     function generateApprovalCode(){ return String(Math.floor(100000 + Math.random() * 900000)); }
     function savePending(key, payload){ localStorage.setItem(key, JSON.stringify(payload)); }
     function loadPending(key){ try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { return null; } }
     function clearPending(key){ localStorage.removeItem(key); }
-    async function sendApprovalEmail(subject, message){
-        const response = await fetch(APPROVAL_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify({name:'UPTD Puskesmas Lanjut - Sistem Akun', email:APPROVAL_EMAIL, _subject:subject, message}) });
-        let data=null; try{ data=await response.json(); }catch(e){}
-        if(!response.ok || (data && data.success===false)) throw new Error((data && data.message) || 'Pengiriman email gagal.');
-        return data;
+    function openWhatsAppApproval(username, code){
+        const text = `PERMINTAAN KONFIRMASI AKUN UPTD PUSKESMAS LANJUT%0A%0AUsername: ${encodeURIComponent(username)}%0AKode verifikasi internal: ${encodeURIComponent(code)}%0A%0AMohon admin membalas pesan ini untuk menyetujui pembuatan akun. Pengguna akan memasukkan kode 6 digit setelah menerima persetujuan.`;
+        const url = `https://wa.me/${APPROVAL_WHATSAPP}?text=${text}`;
+        window.open(url, '_blank', 'noopener');
     }
-    function emailApprovalWarning(){ return 'Catatan: pada penggunaan pertama, FormSubmit meminta aktivasi alamat penerima melalui email aktivasi. Setelah alamat diaktifkan, permintaan berikutnya akan diteruskan otomatis.'; }
     function showRegisterVerifyBox(){ const box=document.getElementById('authRegisterVerifyBox'); if(box) box.style.display='block'; const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.style.display='none'; setTimeout(()=>document.getElementById('authRegisterCode')?.focus(),60); }
     function hideRegisterVerifyBox(){ const box=document.getElementById('authRegisterVerifyBox'); if(box) box.style.display='none'; const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.style.display='flex'; const code=document.getElementById('authRegisterCode'); if(code) code.value=''; }
-    function hideResetVerifyBox(){ const box=document.getElementById('authResetVerifyBox'); if(box) box.style.display='none'; const code=document.getElementById('authResetCode'); if(code) code.value=''; const btn=document.getElementById('authResetRequestBtn'); if(btn){ btn.style.display='inline-block'; btn.disabled=false; } }
-
 
     function readAccounts() {
         try {
@@ -4985,26 +4957,25 @@ function pwsRefreshCalendarPeriod(){
         setTimeout(() => document.getElementById('authUsername')?.focus(), 50);
     };
 
-    window.authRegister = async function () {
+    window.authRegister = function () {
         const username = normalizeUsername(document.getElementById('authRegisterUsername').value);
         const password = document.getElementById('authRegisterPassword').value;
         const password2 = document.getElementById('authRegisterPassword2').value;
         if (!username || username.length < 3) return setAuthMessage('authRegisterMessage','Username minimal 3 karakter.','error');
         if (!/^[a-z0-9._-]+$/.test(username)) return setAuthMessage('authRegisterMessage','Username hanya boleh berisi huruf, angka, titik, garis bawah, atau tanda minus.','error');
-        if (password.length < 4) return setAuthMessage('authRegisterMessage','Password minimal 4 karakter.','error');
+        if (password.length < 4 || !/^[A-Za-z0-9]+$/.test(password) || !/[A-Za-z]/.test(password) || !/\d/.test(password)) return setAuthMessage('authRegisterMessage','Password minimal 4 karakter dan harus mengandung huruf serta angka.','error');
         if (password !== password2) return setAuthMessage('authRegisterMessage','Ulangi password harus sama.','error');
         const accounts = readAccounts();
         if (accounts.some(a => normalizeUsername(a.username) === username)) return setAuthMessage('authRegisterMessage','Username sudah terdaftar. Gunakan username lain.','error');
         const code=generateApprovalCode();
         savePending(PENDING_REGISTER_KEY,{username,password,code,createdAt:Date.now(),expiresAt:Date.now()+600000});
         const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.disabled=true;
-        setAuthMessage('authRegisterMessage','Mengirim kode konfirmasi ke email administrator...','success');
+        setAuthMessage('authRegisterMessage','WhatsApp admin akan dibuka. Kirim permintaan konfirmasi tersebut, lalu masukkan kode 6 digit setelah admin memberikan persetujuan.','success');
         try{
-            await sendApprovalEmail('[KONFIRMASI AKUN BARU] '+username,`Permintaan pembuatan akun baru UPTD Puskesmas Lanjut.\n\nUsername: ${username}\nKode Konfirmasi: ${code}\nBerlaku: 10 menit\n\nMasukkan kode ini pada layar pendaftaran untuk mengaktifkan akun.\n\n${emailApprovalWarning()}`);
-            setAuthMessage('authRegisterMessage','Kode sudah dikirim ke email administrator. Masukkan kode 6 digit untuk mengaktifkan akun.','success');
+            openWhatsAppApproval(username, code);
             showRegisterVerifyBox();
         }catch(err){
-            clearPending(PENDING_REGISTER_KEY); setAuthMessage('authRegisterMessage','Email belum terkirim. '+(err?.message||'Periksa koneksi internet dan aktivasi email FormSubmit.'),'error');
+            clearPending(PENDING_REGISTER_KEY); setAuthMessage('authRegisterMessage','WhatsApp tidak dapat dibuka. '+(err?.message||'Buka WhatsApp secara manual ke 085264444567.'),'error');
         }finally{ if(btn) btn.disabled=false; }
     };
     window.verifyRegisterCode=function(){
@@ -5017,25 +4988,6 @@ function pwsRefreshCalendarPeriod(){
         document.getElementById('authUsername').value=pending.username; document.getElementById('authPassword').value=''; if(document.getElementById('authRememberPassword')) document.getElementById('authRememberPassword').checked=false;
         document.getElementById('authRegisterUsername').value=''; document.getElementById('authRegisterPassword').value=''; document.getElementById('authRegisterPassword2').value=''; hideRegisterVerifyBox(); showAuthLogin('Akun berhasil dikonfirmasi. Silakan login dengan akun yang baru dibuat.','success'); document.getElementById('authPassword')?.focus();
     };
-    window.resetStoredUsers = async function(){
-        if(!confirm('Reset User akan meminta kode konfirmasi ke email administrator, lalu menghapus akun pengguna yang tersimpan di browser ini. Data PWS, inventaris, laporan, dan data aplikasi lainnya TIDAK dihapus. Lanjutkan?')) return;
-        const code=generateApprovalCode(); savePending(PENDING_RESET_KEY,{code,createdAt:Date.now(),expiresAt:Date.now()+600000});
-        const btn=document.getElementById('authResetRequestBtn'); if(btn) btn.disabled=true; setAuthMessage('authLoginMessage','Mengirim kode reset ke email administrator...','success');
-        try{
-            await sendApprovalEmail('[KONFIRMASI RESET USER] UPTD Puskesmas Lanjut',`Permintaan reset user pada aplikasi UPTD Puskesmas Lanjut.\n\nKode Reset User: ${code}\nBerlaku: 10 menit\n\nMasukkan kode ini pada layar Login untuk mengonfirmasi penghapusan akun pengguna dan membuat akun baru.\n\n${emailApprovalWarning()}`);
-            if(btn) btn.style.display='none'; const box=document.getElementById('authResetVerifyBox'); if(box) box.style.display='block'; setAuthMessage('authLoginMessage','Kode reset sudah dikirim ke email administrator. Masukkan kode 6 digit untuk melanjutkan.','success'); setTimeout(()=>document.getElementById('authResetCode')?.focus(),60);
-        }catch(err){ clearPending(PENDING_RESET_KEY); if(btn) btn.disabled=false; setAuthMessage('authLoginMessage','Email reset belum terkirim. '+(err?.message||'Periksa koneksi internet dan aktivasi email FormSubmit.'),'error'); }
-    };
-    window.verifyResetCode=function(){
-        const pending=loadPending(PENDING_RESET_KEY); const code=String(document.getElementById('authResetCode')?.value||'').trim();
-        if(!pending) return setAuthMessage('authLoginMessage','Tidak ada permintaan reset yang menunggu konfirmasi.','error');
-        if(Date.now()>pending.expiresAt){ clearPending(PENDING_RESET_KEY); hideResetVerifyBox(); return setAuthMessage('authLoginMessage','Kode reset sudah kedaluwarsa. Silakan kirim permintaan reset lagi.','error'); }
-        if(code!==pending.code) return setAuthMessage('authLoginMessage','Kode reset salah.','error');
-        localStorage.removeItem(ACCOUNT_KEY); localStorage.removeItem(REMEMBER_KEY); sessionStorage.removeItem(SESSION_KEY); clearPending(PENDING_RESET_KEY); hideResetVerifyBox();
-        document.getElementById('authUsername').value=''; document.getElementById('authPassword').value=''; if(document.getElementById('authRememberPassword')) document.getElementById('authRememberPassword').checked=false;
-        document.body.classList.add('auth-locked'); setAuthMessage('authLoginMessage','Reset User berhasil dikonfirmasi. Silakan buat akun baru.','success'); setTimeout(()=>showAuthRegister(),350);
-    };
-
     window.authLogin = function () {
         const username = normalizeUsername(document.getElementById('authUsername').value);
         const password = document.getElementById('authPassword').value;
@@ -5043,16 +4995,9 @@ function pwsRefreshCalendarPeriod(){
         const accounts = readAccounts();
         const account = accounts.find(a => normalizeUsername(a.username) === username && a.password === password);
 
-        // Akun awal agar instalasi pertama langsung dapat digunakan.
-        const isDefaultAdmin = username === 'admin' && password === 'admin';
-        if (!account && !isDefaultAdmin) {
-            setAuthMessage('authLoginMessage', 'Username atau password salah.', 'error');
+        if (!account) {
+            setAuthMessage('authLoginMessage', 'Username atau password salah, atau akun belum dikonfirmasi.', 'error');
             return;
-        }
-
-        if (isDefaultAdmin && !accounts.some(a => normalizeUsername(a.username) === 'admin')) {
-            accounts.push({ username: 'admin', password: 'admin', createdAt: new Date().toISOString(), defaultAccount: true });
-            writeAccounts(accounts);
         }
 
         saveRememberedCredentials(username, password, remember);
@@ -5082,6 +5027,13 @@ function pwsRefreshCalendarPeriod(){
     };
 
     document.addEventListener('DOMContentLoaded', function () {
+        // Menghapus akun lama yang tersimpan dari versi sebelumnya. Data modul aplikasi lain tidak disentuh.
+        try {
+            localStorage.removeItem('puskesmas_app_accounts_v1');
+            localStorage.removeItem('puskesmas_app_accounts_v2_whatsapp');
+            localStorage.removeItem('puskesmas_app_remember_v1');
+            sessionStorage.removeItem('puskesmas_app_session_v1');
+        } catch (e) {}
         document.body.classList.add('auth-locked');
         loadRememberedCredentials();
         const activeSession = sessionStorage.getItem(SESSION_KEY);
