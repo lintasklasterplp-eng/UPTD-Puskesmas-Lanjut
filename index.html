@@ -1,3 +1,267 @@
+Today 8:43 PM
+index(1).html
+File
+index_gabungan_ikp_terintegrasi_rapi_rujukan_terbaru(1).html
+File
+masukkan kode index1 kedalam index gabungan pada menu arsip submenu dibuat Rencana Kebutuhan obat (RKO) dengan password "admin"
+index(2).html
+File
+gabungkan kode tersebut kedalam submen rencana kebutuhan obat
+index(3).html
+File
+masukkan kode ke dalam submenu rencana kebutuhan obat dan dapat di operasikan
+index(4).html
+File
+lengkapi tabel obat pada kode tersebut, jika terjadi kendala atau masalah bantu untuk menyesuaikan
+index_gabungan_RKO_tabel_baris_obat_tampil_diperbaiki(1).html
+File
+index(5).html
+File
+munculkan tabel baris obat seperti kode index(5)
+
+Sudah saya ubah ikon hamburger menjadi 3 garis horizontal yang lebih tebal dan jelas untuk tampilan handphone.
+
+Download file dengan ikon hamburger 3 garis
+
+index_gabungan_RKO_localstorage_hamburger_garis3.html
+HTML
+menurut penelusuran anda dari semua kode tersebut agar semua data yang tersimpan bisa disimpan disupabase data docs apa saja yang dibutuhkan
+
+Dari penelusuran file HTML terbaru, tabel docs saat ini belum dirancang untuk menyimpan seluruh data aplikasi. Kode yang berjalan sekarang hanya memakai docs terutama untuk metadata file dan URL file di Storage. Struktur yang terlihat di kode adalah id, menuId, fileName, fileType, fileSize, dan fileUrl.
+
+Sementara itu, banyak data aplikasi lain masih disimpan langsung di localStorage, misalnya KIR, OBHP/BMHP, riwayat Get Up and Go, tautan rujukan, tautan skrining, nomor SBAR, data petugas ambulance, data PWS, dan tracker IKP.
+
+Struktur docs yang saya sarankan
+
+Supaya semua data aplikasi dapat dipindahkan ke Supabase tanpa membuat puluhan tabel, paling praktis adalah menjadikan docs sebagai tabel penyimpanan data umum dengan satu kolom data jsonb.
+
+Strukturnya:
+
+Kolom	Tipe	Fungsi
+id	uuid	ID unik setiap data
+menu_id	text	Identitas modul/menu
+record_key	text	Identitas record unik, misalnya rko_data_all
+data	jsonb	Isi seluruh data form/tabel
+file_name	text	Nama file jika ada
+file_type	text	MIME type file
+file_size	bigint	Ukuran file
+file_path	text	Lokasi file di Storage
+file_url	text	URL file
+created_at	timestamptz	Waktu dibuat
+updated_at	timestamptz	Waktu diperbarui
+
+Dengan desain ini, data RKO tidak perlu membuat kolom satu per satu. Seluruh tabel RKO + Realisasi + konfigurasi tanda tangan + kolom tambahan bisa masuk ke data.
+
+Contoh isi data RKO:
+
+{
+  "version": 1,
+  "extraColumnsCount": 2,
+  "extraColumnNames": [
+    "Keterangan",
+    "Catatan"
+  ],
+  "drugs": [
+    {
+      "nama": "Paracetamol 500 mg Tablet",
+      "satuan": "Tablet",
+      "stokDes": 100,
+      "rataRata": 30,
+      "kebutuhan": 360,
+      "extraRKO": ["", ""],
+      "batch": "",
+      "tglExpired": "",
+      "tglMasuk": "",
+      "jumlahMasuk": 0,
+      "distribusi": 0,
+      "sisaStok": 0,
+      "extraReal": ["", ""]
+    }
+  ],
+  "signature": {
+    "kepala": "",
+    "nip": ""
+  }
+}
+menu_id harus membedakan setiap modul
+
+Karena kode utama sekarang sudah menggunakan konsep:
+
+currentMenuId = categoryCode + "-" + periodIdentifier
+
+misalnya inventaris-kir, inventaris-obhp_bmhp, dan sebagainya, konsep ini sangat cocok dijadikan menu_id.
+
+Saya menyarankan mapping seperti ini:
+
+Modul	menu_id
+RKO	rko-all
+KIR	inventaris-kir
+OBHP/BMHP	inventaris-obhp_bmhp
+Monitoring UPKDK	monitoring-upkdk
+Get Up and Go	skrining-get_up_and_go
+Rujukan Internal	rujukan-internal
+Rujukan Eksternal	rujukan-eksternal
+Rujukan UPKDK	rujukan_upkdk-upkdk
+Ambulance	ambulance-all
+PWS	pws-all
+IKP	ikp-all
+URL Rujukan	url-rujukan
+URL Skrining	url-skrining
+Pengaturan	pengaturan
+Yang perlu diperhatikan untuk file/dokumen
+
+Untuk file seperti PDF, JPG, PNG, dan dokumen lainnya, jangan memasukkan isi file besar langsung ke jsonb.
+
+Kode sekarang memang sudah menggunakan Storage:
+
+supabaseClient.storage
+    .from(STORAGE_BUCKET)
+    .upload(filePath, file)
+
+kemudian metadata file dimasukkan ke docs.
+
+Jadi arsitekturnya sebaiknya:
+
+Supabase Storage / bucket INVENTARIS
+        ↓
+   file sebenarnya
+
+public.docs
+        ↓
+menu_id
+record_key
+data
+file_name
+file_type
+file_size
+file_path
+file_url
+created_at
+updated_at
+
+Artinya Storage menyimpan file, sedangkan docs menyimpan data dan informasi file.
+
+SQL tabel yang saya rekomendasikan
+
+Untuk aplikasi Anda, saya lebih menyarankan struktur ini daripada menambah kolom satu per satu:
+
+create table if not exists public.docs (
+    id uuid primary key default gen_random_uuid(),
+
+    menu_id text not null,
+    record_key text not null,
+
+    data jsonb not null default '{}'::jsonb,
+
+    file_name text,
+    file_type text,
+    file_size bigint,
+    file_path text,
+    file_url text,
+
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+
+    unique (menu_id, record_key)
+);
+
+Lalu buat index:
+
+create index if not exists docs_menu_id_idx
+on public.docs (menu_id);
+
+create index if not exists docs_record_key_idx
+on public.docs (record_key);
+
+create index if not exists docs_menu_record_idx
+on public.docs (menu_id, record_key);
+Hal penting: kode sekarang perlu diubah
+
+Saat ini kode file masih menggunakan nama field camelCase:
+
+{
+    menuId: currentMenuId,
+    fileName: file.name,
+    fileType: file.type,
+    fileSize: file.size,
+    fileUrl: publicUrl
+}
+
+Kalau tabel baru menggunakan menu_id, file_name, dan seterusnya, kode harus disesuaikan. Saya lebih menyarankan snake_case karena lebih aman dan lebih nyaman digunakan di PostgreSQL.
+
+Yang sekarang masih belum tersimpan di docs
+
+Berdasarkan kode terbaru, beberapa penyimpanan lokal yang perlu dipindahkan bila tujuan Anda adalah seluruh data tersentralisasi di Supabase antara lain:
+
+app_system_password
+kir_temp_data
+stokPuskesmasLanjutA4
+riwayatSkriningGUG
+url_rujukan_...
+url_skrining_...
+sbar_counter
+ambulance_petugas_nama
+ambulance_petugas_hp
+ambulance_petugas_foto
+data PWS
+bulanDisimpan
+data RKO
+
+Kode memang masih memanggil localStorage.getItem() untuk item-item tersebut.
+
+Kesimpulan
+
+Untuk aplikasi Anda, saya tidak menyarankan membuat tabel:
+
+rko
+obat
+obhp
+bmhp
+kir
+pws
+ikp
+ambulance
+rujukan
+...
+
+satu per satu terlebih dahulu.
+
+Lebih sederhana:
+
+public.docs
+├── id
+├── menu_id
+├── record_key
+├── data JSONB
+├── file_name
+├── file_type
+├── file_size
+├── file_path
+├── file_url
+├── created_at
+└── updated_at
+
+Dengan demikian RKO, KIR, OBHP/BMHP, PWS, IKP, Ambulance, Rujukan, dan data form lainnya bisa disimpan terstruktur di satu tabel, sedangkan berkas fisik tetap berada di bucket INVENTARIS. Kode saat ini memang sudah memakai bucket INVENTARIS dan docs untuk metadata file.
+
+Ada satu hal lagi yang penting: saat ini RKO sengaja sudah dipindahkan ke Local Storage, sedangkan modul lain masih campuran Local Storage + Supabase. Jadi agar "semua data tersimpan di Supabase" benar-benar tercapai, bukan hanya tabel docs yang perlu dibuat—fungsi Simpan/Muat setiap modul harus diarahkan ke docs.data.
+
+Saya dapat menyusun struktur tabel docs final + SQL RLS + format JSON untuk setiap modul + perubahan kode HTML agar semua tombol Simpan/Muat menggunakan Supabase.
+
+index(6).html
+File
+buatkan ikon menu Hamburger untuk versi handphone yang elegan
+
+Sudah saya buat ikon hamburger 3 garis yang lebih elegan untuk versi handphone:
+
+Bentuk tombol rounded dengan efek glass ringan.
+Tiga garis horizontal yang rapi dan proporsional.
+Ada animasi halus saat menu dibuka, berubah menjadi bentuk X.
+Ada efek sentuh/hover yang lembut.
+Tetap tersembunyi pada desktop dan hanya muncul pada layar ≤900px.
+Tidak mengubah fungsi menu yang sudah ada pada file Anda.
+
+Download file dengan Hamburger Elegan 
+
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -122,44 +386,70 @@
             flex: 1;
         }
 
+        /* Hamburger mobile elegan */
         .hamburger-btn {
             display: none;
-            width: 44px;
-            height: 44px;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            width: 46px;
+            height: 46px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(4, 120, 87, 0.18);
+            border-radius: 14px;
             color: var(--primary);
             cursor: pointer;
-            padding: 8px;
+            padding: 0;
             align-items: center;
             justify-content: center;
             flex-direction: column;
             gap: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
             flex-shrink: 0;
+            transition: transform .2s ease, box-shadow .2s ease,
+                        background-color .2s ease, border-color .2s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
-        .hamburger-btn:hover, .hamburger-btn:focus {
+
+        .hamburger-btn:hover,
+        .hamburger-btn:focus-visible {
             background: var(--primary);
             border-color: var(--primary);
+            color: #ffffff;
             outline: none;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(4, 120, 87, 0.22);
         }
+
+        .hamburger-btn:active {
+            transform: scale(.96);
+        }
+
         .hamburger-btn span {
             display: block;
-            width: 24px;
-            height: 3px;
+            width: 22px;
+            height: 2.5px;
             background: currentColor;
-            border-radius: 2px;
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            border-radius: 999px;
+            transition: transform .25s ease, opacity .2s ease, width .25s ease;
+            transform-origin: center;
         }
-        .hamburger-btn:hover span, .hamburger-btn:focus span {
-            background: #ffffff;
+
+        .hamburger-btn.is-open span:nth-child(1) {
+            transform: translateY(7.5px) rotate(45deg);
+        }
+
+        .hamburger-btn.is-open span:nth-child(2) {
+            opacity: 0;
+            width: 10px;
+        }
+
+        .hamburger-btn.is-open span:nth-child(3) {
+            transform: translateY(-7.5px) rotate(-45deg);
         }
         
         @media (max-width: 900px) {
             header { flex-direction: column; padding: 8px 12px; gap: 6px; align-items: stretch; }
             .navbar { justify-content: space-between; width: 100%; }
-            .hamburger-btn { display: block; }
+            .hamburger-btn { display: flex; }
             .top-nav-bar { display: none; flex-direction: column; width: 100%; align-items: stretch; }
             .top-nav-bar.show-mobile { display: flex; }
             .nav-item, .nav-btn-h { width: 100%; text-align: left; justify-content: space-between; }
@@ -704,6 +994,31 @@
         .gug-badge-rendah { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
         .gug-badge-tidak { background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
         @media (max-width: 576px) { .gug-card { padding: 15px; } .gug-flex-row { flex-direction: column; gap: 10px; } .gug-table { font-size: 11px; } .gug-table th, .gug-table td { padding: 6px 4px; } }
+    
+        @media (max-width: 900px) {
+            .navbar {
+                min-height: 50px;
+            }
+            .logo-container {
+                min-width: 0;
+                padding-right: 8px;
+            }
+            .logo-text {
+                font-size: 1rem;
+            }
+            .logo-subtext {
+                font-size: 0.62rem;
+            }
+            .top-nav-bar.show-mobile {
+                animation: mobileMenuIn .22s ease-out;
+                transform-origin: top right;
+            }
+            @keyframes mobileMenuIn {
+                from { opacity: 0; transform: translateY(-6px) scale(.985); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+        }
+
     </style>
 
 <style id="pws-edit-mode-css">
@@ -3126,6 +3441,10 @@
             const isOpen = nav.classList.toggle('show-mobile');
             btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
             btn.setAttribute('aria-label', isOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const isOpen = nav.classList.contains('show-mobile');
+            hamburgerBtn.classList.toggle('is-open', isOpen);
+        
         }
 
         document.addEventListener('click', function(e) {
@@ -4520,3 +4839,5 @@ window.addEventListener('DOMContentLoaded',()=>{ pwsInitFilters(); pwsRenderTabl
 
 </body>
 </html>
+index_6_hamburger_elegan.html
+HTML
