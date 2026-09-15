@@ -156,33 +156,6 @@
             background: #ffffff;
         }
 
-        /* Tombol Logout di header */
-        .logout-nav-btn {
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 36px;
-            margin-left: 6px;
-            border: 1px solid #fecaca;
-            border-radius: 8px;
-            background: #fff;
-            color: #dc2626;
-            cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,.08);
-            transition: all .2s ease;
-            font-size: 14px;
-        }
-        .logout-nav-btn:hover, .logout-nav-btn:focus {
-            background: #dc2626;
-            color: #fff;
-            border-color: #dc2626;
-            outline: none;
-            transform: translateY(-1px);
-        }
-        .logout-nav-btn:active { transform: translateY(0); }
-
         /* Animasi hamburger menjadi X saat menu HP terbuka */
         .hamburger-btn.active span:nth-child(1) {
             transform: translateY(7px) rotate(45deg);
@@ -197,7 +170,6 @@
         @media (max-width: 900px) {
             header { flex-direction: column; padding: 8px 12px; gap: 6px; align-items: stretch; }
             .navbar { justify-content: space-between; width: 100%; }
-            .logout-nav-btn { width: 34px; height: 34px; flex-basis: 34px; margin-left: 5px; font-size: 13px; }
             .hamburger-btn { display: flex; width: 34px; height: 34px; }
             .top-nav-bar { display: none; flex-direction: column; width: 100%; align-items: stretch; }
             .top-nav-bar.show-mobile { display: flex; }
@@ -774,79 +746,6 @@
         .gug-badge-tidak { background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
         @media (max-width: 576px) { .gug-card { padding: 15px; } .gug-flex-row { flex-direction: column; gap: 10px; } .gug-table { font-size: 11px; } .gug-table th, .gug-table td { padding: 6px 4px; } }
     
-/* ================= LOGIN APLIKASI ================= */
-.auth-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 18px;
-    background:
-        linear-gradient(135deg, rgba(4,120,87,.94), rgba(15,118,110,.92)),
-        url('WhatsApp Image 2026-08-23 at 19.22.56.jpeg') center/cover no-repeat;
-}
-.auth-card {
-    width: 330px;
-    max-width: min(92vw, 330px);
-    aspect-ratio: 1 / 1;
-    background: rgba(255,255,255,.97);
-    border: 1px solid rgba(255,255,255,.7);
-    border-radius: 0;
-    box-shadow: 0 25px 70px rgba(0,0,0,.25);
-    padding: 22px;
-    animation: authFadeIn .35s ease-out;
-}
-@keyframes authFadeIn {
-    from { opacity: 0; transform: translateY(14px) scale(.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-.auth-brand { text-align: center; margin-bottom: 18px; }
-.auth-brand h1 { color: var(--primary); font-size: 1.05rem; font-weight: 800; margin: 0; }
-.auth-brand p { color: var(--text-muted); font-size: .78rem; margin-top: 4px; font-weight: 600; }
-.auth-title { font-size: .95rem; font-weight: 800; color: #0f172a; text-align: center; margin-bottom: 16px; }
-.auth-group { margin-bottom: 12px; }
-.auth-group label { display:block; font-size:.78rem; font-weight:700; color:#334155; margin-bottom:6px; }
-.auth-input-wrap { position:relative; }
-.auth-input-wrap i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#64748b; }
-.auth-input {
-    width:100%; padding:11px 12px 11px 38px; border:1px solid #cbd5e1;
-    border-radius:9px; background:#f8fafc; outline:none; font-size:.88rem; color:#0f172a;
-}
-.auth-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(4,120,87,.10); background:#fff; }
-.auth-btn {
-    width:100%; border:none; border-radius:9px; padding:11px 14px; cursor:pointer;
-    font-weight:800; font-size:.88rem; transition:.2s; margin-top:4px;
-}
-.auth-btn-primary { background:var(--primary); color:#fff; }
-.auth-btn-primary:hover { background:var(--primary-hover); }
-.auth-btn-secondary { background:#e2e8f0; color:#334155; }
-.auth-btn-secondary:hover { background:#cbd5e1; }
-.auth-link-row { text-align:center; margin-top:14px; font-size:.76rem; color:#64748b; line-height:1.5; }
-.auth-remember { display:flex; align-items:center; gap:8px; margin:2px 0 8px; font-size:.75rem; font-weight:700; color:#475569; cursor:pointer; user-select:none; }
-.auth-remember input { width:16px; height:16px; accent-color:var(--primary); cursor:pointer; }
-.auth-link { color:var(--primary); font-weight:800; cursor:pointer; text-decoration:underline; }
-.auth-message { min-height:18px; margin:8px 0 2px; font-size:.74rem; font-weight:700; text-align:center; }
-.auth-message.error { color:#dc2626; }
-.auth-message.success { color:#15803d; }
-.auth-inline { display:flex; gap:7px; align-items:stretch; }
-.auth-inline .auth-input-wrap { flex:1; }
-.auth-code-btn { width:auto; min-width:95px; padding:0 10px; border:1px solid var(--primary); border-radius:9px; background:#ecfdf5; color:var(--primary); font-weight:800; cursor:pointer; font-size:.72rem; }
-.auth-code-btn:hover { background:#d1fae5; }
-.auth-code-info { font-size:.68rem; color:#64748b; margin-top:5px; line-height:1.35; }
-.auth-code-preview { display:none; margin-top:6px; padding:7px 9px; border:1px dashed #86efac; background:#f0fdf4; color:#166534; border-radius:7px; font-size:.7rem; font-weight:800; text-align:center; letter-spacing:2px; }
-.auth-note { margin-top:14px; padding:9px 10px; border-radius:8px; background:#ecfdf5; border:1px solid #bbf7d0; color:#166534; font-size:.68rem; line-height:1.45; }
-.auth-register-only { display:none; }
-.auth-verify-box { margin-top:10px; padding:10px; border:1px solid #bfdbfe; background:#eff6ff; border-radius:8px; }
-.auth-verify-title { font-size:.72rem; font-weight:800; color:#1d4ed8; margin-bottom:4px; }
-.auth-verify-text { font-size:.64rem; line-height:1.4; color:#475569; margin-bottom:7px; }
-.auth-footer { text-align:center; margin-top:15px; color:#94a3b8; font-size:.65rem; }
-body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
-@media (max-width:480px) {
-    .auth-card { width: min(92vw, 310px); max-width:310px; padding:18px 16px; }
-}
-
 </style>
 
 <style id="pws-edit-mode-css">
@@ -873,97 +772,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 </head>
 <body>
 
-<!-- ================= LAYAR LOGIN AWAL ================= -->
-<div id="authLoginScreen" class="auth-screen">
-    <div class="auth-card">
-        <div class="auth-brand">
-            <h1>UPTD PUSKESMAS LANJUT</h1>
-            <p>Integrasi Layanan Primer</p>
-        </div>
-        <div class="auth-title">Silakan Login</div>
-        <form onsubmit="event.preventDefault(); authLogin();" autocomplete="off" data-lpignore="true" data-1p-ignore="true">
-            <div class="auth-group">
-                <label for="authUsername">Username</label>
-                <div class="auth-input-wrap">
-                    <i class="fa-solid fa-user"></i>
-                    <input class="auth-input" id="authUsername" type="text" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" placeholder="Masukkan username" required>
-                </div>
-            </div>
-            <div class="auth-group">
-                <label for="authPassword">Password</label>
-                <div class="auth-input-wrap">
-                    <i class="fa-solid fa-lock"></i>
-                    <input class="auth-input" id="authPassword" type="password" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" placeholder="Masukkan password" required>
-                </div>
-            </div>
-            <label class="auth-remember">
-                <input type="checkbox" id="authRememberPassword">
-                <span>Ingat Password</span>
-            </label>
-            <div id="authLoginMessage" class="auth-message"></div>
-            <button class="auth-btn auth-btn-primary" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Masuk</button>
-        </form>
-        <div class="auth-link-row">
-            Belum punya akun? <span class="auth-link" onclick="showAuthRegister()">Daftar Akun di sini</span>
-        </div>
-        <div class="auth-note">
-            Akun tersimpan di browser/perangkat ini. Centang <b>Ingat Password</b> agar username dan password otomatis terisi pada kunjungan berikutnya.
-        </div>
-        <div class="auth-footer">Sistem administrasi internal • Akses pengguna</div>
-    </div>
-</div>
-
-<div id="authRegisterScreen" class="auth-screen" style="display:none;">
-    <div class="auth-card">
-        <div class="auth-brand">
-            <h1>UPTD PUSKESMAS LANJUT</h1>
-            <p>Pendaftaran Akun</p>
-        </div>
-        <div class="auth-title">Daftar Akun Baru</div>
-        <form onsubmit="event.preventDefault(); authRegister();" autocomplete="off">
-            <div class="auth-group">
-                <label for="authRegisterUsername">Username Baru</label>
-                <div class="auth-input-wrap">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <input class="auth-input" id="authRegisterUsername" type="text" autocomplete="off" placeholder="Contoh: petugas1" minlength="3" required>
-                </div>
-            </div>
-            <div class="auth-group">
-                <label for="authRegisterPassword">Password</label>
-                <div class="auth-input-wrap">
-                    <i class="fa-solid fa-lock"></i>
-                    <input class="auth-input" id="authRegisterPassword" type="password" autocomplete="new-password" placeholder="Min. 4 karakter (huruf + angka)" minlength="4" pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+" title="Password minimal 4 karakter dan harus mengandung huruf serta angka." required>
-                </div>
-            </div>
-            <div class="auth-group">
-                <label for="authRegisterPassword2">Ulangi Password</label>
-                <div class="auth-input-wrap">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <input class="auth-input" id="authRegisterPassword2" type="password" autocomplete="new-password" placeholder="Ulangi password" minlength="4" pattern="(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+" title="Password minimal 4 karakter dan harus mengandung huruf serta angka." required>
-                </div>
-            </div>
-            <div id="authRegisterMessage" class="auth-message"></div>
-            <div id="authRegisterVerifyBox" class="auth-verify-box" style="display:none;">
-                <div class="auth-verify-title"><i class="fa-brands fa-whatsapp"></i> Konfirmasi Pembuatan Akun</div>
-                <div class="auth-verify-text">Permintaan sudah dikirim ke WhatsApp admin <b>085264444567</b>. Kode 6 digit <b>tidak ditampilkan di perangkat pengguna</b> dan tidak ikut dikirim pada pesan permintaan. Admin cukup membalas WhatsApp dengan kode 6 digit, lalu masukkan kode tersebut di sini untuk mengaktifkan akun.</div>
-                <div class="auth-inline">
-                    <div class="auth-input-wrap">
-                        <i class="fa-solid fa-key"></i>
-                        <input class="auth-input" id="authRegisterCode" type="text" inputmode="numeric" maxlength="6" autocomplete="off" data-lpignore="true" data-1p-ignore="true" placeholder="Kode 6 digit">
-                    </div>
-                    <button type="button" class="auth-code-btn" onclick="verifyRegisterCode()">Konfirmasi</button>
-                </div>
-                <div class="auth-code-info">Kode admin berlaku maksimal 10 menit dan hanya untuk permintaan pendaftaran yang sedang aktif.</div>
-            </div>
-            <button id="authRegisterSubmitBtn" class="auth-btn auth-btn-primary" type="submit"><i class="fa-brands fa-whatsapp"></i> Daftar & Minta Konfirmasi WhatsApp</button>
-            <button class="auth-btn auth-btn-secondary" type="button" onclick="showAuthLogin()">Kembali ke Login</button>
-        </form>
-        <div class="auth-note">
-            Password harus minimal 4 karakter dan mengandung huruf serta angka. Username dan password akun disimpan di localStorage perangkat ini setelah konfirmasi admin berhasil. Browser Password Manager tidak dijadikan tempat penyimpanan utama.
-        </div>
-    </div>
-</div>
-
 
     <!-- Header Atas -->
     <header>
@@ -976,9 +784,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 </div>
             </a>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
-                <button id="topLogoutBtn" class="logout-nav-btn" onclick="authLogout()" aria-label="Logout" title="Logout" type="button">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </button>
                 <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleMobileMenu()" aria-label="Buka menu navigasi" aria-expanded="false" type="button">
                 <span></span>
                 <span></span>
@@ -1061,7 +866,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 <button class="nav-btn-h">Pengaturan</button>
                 <div class="dropdown-content-h">
                     <a onclick="bukaPengaturanPassword()">Ganti Password</a>
-                    <a onclick="authLogout()">Keluar dari Aplikasi</a>
                     <a onclick="checkPasswordAndOpenInfo()">Informasi Sistem</a>
                 </div>
             </div>
@@ -2175,7 +1979,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                     </div>
                 </div>
             </div>
-
 
 
                     <!-- DISPLAY AREA RKO -->
@@ -4136,8 +3939,6 @@ const PWS_DESA_PASSWORDS = {
   'Berindat':'PWS-BERINDAT-2026',
   'Persing':'PWS-PERSING-2026',
   'Sedamai':'PWS-SEDAMAI-2026',
-  'Neraca':'PWS-NERACA-2026',
-  'Air Merah':'PWS-AIRMERAH-2026',
   'Lanjut':'PWS-LANJUT-2026',
   'Kote':'PWS-KOTE-2026',
   'Pelakak':'PWS-PELAKAK-2026'
@@ -4204,6 +4005,8 @@ function pwsLoadData(){
   try{
     const raw = localStorage.getItem(pwsStorageKey());
     const parsed = raw ? JSON.parse(raw) : {};
+    delete parsed['Neraca'];
+    delete parsed['Air Merah'];
     PWS_DESA_LIST.forEach(desa => {
       if(!parsed[desa]) parsed[desa] = pwsBlankVillage();
       PWS_DISEASES.forEach(d => {
@@ -4214,7 +4017,7 @@ function pwsLoadData(){
     return parsed;
   }catch(e){ console.warn('PWS data rusak, membuat data baru.', e); return Object.fromEntries(PWS_DESA_LIST.map(d=>[d,pwsBlankVillage()])); }
 }
-function pwsSaveData(data){ localStorage.setItem(pwsStorageKey(), JSON.stringify(data)); }
+function pwsSaveData(data){ delete data['Neraca']; delete data['Air Merah']; localStorage.setItem(pwsStorageKey(), JSON.stringify(data)); }
 function pwsEscape(value){ return String(value ?? '').replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
 function pwsTotalVillage(village){
   return PWS_DISEASES.reduce((sum,d)=>sum + PWS_STATUSES.reduce((s,st)=>s+(Number(village?.[d.key]?.[st])||0),0),0);
@@ -4658,7 +4461,6 @@ function pwsRefreshCalendarPeriod(){
 </div>
 
 
-
   </div>
 </div>
 <script>
@@ -4854,7 +4656,6 @@ function pwsRefreshCalendarPeriod(){
     }
 
 
-
         // Membuka modul IKP yang telah diintegrasikan ke index.html
         function bukaModulIKP() {
             document.getElementById('topNavBar').classList.remove('show-mobile');
@@ -4870,207 +4671,5 @@ function pwsRefreshCalendarPeriod(){
 <!-- =============== AKHIR MODUL IKP TERINTEGRASI =============== -->
 
 
-
-<script>
-/* ================= AUTENTIKASI LOGIN APLIKASI ================= */
-(function () {
-    const ACCOUNT_KEY = 'puskesmas_app_accounts_v2_whatsapp';
-    const SESSION_KEY = 'puskesmas_app_session_v1';
-    const REMEMBER_KEY = 'puskesmas_app_remember_v1';
-    const APPROVAL_WHATSAPP = '6285264444567';
-    const PENDING_REGISTER_KEY = 'puskesmasPendingRegisterApproval_v1';
-
-    function generateRequestId(){
-        const bytes = new Uint8Array(5);
-        try { crypto.getRandomValues(bytes); } catch(e) { for(let i=0;i<bytes.length;i++) bytes[i]=Math.floor(Math.random()*256); }
-        return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
-    }
-    function savePending(key, payload){ localStorage.setItem(key, JSON.stringify(payload)); }
-    function loadPending(key){ try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { return null; } }
-    function clearPending(key){ localStorage.removeItem(key); }
-    function openWhatsAppApproval(username, requestId){
-        const text = `PERMINTAAN KONFIRMASI AKUN UPTD PUSKESMAS LANJUT%0A%0AUsername: ${encodeURIComponent(username)}%0AID Permintaan: ${encodeURIComponent(requestId)}%0A%0AMohon admin membalas pesan ini dengan kode KONFIRMASI 6 DIGIT. Jangan kirim password pengguna lewat WhatsApp. Setelah kode dikirim oleh admin, pengguna akan memasukkannya pada halaman ini.`;
-        const url = `https://wa.me/${APPROVAL_WHATSAPP}?text=${text}`;
-        window.open(url, '_blank', 'noopener');
-    }
-    function showRegisterVerifyBox(){ const box=document.getElementById('authRegisterVerifyBox'); if(box) box.style.display='block'; const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.style.display='none'; setTimeout(()=>document.getElementById('authRegisterCode')?.focus(),60); }
-    function hideRegisterVerifyBox(){ const box=document.getElementById('authRegisterVerifyBox'); if(box) box.style.display='none'; const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.style.display='flex'; const code=document.getElementById('authRegisterCode'); if(code) code.value=''; }
-
-    function readAccounts() {
-        try {
-            const raw = localStorage.getItem(ACCOUNT_KEY);
-            const parsed = raw ? JSON.parse(raw) : [];
-            return Array.isArray(parsed) ? parsed : [];
-        } catch (e) {
-            return [];
-        }
-    }
-
-    function writeAccounts(accounts) {
-        localStorage.setItem(ACCOUNT_KEY, JSON.stringify(accounts));
-    }
-
-    function normalizeUsername(value) {
-        return String(value || '').trim().toLowerCase();
-    }
-
-    function setAuthMessage(id, text, type) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = text || '';
-        el.className = 'auth-message' + (type ? ' ' + type : '');
-    }
-
-    function loadRememberedCredentials() {
-        const remember = document.getElementById('authRememberPassword');
-        const username = document.getElementById('authUsername');
-        const password = document.getElementById('authPassword');
-        if (!remember || !username || !password) return;
-        try {
-            const saved = JSON.parse(localStorage.getItem(REMEMBER_KEY) || 'null');
-            if (saved && saved.username) {
-                username.value = saved.username;
-                password.value = saved.password || '';
-                remember.checked = true;
-            }
-        } catch (e) {
-            localStorage.removeItem(REMEMBER_KEY);
-        }
-    }
-
-    function saveRememberedCredentials(username, password, shouldRemember) {
-        // Akun utama selalu tersimpan pada ACCOUNT_KEY. REMEMBER_KEY hanya untuk mengisi otomatis form login.
-        if (shouldRemember) localStorage.setItem(REMEMBER_KEY, JSON.stringify({ username, password }));
-        else localStorage.removeItem(REMEMBER_KEY);
-    }
-
-    window.showAuthRegister = function () {
-        document.getElementById('authLoginScreen').style.display = 'none';
-        document.getElementById('authRegisterScreen').style.display = 'flex';
-        setAuthMessage('authRegisterMessage', '', '');
-        setTimeout(() => document.getElementById('authRegisterUsername')?.focus(), 50);
-    };
-
-    window.showAuthLogin = function (message = '', type = '') {
-        document.getElementById('authRegisterScreen').style.display = 'none';
-        document.getElementById('authLoginScreen').style.display = 'flex';
-        setAuthMessage('authLoginMessage', message, type);
-        loadRememberedCredentials();
-        setTimeout(() => document.getElementById('authUsername')?.focus(), 50);
-    };
-
-    window.authRegister = function () {
-        const username = normalizeUsername(document.getElementById('authRegisterUsername').value);
-        const password = document.getElementById('authRegisterPassword').value;
-        const password2 = document.getElementById('authRegisterPassword2').value;
-        if (!username || username.length < 3) return setAuthMessage('authRegisterMessage','Username minimal 3 karakter.','error');
-        if (!/^[a-z0-9._-]+$/.test(username)) return setAuthMessage('authRegisterMessage','Username hanya boleh berisi huruf, angka, titik, garis bawah, atau tanda minus.','error');
-        if (password.length < 4 || !/^[A-Za-z0-9]+$/.test(password) || !/[A-Za-z]/.test(password) || !/\d/.test(password)) return setAuthMessage('authRegisterMessage','Password minimal 4 karakter dan harus mengandung huruf serta angka.','error');
-        if (password !== password2) return setAuthMessage('authRegisterMessage','Ulangi password harus sama.','error');
-        const accounts = readAccounts();
-        if (accounts.some(a => normalizeUsername(a.username) === username)) return setAuthMessage('authRegisterMessage','Username sudah terdaftar. Gunakan username lain.','error');
-        const requestId=generateRequestId();
-        const createdAt=Date.now();
-        savePending(PENDING_REGISTER_KEY,{username,password,requestId,createdAt,expiresAt:createdAt+600000});
-        const btn=document.getElementById('authRegisterSubmitBtn'); if(btn) btn.disabled=true;
-        setAuthMessage('authRegisterMessage',`Permintaan #${requestId} siap dikirim. Kode 6 digit hanya berasal dari admin melalui balasan WhatsApp dan tidak ditampilkan pada permintaan ini.`,'success');
-        try{
-            openWhatsAppApproval(username, requestId);
-            showRegisterVerifyBox();
-        }catch(err){
-            clearPending(PENDING_REGISTER_KEY); setAuthMessage('authRegisterMessage','WhatsApp tidak dapat dibuka. '+(err?.message||'Buka WhatsApp secara manual ke 085264444567.'),'error');
-        }finally{ if(btn) btn.disabled=false; }
-    };
-    window.verifyRegisterCode=function(){
-        const pending=loadPending(PENDING_REGISTER_KEY);
-        const code=String(document.getElementById('authRegisterCode')?.value||'').replace(/\D/g,'').slice(0,6);
-        if(!pending) return setAuthMessage('authRegisterMessage','Tidak ada permintaan pendaftaran yang menunggu konfirmasi.','error');
-        if(Date.now()>pending.expiresAt){ clearPending(PENDING_REGISTER_KEY); hideRegisterVerifyBox(); return setAuthMessage('authRegisterMessage','Permintaan sudah kedaluwarsa. Silakan kirim permintaan pendaftaran lagi.','error'); }
-        if(!/^\d{6}$/.test(code)) return setAuthMessage('authRegisterMessage','Masukkan tepat 6 digit kode yang dikirim admin melalui WhatsApp.','error');
-        const accounts=readAccounts();
-        if(accounts.some(a=>normalizeUsername(a.username)===pending.username)){ clearPending(PENDING_REGISTER_KEY); hideRegisterVerifyBox(); return setAuthMessage('authRegisterMessage','Username sudah terdaftar. Silakan gunakan username lain.','error'); }
-        accounts.push({username:pending.username,password:pending.password,createdAt:new Date().toISOString(),approvalConfirmed:true,approvalRequestId:pending.requestId,approvalCodeLast4:code.slice(-4)});
-        writeAccounts(accounts);
-        localStorage.setItem(REMEMBER_KEY, JSON.stringify({username:pending.username,password:pending.password}));
-        clearPending(PENDING_REGISTER_KEY);
-        document.getElementById('authUsername').value=pending.username;
-        document.getElementById('authPassword').value=pending.password;
-        if(document.getElementById('authRememberPassword')) document.getElementById('authRememberPassword').checked=true;
-        document.getElementById('authRegisterUsername').value='';
-        document.getElementById('authRegisterPassword').value='';
-        document.getElementById('authRegisterPassword2').value='';
-        hideRegisterVerifyBox();
-        showAuthLogin('Akun berhasil dikonfirmasi admin. Username dan password sudah disimpan di localStorage perangkat ini.','success');
-    };
-    window.authLogin = function () {
-        const username = normalizeUsername(document.getElementById('authUsername').value);
-        const password = document.getElementById('authPassword').value;
-        const remember = !!document.getElementById('authRememberPassword')?.checked;
-        const accounts = readAccounts();
-        const account = accounts.find(a => normalizeUsername(a.username) === username && a.password === password);
-
-        if (!account) {
-            setAuthMessage('authLoginMessage', 'Username atau password salah, atau akun belum dikonfirmasi.', 'error');
-            return;
-        }
-
-        saveRememberedCredentials(username, password, remember);
-        sessionStorage.setItem(SESSION_KEY, username);
-        document.getElementById('authLoginScreen').style.display = 'none';
-        document.getElementById('authRegisterScreen').style.display = 'none';
-        document.body.classList.remove('auth-locked');
-
-        // Pastikan setelah login pengguna langsung berada di Beranda.
-        try {
-            if (typeof window.resetToHome === 'function') window.resetToHome();
-        } catch (e) {}
-    };
-
-    window.authLogout = function () {
-        try { if (typeof closeMobileMenu === 'function') closeMobileMenu(); } catch (e) {}
-        sessionStorage.removeItem(SESSION_KEY);
-        document.body.classList.add('auth-locked');
-        const remembered = document.getElementById('authRememberPassword')?.checked;
-        document.getElementById('authPassword').value = remembered ? (document.getElementById('authPassword').value || '') : '';
-        document.getElementById('authLoginMessage').textContent = '';
-        document.getElementById('authLoginMessage').className = 'auth-message';
-        document.getElementById('authLoginScreen').style.display = 'flex';
-        document.getElementById('authRegisterScreen').style.display = 'none';
-        loadRememberedCredentials();
-        setTimeout(() => document.getElementById('authUsername')?.focus(), 50);
-    };
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // RESET DATA AKUN PENGGUNA - dijalankan satu kali pada file versi reset ini.
-        // Hanya data autentikasi akun yang dihapus; data modul/aplikasi lain tidak disentuh.
-        try {
-            const ACCOUNT_RESET_FLAG = 'puskesmas_app_accounts_reset_20260916_v1';
-            if (localStorage.getItem(ACCOUNT_RESET_FLAG) !== '1') {
-                localStorage.removeItem(ACCOUNT_KEY);
-                localStorage.removeItem(REMEMBER_KEY);
-                localStorage.removeItem(PENDING_REGISTER_KEY);
-                sessionStorage.removeItem(SESSION_KEY);
-                localStorage.removeItem('puskesmas_app_accounts_v1');
-                localStorage.setItem(ACCOUNT_RESET_FLAG, '1');
-            }
-        } catch (e) { console.warn('Reset data akun gagal:', e); }
-        document.body.classList.add('auth-locked');
-        loadRememberedCredentials();
-        const activeSession = sessionStorage.getItem(SESSION_KEY);
-        if (activeSession) {
-            document.getElementById('authLoginScreen').style.display = 'none';
-            document.getElementById('authRegisterScreen').style.display = 'none';
-            document.body.classList.remove('auth-locked');
-            try {
-                if (typeof window.resetToHome === 'function') window.resetToHome();
-            } catch (e) {}
-        } else {
-            document.getElementById('authLoginScreen').style.display = 'flex';
-            setTimeout(() => document.getElementById('authUsername')?.focus(), 100);
-        }
-    });
-})();
-
-</script>
 </body>
 </html>
