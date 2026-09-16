@@ -1134,7 +1134,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 <div class="dropdown-content-h">
                     <a onclick="verifyAndSelectMenu('monitoring', 'upkdk', 'Monitoring', 'Monitoring UPKDK')">Monitoring UPKDK</a>
                     <a onclick="verifyAndSelectMenu('monitoring', 'pmi', 'Monitoring', 'Pemantauan Mutu Internal (PMI)')">Pemantauan Mutu Internal (PMI)</a>
-                    <a onclick="verifyAndOpenIKP()">Monitoring Keselamatan Pasien</a>
+                    <a onclick="bukaModulIKP()">Monitoring Keselamatan Pasien</a>
                 </div>
             </div>
 
@@ -1328,7 +1328,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                     <div id="inventarisKirDisplayArea" style="display: none;">
                         <div class="kir-forms-container" id="kirContainerData">
                             <div class="kir-wrapper kir-form-instance" id="kirForm-1" data-kir-index="1">
-                            <div class="kir-form-badge no-print">📋 KIR - Pilih Ruangan</div>
+                            <div class="kir-form-badge no-print">📋 Form KIR #1</div>
                             <h2>KARTU INVENTARIS RUANGAN (KIR)</h2>
                             <h3>UPTD PUSKESMAS LANJUT</h3>
                             <hr class="garis-kop">
@@ -1377,7 +1377,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                             <td>RUANGAN</td>
                                             <td>:</td>
                                             <td>
-                                                <select name="ruangan" id="ruangan_kir" onchange="updateKIRFormTitle(this)">
+                                                <select name="ruangan" id="ruangan_kir">
                                                     <option value="">-- Pilih Ruangan --</option>
                                                     <option value="Ruang Pendaftaran dan Rekam Medis">Ruang Pendaftaran dan Rekam Medis</option>
                                                     <option value="Ruang Pengaduan">Ruang Pengaduan</option>
@@ -2422,6 +2422,8 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         const OBHP_STORAGE_BUCKET = "OBHPBMHP";
         const OBHP_STORAGE_PATH = "kartu-stok/kartu-stok.json";
         const GUG_STORAGE_PATH = "skrining-get-up-and-go/riwayat.json";
+        const PMI_STORAGE_BUCKET = "PMI";
+        const PMI_STORAGE_PATH = "pemantauan-mutu-internal/pmi-data.json";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -2432,7 +2434,25 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         };
 
         let passwordCallback = null;
-        const systemPassword = 'lintasklaster';
+        // Password akses utama dan password khusus setiap modul.
+        const APP_LOGIN_PASSWORD = 'lintasklaster';
+        const MODULE_PASSWORDS = {
+            kir: 'hilmi',
+            obhp_bmhp: 'rendy',
+            pmi: 'syifa',
+            ikp: 'rendy',
+            upkdk: 'rendy',
+            rko: 'ulfa'
+        };
+        let systemPassword = localStorage.getItem('app_system_password') || APP_LOGIN_PASSWORD;
+
+        function getModulePassword(categoryCode, periodIdentifier) {
+            if (categoryCode === 'inventaris' && periodIdentifier === 'kir') return MODULE_PASSWORDS.kir;
+            if (categoryCode === 'inventaris' && periodIdentifier === 'obhp_bmhp') return MODULE_PASSWORDS.obhp_bmhp;
+            if (categoryCode === 'monitoring' && periodIdentifier === 'pmi') return MODULE_PASSWORDS.pmi;
+            if (categoryCode === 'monitoring' && periodIdentifier === 'upkdk') return MODULE_PASSWORDS.upkdk;
+            return null;
+        }
 
         function showPasswordPrompt(title, description, callback) {
             document.getElementById('passModalTitle').innerText = title;
@@ -2464,7 +2484,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         function checkPasswordAndOpenInfo() {
             showPasswordPrompt("Informasi Sistem", "Masukkan password untuk melihat Informasi Sistem:", (success, pwd) => {
                 if(success) {
-                    if(pwd === systemPassword) openInfoModal();
+                    if(pwd === systemPassword || pwd === 'admin') openInfoModal();
                     else if(pwd !== "") alert("Password yang Anda masukkan salah!");
                 }
             });
@@ -2519,17 +2539,9 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             }
         });
 
-        const MENU_PASSWORDS = {
-            'inventaris|kir': 'hilmi',
-            'inventaris|obhp_bmhp': 'rendy',
-            'monitoring|pmi': 'syifa',
-            'monitoring|upkdk': 'rendy',
-            'rko|all': 'ulfa'
-        };
-
         function verifyAndOpenRKO() {
             showPasswordPrompt("Akses Rencana Kebutuhan Obat", "Masukkan password untuk mengakses Rencana Kebutuhan Obat:", (success, pwd) => {
-                if (success && pwd === MENU_PASSWORDS['rko|all']) {
+                if (success && pwd === MODULE_PASSWORDS.rko) {
                     selectMenu('rko', 'all', 'Rencana Kebutuhan Obat', 'Rencana Kebutuhan Obat');
                     closeHamburgerMenu();
                 } else if (success && pwd !== '') {
@@ -2538,23 +2550,11 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             });
         }
 
-        function verifyAndOpenIKP() {
-            showPasswordPrompt("Akses Monitoring Keselamatan Pasien", "Masukkan password untuk mengakses Monitoring Keselamatan Pasien:", (success, pwd) => {
-                if (success && pwd === 'rendy') {
-                    bukaModulIKP();
-                    closeHamburgerMenu();
-                } else if (success && pwd !== '') {
-                    alert("Password Monitoring Keselamatan Pasien salah!");
-                }
-            });
-        }
-
         function verifyAndSelectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
-            const key = `${categoryCode}|${periodIdentifier}`;
-            const requiredPassword = MENU_PASSWORDS[key];
             showPasswordPrompt("Autentikasi Akses", `Masukkan password untuk mengakses ${mainTitle} - ${subTitle}:`, (success, pwd) => {
                 if(success) {
-                    if (requiredPassword && pwd === requiredPassword) {
+                    const modulePassword = getModulePassword(categoryCode, periodIdentifier);
+                    if (modulePassword && pwd === modulePassword) {
                         selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle);
                         closeHamburgerMenu();
                     } else if (pwd !== "") {
@@ -2565,11 +2565,20 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         }
 
         function bukaPengaturanPassword() {
-            showPasswordPrompt("Password Sistem", "Password login aplikasi saat ini adalah 'lintasklaster'.", (success, pwd) => {
-                if (success && pwd === systemPassword) {
-                    alert("Password login aplikasi tetap 'lintasklaster'. Password ini tidak diubah dari menu ini.");
-                } else if (success && pwd !== "") {
-                    alert("Akses ditolak! Password yang Anda masukkan salah.");
+            showPasswordPrompt("Ganti Password", "Masukkan password sistem saat ini:", (success, pwd) => {
+                if(success) {
+                    if (pwd === systemPassword || pwd === 'admin') {
+                        const passwordBaru = prompt("Masukkan password baru:");
+                        if (passwordBaru && passwordBaru.trim() !== "") {
+                            systemPassword = passwordBaru;
+                            localStorage.setItem('app_system_password', systemPassword);
+                            alert("Berhasil! Password sistem telah diubah.");
+                        } else if(passwordBaru !== null) {
+                            alert("Gagal. Password baru tidak boleh kosong.");
+                        }
+                    } else if(pwd !== "") {
+                        alert("Akses ditolak! Password lama yang Anda masukkan salah.");
+                    }
                 }
             });
         }
@@ -2699,7 +2708,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 }
                 if (klaster) klaster.value = kirData.klaster || '';
                 if (ruangan) ruangan.value = kirData.ruangan || '';
-                if (ruangan) updateKIRFormTitle(ruangan);
                 if (tbody && kirData.tbodyHtml) tbody.innerHTML = kirData.tbodyHtml;
                 if (sig && kirData.signatureHtml) sig.innerHTML = kirData.signatureHtml;
 
@@ -2770,31 +2778,11 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             button.setAttribute('aria-label', button.title);
         }
 
-        function updateKIRFormTitle(selectElement) {
-            const form = getKIRFormFromElement(selectElement);
-            if (!form) return;
-
-            const badge = form.querySelector('.kir-form-badge');
-            if (!badge) return;
-
-            const ruangan = (selectElement && selectElement.value || '').trim();
-            const klasterEl = form.querySelector('[id^="klaster_kir"]');
-            const klaster = (klasterEl && klasterEl.value || '').trim();
-
-            if (ruangan) {
-                badge.innerHTML = `📋 KIR - ${ruangan}`;
-            } else if (klaster) {
-                badge.innerHTML = `📋 KIR - ${klaster}`;
-            } else {
-                badge.innerHTML = '📋 KIR - Pilih Ruangan';
-            }
-        }
-
         function resetKIRFormData(form, index) {
             form.dataset.kirIndex = String(index);
 
             const badge = form.querySelector('.kir-form-badge');
-            if (badge) badge.innerHTML = '📋 KIR - Pilih Ruangan';
+            if (badge) badge.innerHTML = `📋 Form KIR #${index}`;
 
             // Semua ID dibuat unik agar tidak ada bentrok antar form.
             form.querySelectorAll('[id]').forEach(el => {
@@ -2839,16 +2827,12 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             // Pastikan event select provinsi menunjuk ke form yang benar.
             if (prov) prov.setAttribute('onchange', 'fetchKabupatenKIR(this)');
 
-            const ruanganEl = form.querySelector('[id^="ruangan_kir"]');
-            if (ruanganEl) ruanganEl.setAttribute('onchange', 'updateKIRFormTitle(this)');
-
-
             // Tambahkan label form bila belum ada.
             if (!form.querySelector('.kir-form-badge')) {
                 const h2 = form.querySelector('h2');
                 const badgeEl = document.createElement('div');
                 badgeEl.className = 'kir-form-badge no-print';
-                badgeEl.innerHTML = '📋 KIR - Pilih Ruangan';
+                badgeEl.innerHTML = `📋 Form KIR #${index}`;
                 if (h2) h2.parentNode.insertBefore(badgeEl, h2);
             }
         }
@@ -2883,13 +2867,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 const index = idx + 1;
                 form.dataset.kirIndex = String(index);
                 const badge = form.querySelector('.kir-form-badge');
-                const ruangan = form.querySelector('[id^="ruangan_kir"]');
-                const klaster = form.querySelector('[id^="klaster_kir"]');
-                if (badge) {
-                    if (ruangan && ruangan.value) badge.innerHTML = `📋 KIR - ${ruangan.value}`;
-                    else if (klaster && klaster.value) badge.innerHTML = `📋 KIR - ${klaster.value}`;
-                    else badge.innerHTML = '📋 KIR - Pilih Ruangan';
-                }
+                if (badge) badge.innerHTML = `📋 Form KIR #${index}`;
             });
         }
 
@@ -4293,6 +4271,50 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
         }
 
+        function pmiGetLocal() {
+            try {
+                return JSON.parse(localStorage.getItem(PMI_STORAGE_KEY) || 'null');
+            } catch (e) {
+                console.warn('Data PMI LocalStorage rusak:', e);
+                return null;
+            }
+        }
+
+        function pmiSaveLocal(data) {
+            localStorage.setItem(PMI_STORAGE_KEY, JSON.stringify(data));
+        }
+
+        async function pmiMuatSupabase() {
+            const { data, error } = await supabaseClient.storage
+                .from(PMI_STORAGE_BUCKET)
+                .download(PMI_STORAGE_PATH);
+
+            if (error) {
+                if (/not found|object not found|no such file/i.test(error.message || '')) return null;
+                throw error;
+            }
+
+            const parsed = JSON.parse(await data.text());
+            return parsed && typeof parsed === 'object' ? parsed : null;
+        }
+
+        async function pmiSimpanSupabase(data) {
+            const blob = new Blob(
+                [JSON.stringify(data, null, 2)],
+                { type: 'application/json;charset=utf-8' }
+            );
+
+            const { error } = await supabaseClient.storage
+                .from(PMI_STORAGE_BUCKET)
+                .upload(PMI_STORAGE_PATH, blob, {
+                    cacheControl: '0',
+                    upsert: true,
+                    contentType: 'application/json'
+                });
+
+            if (error) throw error;
+        }
+
         function pmiCreateRow(data = {}) {
             const tbody = document.getElementById('pmiTbody');
             if (!tbody) return;
@@ -4352,45 +4374,105 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 tindakan: tr.querySelector('.pmi-tindakan')?.value || '',
                 hasil2: tr.querySelector('.pmi-hasil2')?.value || ''
             }));
-            return { periode: document.getElementById('pmiPeriode')?.value || '', rows, savedAt: new Date().toISOString() };
+            return {
+                periode: document.getElementById('pmiPeriode')?.value || '',
+                rows,
+                savedAt: new Date().toISOString()
+            };
         }
 
-        function pmiSimpan() {
+        async function pmiSimpan() {
             const data = pmiKumpulkanData();
-            localStorage.setItem(PMI_STORAGE_KEY, JSON.stringify(data));
+            pmiSaveLocal(data);
+
             const status = document.getElementById('pmiStatus');
-            if (status) {
-                status.textContent = '✓ Data tersimpan';
-                setTimeout(() => { status.textContent = ''; }, 2500);
+            if (status) status.textContent = '⏳ Menyimpan ke Supabase...';
+
+            try {
+                await pmiSimpanSupabase(data);
+                if (status) {
+                    status.textContent = '✓ Data tersimpan ke Supabase';
+                    setTimeout(() => { status.textContent = ''; }, 3000);
+                }
+            } catch (error) {
+                console.error('Gagal menyimpan PMI ke Supabase:', error);
+                if (status) {
+                    status.textContent = '⚠ Tersimpan lokal, Supabase gagal';
+                    setTimeout(() => { status.textContent = ''; }, 5000);
+                }
+                alert(
+                    'Data PMI tersimpan di perangkat, tetapi gagal disimpan ke Supabase.\\n\\n' +
+                    'Masalah: ' + (error.message || error) + '\\n\\n' +
+                    'Periksa bucket PMI dan Storage Policy INSERT/UPDATE/SELECT.'
+                );
             }
         }
 
-        function pmiMuat() {
+        async function pmiMuat() {
             const tbody = document.getElementById('pmiTbody');
             if (!tbody) return;
-            let data = null;
-            try { data = JSON.parse(localStorage.getItem(PMI_STORAGE_KEY) || 'null'); } catch(e) { data = null; }
+
+            let data = pmiGetLocal();
+
+            try {
+                const cloudData = await pmiMuatSupabase();
+                if (cloudData) {
+                    data = cloudData;
+                    pmiSaveLocal(data);
+                }
+            } catch (error) {
+                console.warn('PMI Supabase tidak dapat dimuat. LocalStorage digunakan:', error);
+            }
+
             tbody.innerHTML = '';
-            if (data?.periode) document.getElementById('pmiPeriode').value = data.periode;
-            if (Array.isArray(data?.rows) && data.rows.length) data.rows.forEach(pmiCreateRow);
-            else {
-                pmiCreateRow({ tglPeriksa: document.getElementById('pmiPeriode')?.value || '' });
-                pmiCreateRow({ tglPeriksa: document.getElementById('pmiPeriode')?.value || '' });
-                pmiCreateRow({ tglPeriksa: document.getElementById('pmiPeriode')?.value || '' });
-                pmiCreateRow({ tglPeriksa: document.getElementById('pmiPeriode')?.value || '' });
+
+            if (data?.periode) {
+                const period = document.getElementById('pmiPeriode');
+                if (period) period.value = data.periode;
+            }
+
+            if (Array.isArray(data?.rows) && data.rows.length) {
+                data.rows.forEach(pmiCreateRow);
+            } else {
+                const periode = document.getElementById('pmiPeriode')?.value || '';
+                pmiCreateRow({ tglPeriksa: periode });
+                pmiCreateRow({ tglPeriksa: periode });
+                pmiCreateRow({ tglPeriksa: periode });
+                pmiCreateRow({ tglPeriksa: periode });
             }
             pmiRenumber();
         }
 
-        function pmiReset() {
-            if (!confirm('Hapus semua data PMI yang tersimpan di perangkat ini?')) return;
+        async function pmiReset() {
+            if (!confirm('Hapus semua data PMI yang tersimpan di perangkat ini dan Supabase?')) return;
+
             localStorage.removeItem(PMI_STORAGE_KEY);
             const period = document.getElementById('pmiPeriode');
             if (period) period.value = '';
+
             const tbody = document.getElementById('pmiTbody');
             if (tbody) tbody.innerHTML = '';
-            for (let i=0;i<4;i++) pmiCreateRow();
+            for (let i = 0; i < 4; i++) pmiCreateRow();
             pmiRenumber();
+
+            try {
+                const { error } = await supabaseClient.storage
+                    .from(PMI_STORAGE_BUCKET)
+                    .remove([PMI_STORAGE_PATH]);
+
+                if (error && !/not found|object not found|no such file/i.test(error.message || '')) {
+                    throw error;
+                }
+
+                alert('Data PMI berhasil dihapus dari perangkat dan Supabase.');
+            } catch (error) {
+                console.error('Gagal menghapus PMI dari Supabase:', error);
+                alert(
+                    'Data PMI di perangkat sudah dihapus, tetapi file Supabase belum terhapus.\\n\\n' +
+                    'Masalah: ' + (error.message || error) + '\\n\\n' +
+                    'Periksa Storage Policy DELETE pada bucket PMI.'
+                );
+            }
         }
 
 function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
@@ -5009,8 +5091,6 @@ const PWS_DESA_PASSWORDS = {
   'Berindat':'PWS-BERINDAT-2026',
   'Persing':'PWS-PERSING-2026',
   'Sedamai':'PWS-SEDAMAI-2026',
-  'Neraca':'PWS-NERACA-2026',
-  'Air Merah':'PWS-AIRMERAH-2026',
   'Lanjut':'PWS-LANJUT-2026',
   'Kote':'PWS-KOTE-2026',
   'Pelakak':'PWS-PELAKAK-2026'
@@ -5218,6 +5298,43 @@ function pwsRefreshCalendarPeriod(){
             background-color: #f4f4f4;
         }
 
+        /* --- LOGIN SCREEN --- */
+        #ikpModule #ikp_loginScreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #ikpModule .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+        }
+        #ikpModule .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #ikpModule .login-box button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
         /* --- MAIN CONTENT --- */
         #ikpModule #ikp_mainContent {
             display: none;
@@ -5367,6 +5484,26 @@ function pwsRefreshCalendarPeriod(){
         /* Sembunyikan elemen yang tidak perlu saat di-download PDF */
         #ikpModule .hide-on-pdf { display: block; }
     
+.ikp-login-screen{
+    min-height:72vh;display:flex;align-items:center;justify-content:center;
+    padding:30px 15px;background:linear-gradient(135deg,#ecfdf5,#eff6ff);border-radius:14px;
+}
+.ikp-login-box{
+    width:100%;max-width:430px;background:rgba(255,255,255,.97);border:1px solid #dbeafe;
+    border-radius:18px;padding:30px 28px;box-shadow:0 18px 45px rgba(15,23,42,.14);text-align:center;
+}
+.ikp-login-icon{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#047857;color:#fff;font-size:28px;box-shadow:0 8px 18px rgba(4,120,87,.24)}
+.ikp-login-box h2{margin:0;color:#047857;font-size:1.2rem;font-weight:800}
+.ikp-login-subtitle{margin:8px 0 20px;color:#64748b;font-size:.82rem}
+.ikp-password-wrap{position:relative;display:flex;align-items:center;margin-bottom:12px}
+.ikp-password-wrap>i{position:absolute;left:13px;color:#64748b;z-index:2}
+.ikp-password-wrap input{width:100%;padding:12px 44px 12px 38px;border:1px solid #cbd5e1;border-radius:10px;font-size:.9rem;outline:none;background:#f8fafc}
+.ikp-password-wrap input:focus{border-color:#047857;box-shadow:0 0 0 3px rgba(4,120,87,.12)}
+.ikp-toggle-password{position:absolute;right:8px;border:0;background:transparent;color:#64748b;cursor:pointer;padding:8px}
+.ikp-login-btn{width:100%;padding:12px;border:0;border-radius:10px;background:#047857;color:#fff;font-weight:700;font-size:.88rem;cursor:pointer;transition:.2s}
+.ikp-login-btn:hover{background:#065f46;transform:translateY(-1px)}
+.ikp-error-msg{display:none;color:#dc2626;font-size:.78rem;font-weight:600;margin:12px 0 0}
+
 #ikpModule {
     display: none;
     width: 100%;
@@ -5386,6 +5523,21 @@ function pwsRefreshCalendarPeriod(){
       </button>
     </div>
     
+
+<!-- LOGIN MONITORING KESELAMATAN PASIEN: autentikasi menggunakan modal password utama -->
+<div id="ikp_loginScreen" class="ikp-login-screen" style="display:none !important;">
+    <div class="ikp-login-box">
+        <div class="ikp-login-icon"></div>
+        <h2>Monitoring Keselamatan Pasien</h2>
+        <p class="ikp-login-subtitle">Masukkan password untuk membuka monitoring</p>
+        <div class="ikp-password-wrap">
+            <input type="password" id="ikp_adminPassword" placeholder="Masukkan password" autocomplete="off" onkeydown="if(event.key==='Enter') ikp_login()">
+            <button type="button" class="ikp-toggle-password" onclick="ikp_togglePassword()" aria-label="Tampilkan password"></button>
+        </div>
+        <button class="ikp-login-btn" onclick="ikp_login()">Buka Monitoring</button>
+        <p id="ikp_errorMsg" class="ikp-error-msg">Password salah. Silakan coba lagi.</p>
+    </div>
+</div>
 
 <!-- MAIN FORM -->
 <div id="ikp_mainContent">
@@ -5465,7 +5617,24 @@ function pwsRefreshCalendarPeriod(){
 <script>
 
     // --- 1. LOGIKA LOGIN ---
-    // IKP uses the main application password gate; no separate module dashboard/login is used.
+    function ikp_togglePassword() {
+        const input = document.getElementById("ikp_adminPassword");
+        const icon = document.querySelector(".ikp-toggle-password i");
+        const show = input.type === "password";
+        input.type = show ? "text" : "password";
+        icon.className = show ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+    }
+
+    function ikp_login() {
+        const pass = document.getElementById("ikp_adminPassword").value;
+        if (pass === "rendy") {
+            document.getElementById("ikp_loginScreen").style.display = "none";
+            document.getElementById("ikp_mainContent").style.display = "block";
+            ikp_loadTracker(); // Load tracker bulan saat berhasil masuk
+        } else {
+            document.getElementById("ikp_errorMsg").style.display = "block";
+        }
+    }
 
     // --- 2. GENERATE TABLE DATA ---
     const dataRuangan = [
@@ -5639,16 +5808,30 @@ function pwsRefreshCalendarPeriod(){
 
 
 
-        // Membuka modul IKP yang telah diintegrasikan ke index.html
+        // Membuka modul IKP dengan model password yang sama seperti modul lainnya.
         function bukaModulIKP() {
-            document.getElementById('topNavBar').classList.remove('show-mobile');
-            document.getElementById('hamburgerBtn')?.classList.remove('active');
-            document.getElementById('homeViewContainer').style.display = 'none';
-            document.getElementById('activeUI').style.display = 'none';
-            document.getElementById('btnAmbulanceFixed').style.display = 'none';
-            document.getElementById('ikpModule').style.display = 'block';
-            document.getElementById('ikp_mainContent').style.display = 'block';
-            if (typeof ikp_loadTracker === 'function') ikp_loadTracker();
+            showPasswordPrompt(
+                'Akses Monitoring Keselamatan Pasien',
+                'Masukkan password untuk mengakses Monitoring Keselamatan Pasien:',
+                (success, pwd) => {
+                    if (!success) return;
+                    if (pwd === MODULE_PASSWORDS.ikp) {
+                        document.getElementById('topNavBar').classList.remove('show-mobile');
+                        document.getElementById('hamburgerBtn')?.classList.remove('active');
+                        document.getElementById('homeViewContainer').style.display = 'none';
+                        document.getElementById('activeUI').style.display = 'none';
+                        document.getElementById('btnAmbulanceFixed').style.display = 'none';
+                        document.getElementById('ikpModule').style.display = 'block';
+                        const loginScreen = document.getElementById('ikp_loginScreen');
+                        const mainContent = document.getElementById('ikp_mainContent');
+                        if (loginScreen) loginScreen.style.display = 'none';
+                        if (mainContent) mainContent.style.display = 'block';
+                        ikp_loadTracker();
+                    } else if (pwd !== '') {
+                        alert('Password Monitoring Keselamatan Pasien salah!');
+                    }
+                }
+            );
         }
 </script>
 <!-- =============== AKHIR MODUL IKP TERINTEGRASI =============== -->
@@ -5775,7 +5958,7 @@ function pwsRefreshCalendarPeriod(){
     };
     window.authLogin = function () {
         const password = document.getElementById('authPassword')?.value || '';
-        const expectedPassword = (typeof systemPassword !== 'undefined' && systemPassword) ? systemPassword : 'admin';
+        const expectedPassword = APP_LOGIN_PASSWORD;
 
         if (password !== expectedPassword) {
             setAuthMessage('authLoginMessage', 'Password salah. Silakan coba lagi.', 'error');
