@@ -422,6 +422,113 @@
         .kir-wrapper .btn-action.btn-pdf { background-color: #dc2626; }
         .kir-wrapper .btn-action:hover { opacity: 0.9; }
 
+        /* KIR MULTI-FORM + KUNCI PER BARIS */
+        .kir-forms-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .kir-form-instance {
+            width: 100%;
+            position: relative;
+            border: 2px solid #d1fae5;
+            border-radius: 12px;
+            box-shadow: 0 8px 22px rgba(15,23,42,0.08);
+        }
+        .kir-form-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 0 8px 0;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .kir-add-form-area {
+            display: flex;
+            justify-content: center;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px dashed #cbd5e1;
+        }
+        .kir-btn-add-form {
+            background: #7c3aed;
+            color: #fff;
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 14px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 3px 8px rgba(124,58,237,0.2);
+        }
+        .kir-btn-add-form:hover { background: #6d28d9; }
+        .kir-btn-delete-form {
+            background: #dc2626;
+            color: #fff;
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 14px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 3px 8px rgba(220,38,38,0.2);
+        }
+        .kir-btn-delete-form:hover { background: #b91c1c; }
+        .kir-form-btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            width: 100%;
+        }
+        .kir-action-col {
+            width: 56px;
+            min-width: 56px;
+        }
+        .kir-row-lock {
+            border: 1px solid #94a3b8;
+            background: #f8fafc;
+            color: #334155;
+            border-radius: 5px;
+            padding: 3px 6px;
+            min-width: 38px;
+            cursor: pointer;
+            font-size: 13px;
+            line-height: 1;
+        }
+        .kir-row-lock:hover { background: #e2e8f0; }
+        .kir-row-locked td {
+            background: #f8fafc;
+        }
+        .kir-row-locked .kir-row-lock {
+            background: #e2e8f0;
+            border-color: #64748b;
+            color: #0f172a;
+        }
+        .kir-row-locked [contenteditable="false"] {
+            opacity: 0.9;
+            background: #f1f5f9;
+            cursor: not-allowed;
+        }
+        .kir-row-locked input[type="checkbox"] {
+            cursor: not-allowed;
+        }
+        @media print {
+            .kir-form-instance { border: 0 !important; box-shadow: none !important; }
+            .kir-form-badge, .kir-add-form-area, .kir-wrapper .no-print, .kir-action-col {
+                display: none !important;
+            }
+            .kir-wrapper .kir-row-locked [contenteditable="false"] {
+                background: transparent !important;
+            }
+        }
+
         /* CSS KHUSUS OBHP/BMHP */
         .obhp-container {
             max-width: 100%;
@@ -1026,8 +1133,8 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 <button class="nav-btn-h">Monitoring</button>
                 <div class="dropdown-content-h">
                     <a onclick="verifyAndSelectMenu('monitoring', 'upkdk', 'Monitoring', 'Monitoring UPKDK')">Monitoring UPKDK</a>
-                    <a onclick="selectMenu('monitoring', 'pmi', 'Monitoring', 'Pemantauan Mutu Internal (PMI)')">Pemantauan Mutu Internal (PMI)</a>
-                    <a onclick="bukaModulIKP()">Monitoring Keselamatan Pasien</a>
+                    <a onclick="verifyAndSelectMenu('monitoring', 'pmi', 'Monitoring', 'Pemantauan Mutu Internal (PMI)')">Pemantauan Mutu Internal (PMI)</a>
+                    <a onclick="verifyAndOpenIKP()">Monitoring Keselamatan Pasien</a>
                 </div>
             </div>
 
@@ -1219,7 +1326,9 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 
                     <!-- DISPLAY AREA INVENTARIS KIR -->
                     <div id="inventarisKirDisplayArea" style="display: none;">
-                        <div class="kir-wrapper" id="kirContainerData">
+                        <div class="kir-forms-container" id="kirContainerData">
+                            <div class="kir-wrapper kir-form-instance" id="kirForm-1" data-kir-index="1">
+                            <div class="kir-form-badge no-print">📋 KIR - Pilih Ruangan</div>
                             <h2>KARTU INVENTARIS RUANGAN (KIR)</h2>
                             <h3>UPTD PUSKESMAS LANJUT</h3>
                             <hr class="garis-kop">
@@ -1231,7 +1340,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                             <td>PROPINSI</td>
                                             <td>:</td>
                                             <td>
-                                                <select id="provinsi" onchange="fetchKabupatenKIR()">
+                                                <select id="provinsi" onchange="fetchKabupatenKIR(this)">
                                                     <option value="">-- Memuat Provinsi... --</option>
                                                 </select>
                                             </td>
@@ -1268,7 +1377,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                             <td>RUANGAN</td>
                                             <td>:</td>
                                             <td>
-                                                <select name="ruangan" id="ruangan_kir">
+                                                <select name="ruangan" id="ruangan_kir" onchange="updateKIRFormTitle(this)">
                                                     <option value="">-- Pilih Ruangan --</option>
                                                     <option value="Ruang Pendaftaran dan Rekam Medis">Ruang Pendaftaran dan Rekam Medis</option>
                                                     <option value="Ruang Pengaduan">Ruang Pengaduan</option>
@@ -1313,6 +1422,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                             <th rowspan="2">Harga Beli /<br>Perolehan</th>
                                             <th colspan="3">Keadaan Barang</th>
                                             <th rowspan="2">Keterangan / Mutasi<br>dll</th>
+                                            <th rowspan="2" class="kir-action-col no-print">Kunci</th>
                                         </tr>
                                         <tr>
                                             <th style="width: 35px;">Baik (B)</th>
@@ -1334,6 +1444,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                             <td>12</td>
                                             <td>13</td>
                                             <td>14</td>
+                                            <td class="no-print kir-action-col"></td>
                                         </tr>
                                     </thead>
                                     <tbody id="tabel-body-kir">
@@ -1352,13 +1463,14 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                             <td><input type="checkbox"></td>
                                             <td><input type="checkbox"></td>
                                             <td><div contenteditable="true"></div></td>
+                                            <td class="no-print kir-action-col"><button type="button" class="kir-row-lock" onclick="toggleKIRRowLock(this)" title="Kunci baris">🔓</button></td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
 
                             <div class="no-print kir-btn-group" id="kirActionButtons">
-                                <button class="btn-action" onclick="tambahBarisKIR()">+ Tambah Baris Barang</button>
+                                <button class="btn-action" onclick="tambahBarisKIR(this)">+ Tambah Baris Barang</button>
                                 <button class="btn-action btn-save" onclick="simpanKIRSementara()">💾 Simpan</button>
                                 <button class="btn-action btn-load" onclick="muatKIRSementara()">🔄 Muat Data Tersimpan</button>
                                 <button class="btn-action btn-pdf" onclick="unduhPDFKIR()">📄 Unduh PDF</button>
@@ -1385,7 +1497,14 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                     NIP. <div contenteditable="true" data-placeholder="[Ketik NIP]" style="min-width: 120px;"></div>
                                 </div>
                             </div>
+                            <div class="no-print kir-add-form-area">
+                                <div class="kir-form-btn-row">
+                                    <button type="button" class="kir-btn-add-form" onclick="tambahFormKIR(this)">➕ Tambah Form KIR - Klaster / Ruangan Baru</button>
+                                    <button type="button" class="kir-btn-delete-form" onclick="hapusFormKIR(this)" title="Hapus form KIR ini">🗑️ Hapus Form KIR</button>
+                                </div>
+                            </div>
                         </div>
+                    </div>
                     </div>
                     <!-- AKHIR KIR DISPLAY AREA -->
 
@@ -2313,7 +2432,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         };
 
         let passwordCallback = null;
-        let systemPassword = localStorage.getItem('app_system_password') || 'admin';
+        const systemPassword = 'lintasklaster';
 
         function showPasswordPrompt(title, description, callback) {
             document.getElementById('passModalTitle').innerText = title;
@@ -2345,7 +2464,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         function checkPasswordAndOpenInfo() {
             showPasswordPrompt("Informasi Sistem", "Masukkan password untuk melihat Informasi Sistem:", (success, pwd) => {
                 if(success) {
-                    if(pwd === systemPassword || pwd === 'admin') openInfoModal();
+                    if(pwd === systemPassword) openInfoModal();
                     else if(pwd !== "") alert("Password yang Anda masukkan salah!");
                 }
             });
@@ -2400,9 +2519,17 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             }
         });
 
+        const MENU_PASSWORDS = {
+            'inventaris|kir': 'hilmi',
+            'inventaris|obhp_bmhp': 'rendy',
+            'monitoring|pmi': 'syifa',
+            'monitoring|upkdk': 'rendy',
+            'rko|all': 'ulfa'
+        };
+
         function verifyAndOpenRKO() {
             showPasswordPrompt("Akses Rencana Kebutuhan Obat", "Masukkan password untuk mengakses Rencana Kebutuhan Obat:", (success, pwd) => {
-                if (success && pwd === 'admin') {
+                if (success && pwd === MENU_PASSWORDS['rko|all']) {
                     selectMenu('rko', 'all', 'Rencana Kebutuhan Obat', 'Rencana Kebutuhan Obat');
                     closeHamburgerMenu();
                 } else if (success && pwd !== '') {
@@ -2411,10 +2538,23 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             });
         }
 
+        function verifyAndOpenIKP() {
+            showPasswordPrompt("Akses Monitoring Keselamatan Pasien", "Masukkan password untuk mengakses Monitoring Keselamatan Pasien:", (success, pwd) => {
+                if (success && pwd === 'rendy') {
+                    bukaModulIKP();
+                    closeHamburgerMenu();
+                } else if (success && pwd !== '') {
+                    alert("Password Monitoring Keselamatan Pasien salah!");
+                }
+            });
+        }
+
         function verifyAndSelectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
+            const key = `${categoryCode}|${periodIdentifier}`;
+            const requiredPassword = MENU_PASSWORDS[key];
             showPasswordPrompt("Autentikasi Akses", `Masukkan password untuk mengakses ${mainTitle} - ${subTitle}:`, (success, pwd) => {
                 if(success) {
-                    if (pwd === systemPassword || pwd === 'admin') {
+                    if (requiredPassword && pwd === requiredPassword) {
                         selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle);
                         closeHamburgerMenu();
                     } else if (pwd !== "") {
@@ -2425,20 +2565,11 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         }
 
         function bukaPengaturanPassword() {
-            showPasswordPrompt("Ganti Password", "Masukkan password sistem saat ini:", (success, pwd) => {
-                if(success) {
-                    if (pwd === systemPassword || pwd === 'admin') {
-                        const passwordBaru = prompt("Masukkan password baru:");
-                        if (passwordBaru && passwordBaru.trim() !== "") {
-                            systemPassword = passwordBaru;
-                            localStorage.setItem('app_system_password', systemPassword);
-                            alert("Berhasil! Password sistem telah diubah.");
-                        } else if(passwordBaru !== null) {
-                            alert("Gagal. Password baru tidak boleh kosong.");
-                        }
-                    } else if(pwd !== "") {
-                        alert("Akses ditolak! Password lama yang Anda masukkan salah.");
-                    }
+            showPasswordPrompt("Password Sistem", "Password login aplikasi saat ini adalah 'lintasklaster'.", (success, pwd) => {
+                if (success && pwd === systemPassword) {
+                    alert("Password login aplikasi tetap 'lintasklaster'. Password ini tidak diubah dari menu ini.");
+                } else if (success && pwd !== "") {
+                    alert("Akses ditolak! Password yang Anda masukkan salah.");
                 }
             });
         }
@@ -2452,10 +2583,11 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 provinces.forEach(prov => {
                     options += `<option value="${prov.id}">${prov.name}</option>`;
                 });
-                const provSelect = document.getElementById('provinsi');
-                if(provSelect && provSelect.selectedIndex <= 0) {
-                    provSelect.innerHTML = options;
-                }
+                document.querySelectorAll('#kirContainerData .kir-form-instance select[id^="provinsi"]').forEach(provSelect => {
+                    if (provSelect.selectedIndex <= 0) {
+                        provSelect.innerHTML = options;
+                    }
+                });
             }).catch(e => console.log('Error fetch provinsi', e));
 
         function fetchKabupatenKIR() {
@@ -2482,25 +2614,49 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         }
 
         /* ----- FUNGSI SIMPAN & MUAT DATA KIR SEMENTARA ----- */
-        function simpanKIRSementara() {
-            const checkboxes = document.querySelectorAll('#tabel-body-kir input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                if (cb.checked) cb.setAttribute('checked', 'checked');
-                else cb.removeAttribute('checked');
+        function getKIRFormsContainer() {
+            return document.getElementById('kirContainerData');
+        }
+
+        function getKIRFormFromElement(el) {
+            return el ? el.closest('.kir-form-instance') : document.querySelector('.kir-form-instance');
+        }
+
+        function normalizeKIRSelectionState(container) {
+            container.querySelectorAll('select').forEach(select => {
+                const value = select.value;
+                Array.from(select.options).forEach(opt => {
+                    opt.selected = (opt.value === value);
+                    if (opt.selected) opt.setAttribute('selected', 'selected');
+                    else opt.removeAttribute('selected');
+                });
             });
 
-            const kirData = {
-                provinsi: document.getElementById('provinsi').value,
-                kabupatenHtml: document.getElementById('kabupaten').innerHTML,
-                kabupatenVal: document.getElementById('kabupaten').value,
-                klaster: document.getElementById('klaster_kir').value,
-                ruangan: document.getElementById('ruangan_kir').value,
-                tbodyHtml: document.getElementById('tabel-body-kir').innerHTML,
-                signatureHtml: document.getElementById('signature-section-kir').innerHTML
-            };
+            container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                if (cb.checked) cb.setAttribute('checked', 'checked');
+                else cb.removeAttribute('checked');
 
-            localStorage.setItem('kir_temp_data', JSON.stringify(kirData));
-            alert('Data KIR berhasil disimpan sementara! Anda bisa memuatnya kembali nanti tanpa takut data hilang.');
+                if (cb.disabled) cb.setAttribute('disabled', 'disabled');
+                else cb.removeAttribute('disabled');
+            });
+        }
+
+        function simpanKIRSementara() {
+            const container = getKIRFormsContainer();
+            if (!container) return;
+
+            normalizeKIRSelectionState(container);
+
+            const forms = Array.from(container.querySelectorAll('.kir-form-instance'))
+                .map(form => form.outerHTML);
+
+            localStorage.setItem('kir_temp_data', JSON.stringify({
+                version: 2,
+                formsHtml: forms,
+                savedAt: new Date().toISOString()
+            }));
+
+            alert('Semua form KIR berhasil disimpan sementara.');
         }
 
         function muatKIRSementara() {
@@ -2512,37 +2668,51 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 
             try {
                 const kirData = JSON.parse(saved);
-                
-                document.getElementById('provinsi').value = kirData.provinsi || "";
-                if (kirData.kabupatenHtml) {
-                    document.getElementById('kabupaten').innerHTML = kirData.kabupatenHtml;
-                    document.getElementById('kabupaten').value = kirData.kabupatenVal || "";
-                }
-                document.getElementById('klaster_kir').value = kirData.klaster || "";
-                document.getElementById('ruangan_kir').value = kirData.ruangan || "";
+                const container = getKIRFormsContainer();
 
-                if (kirData.tbodyHtml) {
-                    document.getElementById('tabel-body-kir').innerHTML = kirData.tbodyHtml;
+                if (kirData.version === 2 && Array.isArray(kirData.formsHtml) && kirData.formsHtml.length) {
+                    container.innerHTML = kirData.formsHtml.join('\n');
+                    // Pastikan tombol tambah form selalu tersedia pada form terakhir.
+                    const forms = container.querySelectorAll('.kir-form-instance');
+                    forms.forEach((form, idx) => {
+                        form.dataset.kirIndex = String(idx + 1);
+                        const badge = form.querySelector('.kir-form-badge');
+                        if (badge) badge.innerHTML = `📋 Form KIR #${idx + 1}`;
+                    });
+                    alert(`Data KIR berhasil dimuat: ${forms.length} form.`);
+                    return;
                 }
-                if (kirData.signatureHtml) {
-                    document.getElementById('signature-section-kir').innerHTML = kirData.signatureHtml;
+
+                // Kompatibilitas dengan penyimpanan versi lama.
+                const firstForm = container.querySelector('.kir-form-instance') || container;
+                const prov = firstForm.querySelector('#provinsi');
+                const kab = firstForm.querySelector('#kabupaten');
+                const klaster = firstForm.querySelector('#klaster_kir');
+                const ruangan = firstForm.querySelector('#ruangan_kir');
+                const tbody = firstForm.querySelector('#tabel-body-kir');
+                const sig = firstForm.querySelector('#signature-section-kir');
+
+                if (prov) prov.value = kirData.provinsi || '';
+                if (kab && kirData.kabupatenHtml) {
+                    kab.innerHTML = kirData.kabupatenHtml;
+                    kab.value = kirData.kabupatenVal || '';
                 }
-                
-                alert('Data KIR berhasil dikembalikan seperti semula!');
+                if (klaster) klaster.value = kirData.klaster || '';
+                if (ruangan) ruangan.value = kirData.ruangan || '';
+                if (ruangan) updateKIRFormTitle(ruangan);
+                if (tbody && kirData.tbodyHtml) tbody.innerHTML = kirData.tbodyHtml;
+                if (sig && kirData.signatureHtml) sig.innerHTML = kirData.signatureHtml;
+
+                alert('Data KIR berhasil dimuat.');
             } catch (e) {
                 console.error('Error loading KIR data', e);
                 alert('Gagal memuat data KIR.');
             }
         }
 
-        function tambahBarisKIR() {
-            var tbody = document.getElementById("tabel-body-kir");
-            var rowCount = tbody.getElementsByTagName("tr").length;
-            var nextNumber = rowCount + 1;
-            
-            var newRow = document.createElement("tr");
-            newRow.innerHTML = `
-                <td>${nextNumber}</td>
+        function createKIRRowHTML(number) {
+            return `
+                <td>${number}</td>
                 <td><div contenteditable="true"></div></td>
                 <td><div contenteditable="true"></div></td>
                 <td><div contenteditable="true"></div></td>
@@ -2556,25 +2726,260 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 <td><input type="checkbox"></td>
                 <td><input type="checkbox"></td>
                 <td><div contenteditable="true"></div></td>
+                <td class="no-print kir-action-col">
+                    <button type="button" class="kir-row-lock" onclick="toggleKIRRowLock(this)" title="Kunci baris">🔓</button>
+                </td>
             `;
+        }
+
+        function tambahBarisKIR(button) {
+            const form = getKIRFormFromElement(button);
+            if (!form) return;
+
+            const tbody = form.querySelector('tbody[id^="tabel-body-kir"]');
+            if (!tbody) return;
+
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = createKIRRowHTML(rows.length + 1);
             tbody.appendChild(newRow);
         }
 
-        function unduhPDFKIR() {
-            const btnGroup = document.getElementById('kirActionButtons');
-            if (btnGroup) btnGroup.style.display = 'none';
+        function renumberKIRRows(form) {
+            const tbody = form.querySelector('tbody[id^="tabel-body-kir"]');
+            if (!tbody) return;
+            tbody.querySelectorAll('tr').forEach((row, idx) => {
+                if (row.cells[0]) row.cells[0].textContent = String(idx + 1);
+            });
+        }
 
-            const element = document.getElementById('kirContainerData');
+        function toggleKIRRowLock(button) {
+            const row = button.closest('tr');
+            if (!row) return;
+
+            const locked = row.classList.toggle('kir-row-locked');
+            row.querySelectorAll('[contenteditable="true"], [contenteditable="false"]').forEach(el => {
+                el.setAttribute('contenteditable', locked ? 'false' : 'true');
+            });
+            row.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.disabled = locked;
+            });
+
+            button.textContent = locked ? '🔒' : '🔓';
+            button.title = locked ? 'Buka kunci baris' : 'Kunci baris';
+            button.setAttribute('aria-label', button.title);
+        }
+
+        function updateKIRFormTitle(selectElement) {
+            const form = getKIRFormFromElement(selectElement);
+            if (!form) return;
+
+            const badge = form.querySelector('.kir-form-badge');
+            if (!badge) return;
+
+            const ruangan = (selectElement && selectElement.value || '').trim();
+            const klasterEl = form.querySelector('[id^="klaster_kir"]');
+            const klaster = (klasterEl && klasterEl.value || '').trim();
+
+            if (ruangan) {
+                badge.innerHTML = `📋 KIR - ${ruangan}`;
+            } else if (klaster) {
+                badge.innerHTML = `📋 KIR - ${klaster}`;
+            } else {
+                badge.innerHTML = '📋 KIR - Pilih Ruangan';
+            }
+        }
+
+        function resetKIRFormData(form, index) {
+            form.dataset.kirIndex = String(index);
+
+            const badge = form.querySelector('.kir-form-badge');
+            if (badge) badge.innerHTML = '📋 KIR - Pilih Ruangan';
+
+            // Semua ID dibuat unik agar tidak ada bentrok antar form.
+            form.querySelectorAll('[id]').forEach(el => {
+                const baseId = el.id.replace(/-\d+$/, '');
+                el.id = `${baseId}-${index}`;
+            });
+
+            const prov = form.querySelector('[id^="provinsi"]');
+            const kab = form.querySelector('[id^="kabupaten"]');
+            const klaster = form.querySelector('[id^="klaster_kir"]');
+            const ruangan = form.querySelector('[id^="ruangan_kir"]');
+            const tbody = form.querySelector('[id^="tabel-body-kir"]');
+
+            if (prov) prov.value = '';
+            if (kab) {
+                kab.innerHTML = '<option value="">-- Pilih Provinsi Terlebih Dahulu --</option>';
+                kab.value = '';
+            }
+            if (klaster) klaster.value = '';
+            if (ruangan) ruangan.value = '';
+
+            if (tbody) {
+                tbody.innerHTML = `<tr>${createKIRRowHTML(1)}</tr>`;
+            }
+
+            const signature = form.querySelector('[id^="signature-section-kir"]');
+            if (signature) {
+                const editables = signature.querySelectorAll('[contenteditable="true"]');
+                if (editables[0]) editables[0].textContent = 'Kepala UPTD Puskesmas Lanjut';
+                if (editables[1]) editables[1].textContent = '';
+                if (editables[2]) editables[2].textContent = '';
+                if (editables[3]) editables[3].textContent = 'Lanjut, ......................... 20....';
+                if (editables[4]) editables[4].textContent = 'Pengurus / Pemegang Barang';
+                if (editables[5]) editables[5].textContent = '';
+                if (editables[6]) editables[6].textContent = '';
+            }
+
+            // Form baru tidak membawa kontrol global simpan/muat/PDF.
+            const actionGroup = form.querySelector('#kirActionButtons, [id^="kirActionButtons-"]');
+            if (actionGroup) actionGroup.remove();
+
+            // Pastikan event select provinsi menunjuk ke form yang benar.
+            if (prov) prov.setAttribute('onchange', 'fetchKabupatenKIR(this)');
+
+            const ruanganEl = form.querySelector('[id^="ruangan_kir"]');
+            if (ruanganEl) ruanganEl.setAttribute('onchange', 'updateKIRFormTitle(this)');
+
+
+            // Tambahkan label form bila belum ada.
+            if (!form.querySelector('.kir-form-badge')) {
+                const h2 = form.querySelector('h2');
+                const badgeEl = document.createElement('div');
+                badgeEl.className = 'kir-form-badge no-print';
+                badgeEl.innerHTML = '📋 KIR - Pilih Ruangan';
+                if (h2) h2.parentNode.insertBefore(badgeEl, h2);
+            }
+        }
+
+        function hapusFormKIR(button) {
+            const container = getKIRFormsContainer();
+            const form = getKIRFormFromElement(button);
+            if (!container || !form) return;
+
+            const totalForms = container.querySelectorAll('.kir-form-instance').length;
+            const badge = form.querySelector('.kir-form-badge');
+            const nomor = form.dataset.kirIndex || (badge ? badge.textContent.replace(/\D/g, '') : '?');
+
+            if (totalForms <= 1) {
+                alert('Form KIR terakhir tidak dapat dihapus. Minimal harus ada 1 form KIR.');
+                return;
+            }
+
+            if (!confirm(`Yakin ingin menghapus Form KIR #${nomor}?\n\nSemua data barang, klaster/ruangan, dan tanda tangan pada form ini akan dihapus.`)) {
+                return;
+            }
+
+            form.remove();
+            renumberKIRForms();
+        }
+
+        function renumberKIRForms() {
+            const container = getKIRFormsContainer();
+            if (!container) return;
+
+            container.querySelectorAll('.kir-form-instance').forEach((form, idx) => {
+                const index = idx + 1;
+                form.dataset.kirIndex = String(index);
+                const badge = form.querySelector('.kir-form-badge');
+                const ruangan = form.querySelector('[id^="ruangan_kir"]');
+                const klaster = form.querySelector('[id^="klaster_kir"]');
+                if (badge) {
+                    if (ruangan && ruangan.value) badge.innerHTML = `📋 KIR - ${ruangan.value}`;
+                    else if (klaster && klaster.value) badge.innerHTML = `📋 KIR - ${klaster.value}`;
+                    else badge.innerHTML = '📋 KIR - Pilih Ruangan';
+                }
+            });
+        }
+
+        function tambahFormKIR(button) {
+            const container = getKIRFormsContainer();
+            const sourceForm = getKIRFormFromElement(button);
+            if (!container || !sourceForm) return;
+
+            const currentForms = container.querySelectorAll('.kir-form-instance');
+            const newIndex = currentForms.length + 1;
+
+            const clone = sourceForm.cloneNode(true);
+            resetKIRFormData(clone, newIndex);
+
+            // Hapus toolbar global dari form baru.
+            const actionGroup = clone.querySelector('[id^="kirActionButtons"]');
+            if (actionGroup) actionGroup.remove();
+
+            // Pastikan tombol tambah form berada di bagian paling bawah setiap form.
+            if (!clone.querySelector('.kir-add-form-area')) {
+                const addArea = document.createElement('div');
+                addArea.className = 'no-print kir-add-form-area';
+                addArea.innerHTML = `
+                    <div class="kir-form-btn-row">
+                        <button type="button" class="kir-btn-add-form" onclick="tambahFormKIR(this)">➕ Tambah Form KIR - Klaster / Ruangan Baru</button>
+                        <button type="button" class="kir-btn-delete-form" onclick="hapusFormKIR(this)" title="Hapus form KIR ini">🗑️ Hapus Form KIR</button>
+                    </div>
+                `;
+                clone.appendChild(addArea);
+            }
+
+            container.appendChild(clone);
+            clone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            const klaster = clone.querySelector('[id^="klaster_kir"]');
+            if (klaster) setTimeout(() => klaster.focus(), 250);
+        }
+
+        function fetchKabupatenKIR(selectElement) {
+            const form = getKIRFormFromElement(selectElement);
+            if (!form) return;
+
+            const provSelect = form.querySelector('[id^="provinsi"]');
+            const selectKab = form.querySelector('[id^="kabupaten"]');
+            const idProvinsi = provSelect ? provSelect.value : '';
+
+            if (!selectKab) return;
+            if (!idProvinsi) {
+                selectKab.innerHTML = '<option value="">-- Pilih Provinsi Terlebih Dahulu --</option>';
+                return;
+            }
+
+            selectKab.innerHTML = '<option value="">-- Memuat Kabupaten... --</option>';
+            const urlKabupaten = `https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${idProvinsi}.json`;
+
+            fetch(urlKabupaten)
+                .then(response => response.json())
+                .then(regencies => {
+                    let options = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+                    regencies.forEach(kab => {
+                        options += `<option value="${kab.id}">${kab.name}</option>`;
+                    });
+                    selectKab.innerHTML = options;
+                })
+                .catch(e => {
+                    console.log('Error fetch kabupaten', e);
+                    selectKab.innerHTML = '<option value="">-- Gagal memuat Kabupaten/Kota --</option>';
+                });
+        }
+
+        function unduhPDFKIR() {
+            const container = getKIRFormsContainer();
+            if (!container) return;
+
+            container.querySelectorAll('.kir-wrapper .no-print').forEach(el => {
+                el.style.display = 'none';
+            });
+
             const opt = {
-                margin:       10,
-                filename:     'KIR_Inventaris_Puskesmas.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                margin: 10,
+                filename: 'KIR_Inventaris_Puskesmas.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
-            
-            html2pdf().set(opt).from(element).save().then(() => {
-                if (btnGroup) btnGroup.style.display = 'flex';
+
+            html2pdf().set(opt).from(container).save().then(() => {
+                container.querySelectorAll('.kir-wrapper .no-print').forEach(el => {
+                    el.style.display = '';
+                });
             });
         }
         /* ---------------- AKHIR SCRIPT KIR ---------------- */
@@ -3989,14 +4394,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         }
 
 function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
-            // PMI tidak memakai dashboard/login terpisah. Password diminta hanya saat membuka PMI.
-            if (categoryCode === 'monitoring' && periodIdentifier === 'pmi') {
-                const password = window.prompt('Masukkan password untuk membuka Pemantauan Mutu Internal (PMI):');
-                if (password !== 'admin') {
-                    if (password !== null) alert('Password salah. Akses PMI dibatalkan.');
-                    return;
-                }
-            }
             document.getElementById('topNavBar').classList.remove('show-mobile');
             document.getElementById('hamburgerBtn')?.classList.remove('active');
             currentMenuId = categoryCode + "-" + periodIdentifier;
@@ -4821,43 +5218,6 @@ function pwsRefreshCalendarPeriod(){
             background-color: #f4f4f4;
         }
 
-        /* --- LOGIN SCREEN --- */
-        #ikpModule #ikp_loginScreen {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-        #ikpModule .login-box {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 350px;
-        }
-        #ikpModule .login-box input {
-            width: 100%;
-            padding: 10px;
-            margin: 15px 0;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        #ikpModule .login-box button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
         /* --- MAIN CONTENT --- */
         #ikpModule #ikp_mainContent {
             display: none;
@@ -5007,26 +5367,6 @@ function pwsRefreshCalendarPeriod(){
         /* Sembunyikan elemen yang tidak perlu saat di-download PDF */
         #ikpModule .hide-on-pdf { display: block; }
     
-.ikp-login-screen{
-    min-height:72vh;display:flex;align-items:center;justify-content:center;
-    padding:30px 15px;background:linear-gradient(135deg,#ecfdf5,#eff6ff);border-radius:14px;
-}
-.ikp-login-box{
-    width:100%;max-width:430px;background:rgba(255,255,255,.97);border:1px solid #dbeafe;
-    border-radius:18px;padding:30px 28px;box-shadow:0 18px 45px rgba(15,23,42,.14);text-align:center;
-}
-.ikp-login-icon{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#047857;color:#fff;font-size:28px;box-shadow:0 8px 18px rgba(4,120,87,.24)}
-.ikp-login-box h2{margin:0;color:#047857;font-size:1.2rem;font-weight:800}
-.ikp-login-subtitle{margin:8px 0 20px;color:#64748b;font-size:.82rem}
-.ikp-password-wrap{position:relative;display:flex;align-items:center;margin-bottom:12px}
-.ikp-password-wrap>i{position:absolute;left:13px;color:#64748b;z-index:2}
-.ikp-password-wrap input{width:100%;padding:12px 44px 12px 38px;border:1px solid #cbd5e1;border-radius:10px;font-size:.9rem;outline:none;background:#f8fafc}
-.ikp-password-wrap input:focus{border-color:#047857;box-shadow:0 0 0 3px rgba(4,120,87,.12)}
-.ikp-toggle-password{position:absolute;right:8px;border:0;background:transparent;color:#64748b;cursor:pointer;padding:8px}
-.ikp-login-btn{width:100%;padding:12px;border:0;border-radius:10px;background:#047857;color:#fff;font-weight:700;font-size:.88rem;cursor:pointer;transition:.2s}
-.ikp-login-btn:hover{background:#065f46;transform:translateY(-1px)}
-.ikp-error-msg{display:none;color:#dc2626;font-size:.78rem;font-weight:600;margin:12px 0 0}
-
 #ikpModule {
     display: none;
     width: 100%;
@@ -5046,21 +5386,6 @@ function pwsRefreshCalendarPeriod(){
       </button>
     </div>
     
-
-<!-- LOGIN MONITORING KESELAMATAN PASIEN -->
-<div id="ikp_loginScreen" class="ikp-login-screen">
-    <div class="ikp-login-box">
-        <div class="ikp-login-icon"></div>
-        <h2>Monitoring Keselamatan Pasien</h2>
-        <p class="ikp-login-subtitle">Masukkan password untuk membuka monitoring</p>
-        <div class="ikp-password-wrap">
-            <input type="password" id="ikp_adminPassword" placeholder="Masukkan password" autocomplete="off" onkeydown="if(event.key==='Enter') ikp_login()">
-            <button type="button" class="ikp-toggle-password" onclick="ikp_togglePassword()" aria-label="Tampilkan password"></button>
-        </div>
-        <button class="ikp-login-btn" onclick="ikp_login()">Buka Monitoring</button>
-        <p id="ikp_errorMsg" class="ikp-error-msg">Password salah. Silakan coba lagi.</p>
-    </div>
-</div>
 
 <!-- MAIN FORM -->
 <div id="ikp_mainContent">
@@ -5140,24 +5465,7 @@ function pwsRefreshCalendarPeriod(){
 <script>
 
     // --- 1. LOGIKA LOGIN ---
-    function ikp_togglePassword() {
-        const input = document.getElementById("ikp_adminPassword");
-        const icon = document.querySelector(".ikp-toggle-password i");
-        const show = input.type === "password";
-        input.type = show ? "text" : "password";
-        icon.className = show ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
-    }
-
-    function ikp_login() {
-        const pass = document.getElementById("ikp_adminPassword").value;
-        if (pass === "admin") {
-            document.getElementById("ikp_loginScreen").style.display = "none";
-            document.getElementById("ikp_mainContent").style.display = "block";
-            ikp_loadTracker(); // Load tracker bulan saat berhasil masuk
-        } else {
-            document.getElementById("ikp_errorMsg").style.display = "block";
-        }
-    }
+    // IKP uses the main application password gate; no separate module dashboard/login is used.
 
     // --- 2. GENERATE TABLE DATA ---
     const dataRuangan = [
