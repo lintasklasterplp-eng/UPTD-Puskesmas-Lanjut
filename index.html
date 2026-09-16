@@ -740,7 +740,7 @@
         .gug-table th, .gug-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
         .gug-table th { background-color: #00897B; color: white; text-align: center; }
         .gug-table td.center { text-align: center; }
-        .gug-chart-container { width: 100%; max-width: 360px; margin: auto; }
+        .gug-chart-container { height: 320px; position: relative; width: 100%; width: 100%; max-width: 360px; margin: auto; }
         .gug-badge-tinggi { background-color: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
         .gug-badge-rendah { background-color: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
         .gug-badge-tidak { background-color: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-weight: bold;}
@@ -2300,6 +2300,8 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         // Gunakan hanya anon/publishable key di browser. Jangan pernah menaruh service_role key di HTML.
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnd2p6aHNrY3NvaGVpZW56a2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0ODI1MDMsImV4cCI6MjEwNTA1ODUwM30.zOf93AJ_xrEOtPmIqYEv_0oMSONRN41Ubc2bWW_41z4';
         const STORAGE_BUCKET = "INVENTARIS";
+        const OBHP_STORAGE_BUCKET = "OBHPBMHP";
+        const OBHP_STORAGE_PATH = "kartu-stok/kartu-stok.json";
         const GUG_STORAGE_PATH = "skrining-get-up-and-go/riwayat.json";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -2859,7 +2861,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             }
         }
 
-        function simpanSementaraOBHP(showNotification = true) {
+        function kumpulkanDataStokOBHP() {
             const rows = document.querySelectorAll('#obhpTableBody tr');
             const dataStok = [];
 
@@ -2877,19 +2879,86 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 });
             });
 
-            localStorage.setItem('stokPuskesmasLanjutA4', JSON.stringify(dataStok));
+            return dataStok;
+        }
 
+        function kunciTabelOBHP() {
             const table = document.getElementById('obhpStokTable');
-            table.classList.add('obhp-locked');
-            document.getElementById('obhpBtnAdd').style.display = 'none';
+            if (table) table.classList.add('obhp-locked');
+            const btnAdd = document.getElementById('obhpBtnAdd');
+            if (btnAdd) btnAdd.style.display = 'none';
             document.querySelectorAll('.obhp-btn-delete').forEach(btn => btn.style.display = 'none');
 
             const badge = document.getElementById('obhpStatusBadge');
-            badge.className = "obhp-status-badge obhp-status-mode-tersimpan";
-            badge.innerText = "Status: Tersimpan Sementara (Tabel dikunci. Klik 'Edit Data' untuk mengubah)";
+            if (badge) {
+                badge.className = "obhp-status-badge obhp-status-mode-tersimpan";
+                badge.innerText = "Status: Tersimpan (Sinkron Supabase). Klik 'Edit Data' untuk mengubah";
+            }
+        }
 
-            if (showNotification) {
-                alert("Data Kartu Stok OBHP/BMHP Berhasil Disimpan Sementara!");
+        async function ambilDataStokOBHPSupabase() {
+            const { data, error } = await supabaseClient.storage
+                .from(OBHP_STORAGE_BUCKET)
+                .download(OBHP_STORAGE_PATH);
+
+            if (error) {
+                if (/not found|object not found|no such file/i.test(error.message || '')) {
+                    return null;
+                }
+                throw error;
+            }
+
+            const text = await data.text();
+            const parsed = JSON.parse(text);
+            if (Array.isArray(parsed)) return parsed;
+            if (parsed && Array.isArray(parsed.dataStok)) return parsed.dataStok;
+            return [];
+        }
+
+        async function simpanDataStokOBHPSupabase(dataStok) {
+            const payload = {
+                module: 'OBHP/BMHP',
+                updatedAt: new Date().toISOString(),
+                dataStok
+            };
+
+            const blob = new Blob(
+                [JSON.stringify(payload, null, 2)],
+                { type: 'application/json;charset=utf-8' }
+            );
+
+            const { error } = await supabaseClient.storage
+                .from(OBHP_STORAGE_BUCKET)
+                .upload(OBHP_STORAGE_PATH, blob, {
+                    cacheControl: '0',
+                    upsert: true,
+                    contentType: 'application/json'
+                });
+
+            if (error) throw error;
+        }
+
+        async function simpanSementaraOBHP(showNotification = true) {
+            const dataStok = kumpulkanDataStokOBHP();
+
+            // Tetap simpan lokal terlebih dahulu agar aplikasi tetap bekerja saat internet bermasalah.
+            localStorage.setItem('stokPuskesmasLanjutA4', JSON.stringify(dataStok));
+            kunciTabelOBHP();
+
+            try {
+                await simpanDataStokOBHPSupabase(dataStok);
+                if (showNotification) {
+                    alert("Data Kartu Stok OBHP/BMHP berhasil disimpan ke Supabase bucket OBHPBMHP.");
+                }
+            } catch (cloudError) {
+                console.error('Gagal menyimpan OBHP/BMHP ke Supabase:', cloudError);
+                if (showNotification) {
+                    alert(
+                        `Data berhasil disimpan di perangkat, tetapi gagal disimpan ke Supabase.\n\n` +
+                        `Masalah: ${cloudError.message || cloudError}\n\n` +
+                        `Periksa bucket OBHPBMHP dan policy Storage (INSERT/UPDATE/SELECT) terlebih dahulu.`
+                    );
+                }
             }
         }
 
@@ -2904,19 +2973,43 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             badge.innerText = "Status: Mode Edit (Silakan isi atau ubah data)";
         }
 
-        function initOBHPBMHP() {
+        async function initOBHPBMHP() {
             const tbody = document.getElementById('obhpTableBody');
-            tbody.innerHTML = ''; 
+            if (!tbody) return;
+            tbody.innerHTML = '';
 
-            const savedData = localStorage.getItem('stokPuskesmasLanjutA4');
-            if (savedData) {
-                const parsedData = JSON.parse(savedData);
-                if (parsedData.length > 0) {
-                    parsedData.forEach(item => tambahBarisOBHP(item));
-                    simpanSementaraOBHP(false);
-                    return;
+            let parsedData = [];
+            let cloudLoaded = false;
+
+            try {
+                const cloudData = await ambilDataStokOBHPSupabase();
+                if (Array.isArray(cloudData)) {
+                    parsedData = cloudData;
+                    cloudLoaded = true;
+                    localStorage.setItem('stokPuskesmasLanjutA4', JSON.stringify(parsedData));
+                }
+            } catch (cloudError) {
+                console.warn('Data OBHP/BMHP Supabase tidak dapat dimuat, menggunakan LocalStorage:', cloudError);
+            }
+
+            if (!cloudLoaded) {
+                try {
+                    const savedData = localStorage.getItem('stokPuskesmasLanjutA4');
+                    if (savedData) {
+                        parsedData = JSON.parse(savedData);
+                    }
+                } catch (localError) {
+                    console.warn('LocalStorage OBHP/BMHP tidak dapat dibaca:', localError);
+                    parsedData = [];
                 }
             }
+
+            if (Array.isArray(parsedData) && parsedData.length > 0) {
+                parsedData.forEach(item => tambahBarisOBHP(item));
+                kunciTabelOBHP();
+                return;
+            }
+
             tambahBarisOBHP();
             tambahBarisOBHP();
             tambahBarisOBHP();
@@ -3157,6 +3250,64 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         /* ================= SCRIPT SKRINING GET UP AND GO (GUG) ================= */
         let risikoChartInstance = null;
 
+        function updateChartGUG(countTinggi, countRendah, countTidak) {
+            const canvas = document.getElementById('risikoChart');
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            const ctx = canvas.getContext('2d');
+
+            if (risikoChartInstance) {
+                risikoChartInstance.destroy();
+                risikoChartInstance = null;
+            }
+
+            risikoChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Risiko Tinggi', 'Risiko Rendah', 'Tidak Berisiko'],
+                    datasets: [{
+                        data: [countTinggi, countRendah, countTidak],
+                        backgroundColor: ['#dc3545', '#ffc107', '#198754'],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const value = context.raw || 0;
+                                    const percent = total ? ((value / total) * 100).toFixed(1) : '0.0';
+                                    return `${context.label}: ${value} pasien (${percent}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '58%'
+                }
+            });
+        }
+
+        let gugMidnightTimer = null;
+
+        function formatTanggalGUG(date = new Date()) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         function setWaktuOtomatisGUG() {
             const now = new Date();
             const year = now.getFullYear();
@@ -3170,6 +3321,40 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 
             if (tglEl) tglEl.value = `${year}-${month}-${day}`;
             if (waktuEl) waktuEl.value = `${hours}:${minutes}`;
+        }
+
+        function filterRiwayatGUGHariIni(riwayat) {
+            const hariIni = formatTanggalGUG();
+            return (Array.isArray(riwayat) ? riwayat : []).filter(item => {
+                if (!item || !item.tglWaktu) return false;
+                return String(item.tglWaktu).slice(0, 10) === hariIni;
+            });
+        }
+
+        function resetFormGUGHariBaru() {
+            const form = document.getElementById('formSkriningGUG');
+            if (form) form.reset();
+            setWaktuOtomatisGUG();
+            cekAlamatGUG();
+            renderDataGUG();
+        }
+
+        function jadwalkanResetHarianGUG() {
+            if (gugMidnightTimer) {
+                clearTimeout(gugMidnightTimer);
+            }
+
+            const now = new Date();
+            const besok = new Date(now);
+            besok.setHours(24, 0, 0, 50);
+            const delay = Math.max(1000, besok.getTime() - now.getTime());
+
+            gugMidnightTimer = setTimeout(() => {
+                // Riwayat cloud TIDAK dihapus. Hanya tampilan riwayat pasien yang
+                // otomatis berganti ke tanggal baru; diagram tetap menghitung seluruh riwayat.
+                resetFormGUGHariBaru();
+                jadwalkanResetHarianGUG();
+            }, delay);
         }
 
         function hitungUmurGUG() {
@@ -3322,6 +3507,10 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             riwayat.unshift(newData);
             simpanRiwayatGUGLocal(riwayat);
 
+            // LANGSUNG tampilkan data terbaru ke tabel riwayat tanpa menunggu
+            // proses upload Supabase selesai atau input pasien berikutnya.
+            renderDataGUG(riwayat);
+
             const tombol = document.querySelector('#formSkriningGUG .gug-btn');
             const teksTombol = tombol ? tombol.innerHTML : '';
             if (tombol) {
@@ -3348,51 +3537,66 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 
             document.getElementById('formSkriningGUG').reset();
             setWaktuOtomatisGUG();
-            renderDataGUG();
+
+            // Pastikan tampilan tetap menggunakan riwayat terbaru setelah reset form.
+            renderDataGUG(riwayat);
         }
 
-        async function renderDataGUG() {
-            let riwayat = bacaRiwayatGUGLocal();
+        async function renderDataGUG(riwayatOverride = null) {
+            // riwayatSemua = seluruh data untuk mempertahankan diagram kumulatif.
+            // riwayatHariIni = hanya data tanggal berjalan untuk tabel riwayat pasien.
+            let riwayatSemua = Array.isArray(riwayatOverride)
+                ? riwayatOverride
+                : bacaRiwayatGUGLocal();
 
-            try {
-                const cloudRiwayat = await ambilRiwayatGUGSupabase();
-                if (Array.isArray(cloudRiwayat)) {
-                    riwayat = cloudRiwayat;
-                    simpanRiwayatGUGLocal(riwayat);
+            // Saat tidak diberi override, ambil data cloud seperti biasa.
+            // Saat ada override (misalnya baru saja menyimpan pasien), jangan
+            // menimpa tampilan dengan data cloud yang belum selesai ter-update.
+            if (!Array.isArray(riwayatOverride)) {
+                try {
+                    const cloudRiwayat = await ambilRiwayatGUGSupabase();
+                    if (Array.isArray(cloudRiwayat)) {
+                        riwayatSemua = cloudRiwayat;
+                        simpanRiwayatGUGLocal(riwayatSemua);
+                    }
+                } catch (cloudError) {
+                    console.warn('Riwayat GUG Supabase tidak dapat dimuat. LocalStorage digunakan:', cloudError);
                 }
-            } catch (cloudError) {
-                console.warn('Riwayat GUG Supabase tidak dapat dimuat. LocalStorage digunakan:', cloudError);
+            } else {
+                simpanRiwayatGUGLocal(riwayatSemua);
             }
 
+            const riwayatHariIni = filterRiwayatGUGHariIni(riwayatSemua);
             const tbody = document.getElementById('tbodyPasienGUG');
             if (!tbody) return;
             tbody.innerHTML = '';
 
-            if (riwayat.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="center" style="padding: 15px; color: #666;">Belum ada data riwayat pasien skrining.</td></tr>`;
-                updateChartGUG(0, 0, 0);
-                return;
+            if (riwayatHariIni.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="center" style="padding: 15px; color: #666;">Belum ada data riwayat pasien untuk tanggal ${formatTanggalGUG()}.</td></tr>`;
+            } else {
+                riwayatHariIni.forEach((item, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="center">${index + 1}</td>
+                        <td>${item.tglWaktu || ''}</td>
+                        <td><strong>${item.nama || ''}</strong></td>
+                        <td class="center">${item.umur || ''} Thn</td>
+                        <td>${item.alamat || ''}</td>
+                        <td class="center"><span class="${item.badge || 'gug-badge-tidak'}">${item.risiko || 'Tidak Berisiko'}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             }
 
+            // Diagram TETAP kumulatif: data kemarin dan hari-hari sebelumnya tidak dihapus.
             let countTinggi = 0;
             let countRendah = 0;
             let countTidak = 0;
 
-            riwayat.forEach((item, index) => {
+            riwayatSemua.forEach(item => {
                 if (item.risiko === "Risiko Tinggi") countTinggi++;
                 else if (item.risiko === "Risiko Rendah") countRendah++;
                 else countTidak++;
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="center">${index + 1}</td>
-                    <td>${item.tglWaktu || ''}</td>
-                    <td><strong>${item.nama || ''}</strong></td>
-                    <td class="center">${item.umur || ''} Thn</td>
-                    <td>${item.alamat || ''}</td>
-                    <td class="center"><span class="${item.badge || 'gug-badge-tidak'}">${item.risiko || 'Tidak Berisiko'}</span></td>
-                `;
-                tbody.appendChild(tr);
             });
 
             updateChartGUG(countTinggi, countRendah, countTidak);
@@ -3430,6 +3634,8 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 }
             });
         }
+        jadwalkanResetHarianGUG();
+
         /* ================= AKHIR SCRIPT GUG ================= */
 
         function simpanUrlRujukan() {
