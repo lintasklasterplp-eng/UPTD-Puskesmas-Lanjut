@@ -2294,10 +2294,13 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 
     <!-- JavaScript Terintegrasi -->
     <script>
-        const SUPABASE_URL = 'https://nrqdqysorzakicxorfoh.supabase.co';
-        // Gunakan Published key di browser. Secret key wajib tetap di server/backend dan tidak ditanam di HTML.
-        const SUPABASE_ANON_KEY = 'sb_publishable_h-ZMPnpFAdJLBeZp3vVc1g_Pc64eEYd';
+        // ================= KONFIGURASI SUPABASE =================
+        // URL harus berupa URL PROJECT (tanpa /rest/v1/).
+        const SUPABASE_URL = 'https://sgwjzhskcsoheienzkli.supabase.co';
+        // Gunakan hanya anon/publishable key di browser. Jangan pernah menaruh service_role key di HTML.
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnd2p6aHNrY3NvaGVpZW56a2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0ODI1MDMsImV4cCI6MjEwNTA1ODUwM30.zOf93AJ_xrEOtPmIqYEv_0oMSONRN41Ubc2bWW_41z4';
         const STORAGE_BUCKET = "INVENTARIS";
+        const GUG_STORAGE_PATH = "skrining-get-up-and-go/riwayat.json";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -3195,9 +3198,59 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             }
         }
 
-        function simpanDataGUG() {
+        // ================= SIMPAN GET UP & GO KE SUPABASE STORAGE =================
+        // Data tetap dicadangkan di localStorage agar aplikasi tetap bisa dipakai saat internet putus.
+        function simpanRiwayatGUGLocal(riwayat) {
+            localStorage.setItem('riwayatSkriningGUG', JSON.stringify(riwayat));
+        }
+
+        function bacaRiwayatGUGLocal() {
+            try {
+                return JSON.parse(localStorage.getItem('riwayatSkriningGUG')) || [];
+            } catch (e) {
+                console.warn('LocalStorage GUG rusak:', e);
+                return [];
+            }
+        }
+
+        async function ambilRiwayatGUGSupabase() {
+            const { data, error } = await supabaseClient.storage
+                .from(STORAGE_BUCKET)
+                .download(GUG_STORAGE_PATH);
+
+            if (error) {
+                if (/not found|object not found|no such file/i.test(error.message || '')) {
+                    return [];
+                }
+                throw error;
+            }
+
+            const text = await data.text();
+            const parsed = JSON.parse(text);
+            return Array.isArray(parsed) ? parsed : [];
+        }
+
+        async function simpanRiwayatGUGSupabase(riwayat) {
+            const blob = new Blob(
+                [JSON.stringify(riwayat, null, 2)],
+                { type: 'application/json;charset=utf-8' }
+            );
+
+            const { error } = await supabaseClient.storage
+                .from(STORAGE_BUCKET)
+                .upload(GUG_STORAGE_PATH, blob, {
+                    cacheControl: '0',
+                    upsert: true,
+                    contentType: 'application/json'
+                });
+
+            if (error) throw error;
+        }
+
+        async function simpanDataGUG() {
             const nama = document.getElementById('namaPasienGUG').value.trim();
             const umur = document.getElementById('umurPasienGUG').value.trim();
+            const tglLahir = document.getElementById('tglLahirGUG').value || '';
             let alamat = document.getElementById('alamatPasienGUG').value;
             if (alamat === 'Lainnya') {
                 alamat = document.getElementById('alamatLainnyaGUG').value.trim();
@@ -3212,9 +3265,18 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             const waktu = document.getElementById('waktuKunjunganGUG').value;
             const tglWaktuStr = `${tgl} ${waktu}`;
 
-            const a1 = document.querySelector('input[name="kriteriaA1"]:checked').value === 'ya';
-            const a2 = document.querySelector('input[name="kriteriaA2"]:checked').value === 'ya';
-            const b = document.querySelector('input[name="kriteriaB"]:checked').value === 'ya';
+            const a1El = document.querySelector('input[name="kriteriaA1"]:checked');
+            const a2El = document.querySelector('input[name="kriteriaA2"]:checked');
+            const bEl  = document.querySelector('input[name="kriteriaB"]:checked');
+
+            if (!a1El || !a2El || !bEl) {
+                alert("Harap lengkapi seluruh kriteria Get Up & Go.");
+                return;
+            }
+
+            const a1 = a1El.value === 'ya';
+            const a2 = a2El.value === 'ya';
+            const b = bEl.value === 'ya';
 
             const kriteriaACount = (a1 ? 1 : 0) + (a2 ? 1 : 0);
             const kriteriaBVal = b ? 1 : 0;
@@ -3231,29 +3293,79 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             }
 
             const newData = {
+                id: (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`),
                 tglWaktu: tglWaktuStr,
                 nama: nama,
+                tglLahir: tglLahir,
                 umur: umur,
                 alamat: alamat,
+                kriteriaA1: a1El.value,
+                kriteriaA2: a2El.value,
+                kriteriaB: bEl.value,
                 risiko: tingkatRisiko,
-                badge: badgeClass
+                badge: badgeClass,
+                disimpanPada: new Date().toISOString()
             };
 
-            let riwayat = JSON.parse(localStorage.getItem('riwayatSkriningGUG')) || [];
-            riwayat.unshift(newData); // Masukkan ke urutan paling atas
-            localStorage.setItem('riwayatSkriningGUG', JSON.stringify(riwayat));
+            let riwayat = bacaRiwayatGUGLocal();
 
-            alert(`Data berhasil disimpan!\nHasil Skrining: ${tingkatRisiko}`);
-            
-            // Reset form input ringan & perbarui tampilan
+            try {
+                const cloudRiwayat = await ambilRiwayatGUGSupabase();
+                if (Array.isArray(cloudRiwayat) && cloudRiwayat.length) {
+                    riwayat = cloudRiwayat;
+                }
+            } catch (cloudReadError) {
+                console.warn('Cloud GUG tidak dapat dibaca, memakai LocalStorage:', cloudReadError);
+            }
+
+            riwayat = riwayat.filter(item => item && item.id !== newData.id);
+            riwayat.unshift(newData);
+            simpanRiwayatGUGLocal(riwayat);
+
+            const tombol = document.querySelector('#formSkriningGUG .gug-btn');
+            const teksTombol = tombol ? tombol.innerHTML : '';
+            if (tombol) {
+                tombol.disabled = true;
+                tombol.innerHTML = '⏳ Menyimpan ke Supabase...';
+            }
+
+            try {
+                await simpanRiwayatGUGSupabase(riwayat);
+                alert(`Data berhasil disimpan ke Supabase!\nHasil Skrining: ${tingkatRisiko}`);
+            } catch (cloudError) {
+                console.error('Gagal menyimpan GUG ke Supabase:', cloudError);
+                alert(
+                    `Data tersimpan di perangkat, tetapi GAGAL disimpan ke Supabase.\n\n` +
+                    `Masalah: ${cloudError.message || cloudError}\n\n` +
+                    `Periksa policy Storage bucket INVENTARIS dan pastikan path dapat di-upload oleh anon.`
+                );
+            } finally {
+                if (tombol) {
+                    tombol.disabled = false;
+                    tombol.innerHTML = teksTombol || 'Simpan Data & Hitung Risiko';
+                }
+            }
+
             document.getElementById('formSkriningGUG').reset();
             setWaktuOtomatisGUG();
             renderDataGUG();
         }
 
-        function renderDataGUG() {
-            const riwayat = JSON.parse(localStorage.getItem('riwayatSkriningGUG')) || [];
+        async function renderDataGUG() {
+            let riwayat = bacaRiwayatGUGLocal();
+
+            try {
+                const cloudRiwayat = await ambilRiwayatGUGSupabase();
+                if (Array.isArray(cloudRiwayat)) {
+                    riwayat = cloudRiwayat;
+                    simpanRiwayatGUGLocal(riwayat);
+                }
+            } catch (cloudError) {
+                console.warn('Riwayat GUG Supabase tidak dapat dimuat. LocalStorage digunakan:', cloudError);
+            }
+
             const tbody = document.getElementById('tbodyPasienGUG');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             if (riwayat.length === 0) {
@@ -3274,11 +3386,11 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="center">${index + 1}</td>
-                    <td>${item.tglWaktu}</td>
-                    <td><strong>${item.nama}</strong></td>
-                    <td class="center">${item.umur} Thn</td>
-                    <td>${item.alamat}</td>
-                    <td class="center"><span class="${item.badge}">${item.risiko}</span></td>
+                    <td>${item.tglWaktu || ''}</td>
+                    <td><strong>${item.nama || ''}</strong></td>
+                    <td class="center">${item.umur || ''} Thn</td>
+                    <td>${item.alamat || ''}</td>
+                    <td class="center"><span class="${item.badge || 'gug-badge-tidak'}">${item.risiko || 'Tidak Berisiko'}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -3286,45 +3398,35 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             updateChartGUG(countTinggi, countRendah, countTidak);
         }
 
-        function updateChartGUG(tinggi, rendah, tidak) {
-            const ctx = document.getElementById('risikoChart').getContext('2d');
-            
-            if (risikoChartInstance) {
-                risikoChartInstance.destroy();
-            }
+        async function hapusSemuaDataGUG() {
+            showPasswordPrompt("Hapus Riwayat GUG", "Masukkan password untuk menghapus seluruh data riwayat skrining Get Up & Go:", async (success, pwd) => {
+                if (!success) return;
 
-            risikoChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Risiko Tinggi', 'Risiko Rendah', 'Tidak Berisiko'],
-                    datasets: [{
-                        data: [tinggi, rendah, tidak],
-                        backgroundColor: ['#dc3545', '#ffc107', '#28a745'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
+                if (pwd === systemPassword || pwd === 'admin') {
+                    localStorage.removeItem('riwayatSkriningGUG');
+
+                    try {
+                        const { error } = await supabaseClient.storage
+                            .from(STORAGE_BUCKET)
+                            .remove([GUG_STORAGE_PATH]);
+
+                        if (error && !/not found|object not found|no such file/i.test(error.message || '')) {
+                            throw error;
                         }
-                    }
-                }
-            });
-        }
 
-        function hapusSemuaDataGUG() {
-            showPasswordPrompt("Hapus Riwayat GUG", "Masukkan password untuk menghapus seluruh data riwayat skrining Get Up & Go:", (success, pwd) => {
-                if (success) {
-                    if (pwd === systemPassword || pwd === 'admin') {
-                        localStorage.removeItem('riwayatSkriningGUG');
                         renderDataGUG();
-                        alert("Semua data riwayat skrining Get Up & Go berhasil dihapus.");
-                    } else if (pwd !== "") {
-                        alert("Password salah!");
+                        alert("Semua data riwayat skrining Get Up & Go berhasil dihapus dari perangkat dan Supabase.");
+                    } catch (cloudError) {
+                        console.error('Gagal menghapus GUG dari Supabase:', cloudError);
+                        renderDataGUG();
+                        alert(
+                            `Data lokal sudah dihapus, tetapi data Supabase belum terhapus.\n\n` +
+                            `Masalah: ${cloudError.message || cloudError}\n\n` +
+                            `Periksa policy DELETE pada Storage bucket INVENTARIS.`
+                        );
                     }
+                } else if (pwd !== "") {
+                    alert("Password salah!");
                 }
             });
         }
