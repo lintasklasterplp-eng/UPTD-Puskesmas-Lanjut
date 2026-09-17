@@ -4223,36 +4223,40 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         }
 
         async function hapusSemuaDataGUG() {
-            showPasswordPrompt("Hapus Riwayat GUG", "Masukkan password untuk menghapus seluruh data riwayat skrining Get Up & Go:", async (success, pwd) => {
-                if (!success) return;
+            showPasswordPrompt(
+                "Hapus Riwayat GUG",
+                "Masukkan password untuk menghapus seluruh data riwayat skrining Get Up & Go:",
+                async (success, pwd) => {
+                    if (!success) return;
 
-                if (pwd === systemPassword || pwd === 'admin') {
-                    localStorage.removeItem('riwayatSkriningGUG');
-
-                    try {
-                        const { error } = await supabaseClient.storage
-                            .from(STORAGE_BUCKET)
-                            .remove([GUG_STORAGE_PATH]);
-
-                        if (error && !/not found|object not found|no such file/i.test(error.message || '')) {
-                            throw error;
+                    if (pwd === systemPassword || pwd === 'admin') {
+                        if (!confirm("Yakin ingin menghapus seluruh data riwayat Get Up & Go dan mengosongkan diagram?")) {
+                            return;
                         }
 
-                        renderDataGUG();
-                        alert("Semua data riwayat skrining Get Up & Go berhasil dihapus dari perangkat dan Supabase.");
-                    } catch (cloudError) {
-                        console.error('Gagal menghapus GUG dari Supabase:', cloudError);
-                        renderDataGUG();
-                        alert(
-                            `Data lokal sudah dihapus, tetapi data Supabase belum terhapus.\n\n` +
-                            `Masalah: ${cloudError.message || cloudError}\n\n` +
-                            `Periksa policy DELETE pada Storage bucket INVENTARIS.`
-                        );
+                        // Kosongkan data lokal dan langsung reset tabel + diagram ke 0.
+                        const dataKosong = [];
+                        simpanRiwayatGUGLocal(dataKosong);
+                        renderDataGUG(dataKosong);
+
+                        try {
+                            // Tulis ulang file JSON sebagai array kosong.
+                            // Cara ini tidak bergantung pada policy DELETE Storage.
+                            await simpanRiwayatGUGSupabase(dataKosong);
+                            alert("Semua data riwayat skrining Get Up & Go berhasil dihapus. Diagram sudah dikosongkan.");
+                        } catch (cloudError) {
+                            console.error('Gagal mengosongkan data GUG di Supabase:', cloudError);
+                            alert(
+                                'Data di perangkat sudah dihapus dan diagram sudah dikosongkan, tetapi data Supabase belum berhasil diperbarui.\n\n' +
+                                'Masalah: ' + (cloudError.message || cloudError) + '\n\n' +
+                                'Periksa policy INSERT/UPDATE pada Storage bucket INVENTARIS.'
+                            );
+                        }
+                    } else if (pwd !== "") {
+                        alert("Password salah!");
                     }
-                } else if (pwd !== "") {
-                    alert("Password salah!");
                 }
-            });
+            );
         }
         jadwalkanResetHarianGUG();
 
