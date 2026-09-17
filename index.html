@@ -1093,7 +1093,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                     <div class="sub-dropdown" tabindex="0">
                         <button class="sub-nav-btn">Rujukan</button>
                         <div class="sub-dropdown-content">
-                            <a onclick="verifyAndSelectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal')">Internal</a>
+                            <a onclick="selectMenu('rujukan', 'internal', 'Rujukan', 'Rujukan Internal')">Internal</a>
                             <a onclick="selectMenu('rujukan', 'eksternal', 'Rujukan', 'Rujukan Eksternal')">Eksternal</a>
                             <a onclick="selectMenu('rujukan_upkdk', 'upkdk', 'Rujukan', 'Rujukan UPKDK')">UPKDK</a>
                         </div>
@@ -1471,8 +1471,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 
                             <div class="no-print kir-btn-group" id="kirActionButtons">
                                 <button class="btn-action" onclick="tambahBarisKIR(this)">+ Tambah Baris Barang</button>
-                                <button class="btn-action btn-save" onclick="simpanKIRSementara()">💾 Simpan</button>
-                                <button class="btn-action btn-load" onclick="muatKIRSementara()">🔄 Muat Data Tersimpan</button>
+                                <button class="btn-action btn-save" style="background-color:#7c3aed;" onclick="simpanKIRKeSupabase()">💾 Simpan</button>
                                 <button class="btn-action btn-pdf" onclick="unduhPDFKIR()">📄 Unduh PDF</button>
                             </div>
 
@@ -2419,6 +2418,9 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
         // Gunakan hanya anon/publishable key di browser. Jangan pernah menaruh service_role key di HTML.
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnd2p6aHNrY3NvaGVpZW56a2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0ODI1MDMsImV4cCI6MjEwNTA1ODUwM30.zOf93AJ_xrEOtPmIqYEv_0oMSONRN41Ubc2bWW_41z4';
         const STORAGE_BUCKET = "INVENTARIS";
+        // Bucket khusus KIR. File JSON akan disimpan di path KIR_STORAGE_PATH.
+        const KIR_STORAGE_BUCKET = "KIR";
+        const KIR_STORAGE_PATH = "kartu-inventaris-ruangan/kir-data.json";
         const OBHP_STORAGE_BUCKET = "OBHPBMHP";
         const OBHP_STORAGE_PATH = "kartu-stok/kartu-stok.json";
         const GUG_STORAGE_PATH = "skrining-get-up-and-go/riwayat.json";
@@ -2650,56 +2652,190 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             });
         }
 
-        function simpanKIRSementara() {
+        function ambilPayloadKIRDariTampilan() {
             const container = getKIRFormsContainer();
-            if (!container) return;
+            if (!container) throw new Error('Kontainer form KIR tidak ditemukan.');
 
             normalizeKIRSelectionState(container);
 
             const forms = Array.from(container.querySelectorAll('.kir-form-instance'))
                 .map(form => form.outerHTML);
 
-            localStorage.setItem('kir_temp_data', JSON.stringify({
-                version: 2,
-                formsHtml: forms,
-                savedAt: new Date().toISOString()
-            }));
+            return {
+                version: 3,
+                module: 'KIR',
+                updatedAt: new Date().toISOString(),
+                formsHtml: forms
+            };
+        }
 
-            alert('Semua form KIR berhasil disimpan sementara.');
+        function pasangPayloadKIRKeTampilan(kirData) {
+            const container = getKIRFormsContainer();
+            if (!container) throw new Error('Kontainer form KIR tidak ditemukan.');
+
+            if (!kirData || !Array.isArray(kirData.formsHtml) || !kirData.formsHtml.length) {
+                throw new Error('File data KIR tidak memiliki formsHtml yang valid.');
+            }
+
+            container.innerHTML = kirData.formsHtml.join('\n');
+            renumberKIRForms();
+
+            const forms = container.querySelectorAll('.kir-form-instance');
+            forms.forEach(form => {
+                form.querySelectorAll('select').forEach(select => {
+                    const selected = select.querySelector('option[selected]');
+                    if (selected) select.value = selected.value;
+                });
+            });
+
+            return forms.length;
+        }
+
+        function simpanKIRSementara() {
+            const kirData = ambilPayloadKIRDariTampilan();
+            localStorage.setItem('kir_temp_data', JSON.stringify(kirData));
+            alert('Semua form KIR berhasil disimpan di perangkat.');
+        }
+
+        async function cekBucketKIR() {
+            try {
+                const { data, error } = await supabaseClient.storage
+                    .from(KIR_STORAGE_BUCKET)
+                    .list('kartu-inventaris-ruangan', { limit: 5 });
+
+                if (error) throw error;
+
+                const found = Array.isArray(data) && data.some(x => x && x.name === 'kir-data.json');
+                alert(
+                    'Koneksi bucket KIR berhasil.\n\n' +
+                    (found ? 'File kir-data.json sudah ditemukan.' : 'Bucket tersedia, tetapi kir-data.json belum ditemukan. Silakan simpan data KIR.')
+                );
+                return true;
+            } catch (error) {
+                const msg = error?.message || String(error);
+                const status = error?.statusCode || error?.status || '';
+                console.error('Diagnosa bucket KIR:', error);
+                let detail = 'Periksa apakah bucket KIR sudah dibuat dan policy SELECT mengizinkan role anon.';
+                if (/bucket.*not.*found|not found|does not exist/i.test(msg)) {
+                    detail = 'Bucket KIR belum ditemukan. Buat bucket bernama KIR di Supabase Storage.';
+                } else if (/row-level security|permission|not authorized|forbidden/i.test(msg)) {
+                    detail = 'Policy Storage belum mengizinkan SELECT untuk role anon pada bucket KIR.';
+                }
+                alert('Tes koneksi KIR gagal.\n\nHTTP: ' + status + '\nMasalah: ' + msg + '\n\nSolusi: ' + detail);
+                return false;
+            }
+        }
+
+        async function simpanKIRKeSupabase() {
+            const kirData = ambilPayloadKIRDariTampilan();
+
+            try {
+                const jsonText = JSON.stringify(kirData, null, 2);
+                const endpoint = `${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(KIR_STORAGE_BUCKET)}/${KIR_STORAGE_PATH}`;
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json',
+                        'x-upsert': 'true',
+                        'cache-control': 'no-cache'
+                    },
+                    body: jsonText
+                });
+
+                const raw = await response.text();
+                let detail = raw;
+                try { detail = raw ? JSON.parse(raw) : {}; } catch (_) {}
+
+                if (!response.ok) {
+                    const message = typeof detail === 'object'
+                        ? (detail.message || detail.error_description || detail.error || JSON.stringify(detail))
+                        : detail;
+                    const err = new Error(message || `HTTP ${response.status}`);
+                    err.statusCode = response.status;
+                    throw err;
+                }
+
+                console.log('Upload KIR Supabase berhasil:', detail);
+                localStorage.setItem('kir_temp_data', JSON.stringify(kirData));
+                alert('File Tersimpan');
+            } catch (error) {
+                // Fallback otomatis ke penyimpanan lokal agar data tidak hilang.
+                localStorage.setItem('kir_temp_data', JSON.stringify(kirData));
+                console.error('Gagal menyimpan KIR ke Supabase. Data dialihkan ke localStorage.', error);
+
+                const status = error?.statusCode || '';
+                let detail = 'Supabase tidak dapat menyimpan data.';
+                if (status === 401) detail = 'Akses Supabase ditolak (401).';
+                else if (status === 403) detail = 'Izin Storage Supabase ditolak (403).';
+                else if (status === 404) detail = 'Bucket KIR tidak ditemukan (404).';
+                else if (status === 409) detail = 'File KIR ditolak saat diperbarui (409).';
+                else if (/Failed to fetch|NetworkError|fetch/i.test(error?.message || '')) detail = 'Koneksi ke Supabase bermasalah.';
+
+                alert('Tidak bisa simpan di Supabase. Data disimpan di perangkat.\n\n' + detail);
+            }
+        }
+
+        async function muatKIRDariSupabase() {
+            try {
+                const { data, error } = await supabaseClient.storage
+                    .from(KIR_STORAGE_BUCKET)
+                    .download(KIR_STORAGE_PATH);
+
+                if (error) {
+                    if (/not found|object not found|no such file/i.test(error.message || '')) {
+                        alert(
+                            'Data KIR di Supabase belum ditemukan.\n\n' +
+                            `Pastikan file ${KIR_STORAGE_PATH} sudah pernah disimpan ke bucket ${KIR_STORAGE_BUCKET}.`
+                        );
+                        return;
+                    }
+                    throw error;
+                }
+
+                const text = await data.text();
+                const kirData = JSON.parse(text);
+                const jumlahForm = pasangPayloadKIRKeTampilan(kirData);
+
+                // Sinkronkan hasil cloud ke localStorage sebagai cadangan offline.
+                localStorage.setItem('kir_temp_data', JSON.stringify(kirData));
+
+                alert(`Data KIR berhasil dimuat dari Supabase: ${jumlahForm} form.`);
+            } catch (error) {
+                console.error('Gagal memuat KIR dari Supabase:', error);
+                alert(
+                    'Gagal memuat data KIR dari Supabase.\n\n' +
+                    'Masalah: ' + (error?.message || error) + '\n\n' +
+                    'Periksa policy SELECT pada Storage bucket KIR dan pastikan nama file/path benar.'
+                );
+            }
         }
 
         function muatKIRSementara() {
             const saved = localStorage.getItem('kir_temp_data');
             if (!saved) {
-                alert('Tidak ada data KIR tersimpan.');
+                alert('Tidak ada data KIR tersimpan di perangkat.');
                 return;
             }
 
             try {
                 const kirData = JSON.parse(saved);
-                const container = getKIRFormsContainer();
-
-                if (kirData.version === 2 && Array.isArray(kirData.formsHtml) && kirData.formsHtml.length) {
-                    container.innerHTML = kirData.formsHtml.join('\n');
-                    // Pastikan tombol tambah form selalu tersedia pada form terakhir.
-                    const forms = container.querySelectorAll('.kir-form-instance');
-                    forms.forEach((form, idx) => {
-                        form.dataset.kirIndex = String(idx + 1);
-                        const badge = form.querySelector('.kir-form-badge');
-                        if (badge) badge.innerHTML = `📋 Form KIR #${idx + 1}`;
-                    });
-                    alert(`Data KIR berhasil dimuat: ${forms.length} form.`);
+                if (kirData && Array.isArray(kirData.formsHtml) && kirData.formsHtml.length) {
+                    const jumlahForm = pasangPayloadKIRKeTampilan(kirData);
+                    alert(`Data KIR lokal berhasil dimuat: ${jumlahForm} form.`);
                     return;
                 }
 
                 // Kompatibilitas dengan penyimpanan versi lama.
+                const container = getKIRFormsContainer();
                 const firstForm = container.querySelector('.kir-form-instance') || container;
-                const prov = firstForm.querySelector('#provinsi');
-                const kab = firstForm.querySelector('#kabupaten');
-                const klaster = firstForm.querySelector('#klaster_kir');
-                const ruangan = firstForm.querySelector('#ruangan_kir');
-                const tbody = firstForm.querySelector('#tabel-body-kir');
-                const sig = firstForm.querySelector('#signature-section-kir');
+                const prov = firstForm.querySelector('[id^="provinsi"]');
+                const kab = firstForm.querySelector('[id^="kabupaten"]');
+                const klaster = firstForm.querySelector('[id^="klaster_kir"]');
+                const ruangan = firstForm.querySelector('[id^="ruangan_kir"]');
+                const tbody = firstForm.querySelector('[id^="tabel-body-kir"]');
+                const sig = firstForm.querySelector('[id^="signature-section-kir"]');
 
                 if (prov) prov.value = kirData.provinsi || '';
                 if (kab && kirData.kabupatenHtml) {
@@ -2710,11 +2846,10 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 if (ruangan) ruangan.value = kirData.ruangan || '';
                 if (tbody && kirData.tbodyHtml) tbody.innerHTML = kirData.tbodyHtml;
                 if (sig && kirData.signatureHtml) sig.innerHTML = kirData.signatureHtml;
-
-                alert('Data KIR berhasil dimuat.');
+                alert('Data KIR lokal berhasil dimuat.');
             } catch (e) {
                 console.error('Error loading KIR data', e);
-                alert('Gagal memuat data KIR.');
+                alert('Gagal memuat data KIR lokal.');
             }
         }
 
