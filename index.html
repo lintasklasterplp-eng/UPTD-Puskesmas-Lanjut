@@ -893,6 +893,36 @@
         .sbar-btn-pdf { background-color: #dc2626; color: white; }
         .sbar-btn-pdf:hover { background-color: #b91c1c; }
         .sbar-btn-reset { background-color: #64748b; color: white; }
+        .sbar-pdf-history { margin: 16px auto 0; max-width: 850px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(15,23,42,0.05); }
+        .sbar-pdf-folder { background: linear-gradient(135deg, #fffdf3 0%, #f8fafc 100%); border: 1px solid #f4d35e; border-radius: 10px; overflow: hidden; }
+        .sbar-pdf-folder-head { display:flex; align-items:center; gap:10px; padding:10px 12px; background:#fff8dc; border-bottom:1px solid #f4d35e; }
+        .sbar-pdf-folder-icon { font-size:22px; line-height:1; }
+        .sbar-pdf-folder-name { flex:1; min-width:0; }
+        .sbar-pdf-folder-name strong { display:block; color:#7c5d00; font-size:12px; font-weight:800; }
+        .sbar-pdf-folder-name span { display:block; margin-top:2px; color:#8a7a4a; font-size:10px; }
+        .sbar-pdf-history-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+        .sbar-pdf-history-header h3 { margin:0; color:#047857; font-size:13px; font-weight:800; }
+        .sbar-pdf-history-header p { margin:3px 0 0; color:#64748b; font-size:10px; line-height:1.4; }
+        .sbar-pdf-history-list { display:flex; flex-direction:column; gap:10px; padding:10px; }
+        .sbar-pdf-date-group { display:flex; flex-direction:column; gap:7px; }
+        .sbar-pdf-date-title { display:flex; align-items:center; gap:6px; color:#475569; font-size:10px; font-weight:800; padding:2px 3px; }
+        .sbar-pdf-empty { padding:12px; text-align:center; color:#64748b; background:#fff; border:1px dashed #cbd5e1; border-radius:8px; font-size:11px; }
+        .sbar-pdf-item { display:flex; align-items:center; justify-content:space-between; gap:10px; background:#fff; border:1px solid #e2e8f0; border-left:4px solid #dc2626; border-radius:8px; padding:10px 12px; }
+        .sbar-pdf-item-info { min-width:0; flex:1; }
+        .sbar-pdf-item-name { font-size:11px; font-weight:800; color:#0f172a; word-break:break-word; }
+        .sbar-pdf-item-meta { margin-top:3px; font-size:10px; color:#64748b; line-height:1.4; }
+        .sbar-pdf-item-actions { display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; }
+        .sbar-pdf-link, .sbar-pdf-delete { border:none; border-radius:6px; padding:6px 9px; font-size:10px; font-weight:700; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+        .sbar-pdf-link { background:#0284c7; color:#fff; }
+        .sbar-pdf-link.download { background:#16a34a; }
+        .sbar-pdf-delete { background:#ef4444; color:#fff; }
+        .sbar-pdf-link:hover { opacity:.9; }
+        .sbar-pdf-delete:hover { background:#dc2626; }
+        @media (max-width: 640px) {
+            .sbar-pdf-history-header, .sbar-pdf-item { align-items:stretch; flex-direction:column; }
+            .sbar-pdf-item-actions { justify-content:stretch; }
+            .sbar-pdf-link, .sbar-pdf-delete { flex:1; }
+        }
         .pdf-wrapper { position: absolute; left: -9999px; top: -9999px; width: 800px; }
 
         /* CSS KHUSUS SKRINING RESIKO JATUH GET UP AND GO */
@@ -2436,11 +2466,32 @@ footer {
                                 </div>
 
                                 <div class="sbar-btn-group" id="sbarActionButtons">
-                                    <button type="button" class="sbar-btn sbar-btn-pdf" onclick="unduhPDFInternal()">📄 Unduh PDF</button>
+                                    <button type="button" class="sbar-btn sbar-btn-pdf" onclick="unduhPDFInternal('manual')">📄 Unduh PDF</button>
                                     <button type="button" class="sbar-btn sbar-btn-wa" onclick="kirimWhatsAppInternal()">📲 Kirim WA</button>
-                                    <button type="reset" class="sbar-btn sbar-btn-reset" onclick="setTimeout(initRujukanInternalDateTime, 50)">🔄 Reset</button>
+                                    <button type="button" class="sbar-btn sbar-btn-reset" onclick="resetRujukanInternalDenganPassword()">🔄 Reset</button>
                                 </div>
                             </form>
+                        </div>
+
+                        <div id="sbarPdfHistory" class="sbar-pdf-history" aria-live="polite">
+                            <div class="sbar-pdf-history-header">
+                                <div>
+                                    <h3>📚 Rekaman PDF Rujukan Internal</h3>
+                                    <p>PDF yang dikirim melalui tombol Kirim WA akan otomatis diarsipkan di folder berikut.</p>
+                                </div>
+                            </div>
+                            <div class="sbar-pdf-folder">
+                                <div class="sbar-pdf-folder-head">
+                                    <div class="sbar-pdf-folder-icon">📁</div>
+                                    <div class="sbar-pdf-folder-name">
+                                        <strong>Rekaman PDF Rujukan Internal</strong>
+                                        <span>Folder arsip PDF • tersimpan permanen di perangkat/browser ini sampai dihapus admin</span>
+                                    </div>
+                                </div>
+                                <div id="sbarPdfHistoryList" class="sbar-pdf-history-list">
+                                    <div class="sbar-pdf-empty">Belum ada rekaman PDF. Setelah PDF dikirim, rekamannya otomatis masuk ke folder ini.</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -5709,6 +5760,32 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             }
         }
 
+        function resetRujukanInternalDenganPassword() {
+            showPasswordPrompt(
+                'Reset Nomor Surat Rujukan Internal',
+                'Masukkan password admin untuk mereset nomor surat ke nomor awal.',
+                (success, pwd) => {
+                    if (!success) return;
+                    if (pwd !== 'admin') {
+                        alert('Password admin salah. Reset dibatalkan.');
+                        return;
+                    }
+
+                    // Reset penomoran SBAR ke nomor awal.
+                    localStorage.removeItem('sbar_counter');
+                    sbarNomorUsed = false;
+
+                    // Bersihkan isian form tanpa menghapus rekaman PDF yang sudah tersimpan.
+                    const form = document.getElementById('sbarForm');
+                    if (form) form.reset();
+
+                    initRujukanInternalDateTime();
+                    updateSbarNomorDisplay();
+                    alert('Nomor surat Rujukan Internal berhasil direset ke nomor 001.');
+                }
+            );
+        }
+
         function initRujukanInternalDateTime() {
             const now = new Date();
             const year = now.getFullYear();
@@ -5722,34 +5799,294 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             
             sbarNomorUsed = false;
             updateSbarNomorDisplay();
+            sbarRenderPdfHistory();
         }
 
         function getSbarVal(id) {
             return document.getElementById(id).value.trim() || '-';
         }
 
-        function unduhPDFInternal() {
+        function getSbarRawVal(id) {
+            const el = document.getElementById(id);
+            return el ? String(el.value || '').trim() : '';
+        }
+
+        function sanitasiNamaFileRujukan(value) {
+            return String(value || 'tanpa-nama')
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-zA-Z0-9._-]+/g, '_')
+                .replace(/^_+|_+$/g, '')
+                .slice(0, 80) || 'tanpa-nama';
+        }
+
+        const SBAR_PDF_DB_NAME = 'puskesmas_sbar_pdf_history_v1';
+        const SBAR_PDF_STORE_NAME = 'pdf_records';
+        const SBAR_PDF_DELETE_PASSWORD = 'admin';
+        let sbarPdfObjectUrls = [];
+
+        function sbarMintaPasswordHapusPdf(onSuccess) {
+            showPasswordPrompt(
+                'Hapus Rekaman PDF Rujukan Internal',
+                'Masukkan password admin untuk menghapus rekaman PDF.',
+                (success, pwd) => {
+                    if (!success) return;
+                    if (pwd !== SBAR_PDF_DELETE_PASSWORD) {
+                        alert('Password admin salah. Penghapusan dibatalkan.');
+                        return;
+                    }
+                    onSuccess();
+                }
+            );
+        }
+
+        function sbarOpenPdfDb() {
+            return new Promise((resolve, reject) => {
+                if (!('indexedDB' in window)) {
+                    reject(new Error('IndexedDB tidak tersedia di browser ini.'));
+                    return;
+                }
+                const request = indexedDB.open(SBAR_PDF_DB_NAME, 1);
+                request.onupgradeneeded = () => {
+                    const db = request.result;
+                    if (!db.objectStoreNames.contains(SBAR_PDF_STORE_NAME)) {
+                        const store = db.createObjectStore(SBAR_PDF_STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('createdAt', 'createdAt', { unique: false });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Gagal membuka penyimpanan PDF.'));
+            });
+        }
+
+        async function sbarAddPdfRecord(blob, filename, actionLabel) {
+            const record = {
+                filename,
+                blob,
+                folder: 'Rekaman PDF Rujukan Internal',
+                action: actionLabel || 'PDF dibuat',
+                nomorSurat: document.getElementById('sbar_nomor_surat_display')?.innerText?.trim() || '-',
+                namaPasien: getSbarRawVal('nama_pasien') || '-',
+                createdAt: new Date().toISOString(),
+                mimeType: blob?.type || 'application/pdf',
+                size: Number(blob?.size || 0)
+            };
+            const db = await sbarOpenPdfDb();
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(SBAR_PDF_STORE_NAME, 'readwrite');
+                tx.objectStore(SBAR_PDF_STORE_NAME).add(record);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Gagal merekam PDF.'));
+            });
+            db.close();
+            await sbarPrunePdfHistory();
+            await sbarRenderPdfHistory();
+        }
+
+        async function sbarGetPdfRecords() {
+            const db = await sbarOpenPdfDb();
+            const records = await new Promise((resolve, reject) => {
+                const tx = db.transaction(SBAR_PDF_STORE_NAME, 'readonly');
+                const req = tx.objectStore(SBAR_PDF_STORE_NAME).index('createdAt').getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => reject(req.error || new Error('Gagal membaca rekaman PDF.'));
+            });
+            db.close();
+            return records.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
+
+        async function sbarPrunePdfHistory(maxRecords = 30) {
+            const records = await sbarGetPdfRecords();
+            if (records.length <= maxRecords) return;
+            const remove = records.slice(maxRecords);
+            const db = await sbarOpenPdfDb();
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(SBAR_PDF_STORE_NAME, 'readwrite');
+                remove.forEach(item => tx.objectStore(SBAR_PDF_STORE_NAME).delete(item.id));
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Gagal merapikan riwayat PDF.'));
+            });
+            db.close();
+        }
+
+        async function sbarDeletePdfRecord(id) {
+            const db = await sbarOpenPdfDb();
+            await new Promise((resolve, reject) => {
+                const tx = db.transaction(SBAR_PDF_STORE_NAME, 'readwrite');
+                tx.objectStore(SBAR_PDF_STORE_NAME).delete(id);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error || new Error('Gagal menghapus rekaman PDF.'));
+            });
+            db.close();
+            await sbarRenderPdfHistory();
+        }
+
+        function sbarFormatPdfDate(iso) {
+            try {
+                return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso));
+            } catch (e) {
+                return new Date(iso).toLocaleString('id-ID');
+            }
+        }
+
+        async function sbarRenderPdfHistory() {
+            const list = document.getElementById('sbarPdfHistoryList');
+            if (!list) return;
+
+            sbarPdfObjectUrls.forEach(url => URL.revokeObjectURL(url));
+            sbarPdfObjectUrls = [];
+
+            try {
+                const records = await sbarGetPdfRecords();
+                list.innerHTML = '';
+
+                if (!records.length) {
+                    list.innerHTML = '<div class="sbar-pdf-empty">Belum ada rekaman PDF. Setelah PDF dibuat atau dikirim, rekamannya muncul otomatis di sini.</div>';
+                    return;
+                }
+
+                const groups = {};
+                records.forEach(record => {
+                    const dateKey = String(record.createdAt || '').slice(0, 10) || 'tanpa-tanggal';
+                    if (!groups[dateKey]) groups[dateKey] = [];
+                    groups[dateKey].push(record);
+                });
+
+                Object.keys(groups).sort().reverse().forEach(dateKey => {
+                    const dateGroup = document.createElement('div');
+                    dateGroup.className = 'sbar-pdf-date-group';
+                    const dateTitle = document.createElement('div');
+                    dateTitle.className = 'sbar-pdf-date-title';
+                    dateTitle.textContent = '📂 ' + (dateKey === 'tanpa-tanggal' ? 'Tanggal tidak diketahui' : new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(new Date(dateKey + 'T00:00:00')));
+                    dateGroup.appendChild(dateTitle);
+                    list.appendChild(dateGroup);
+
+                    groups[dateKey].forEach(record => {
+                    const pdfBlob = record.blob instanceof Blob ? record.blob : new Blob([record.blob], { type: record.mimeType || 'application/pdf' });
+                    const url = URL.createObjectURL(pdfBlob);
+                    sbarPdfObjectUrls.push(url);
+
+                    const item = document.createElement('div');
+                    item.className = 'sbar-pdf-item';
+
+                    const info = document.createElement('div');
+                    info.className = 'sbar-pdf-item-info';
+
+                    const name = document.createElement('div');
+                    name.className = 'sbar-pdf-item-name';
+                    name.textContent = '📄 ' + record.filename;
+
+                    const meta = document.createElement('div');
+                    meta.className = 'sbar-pdf-item-meta';
+                    const ukuranMB = ((Number(record.size || 0)) / (1024 * 1024)).toFixed(2);
+                    meta.textContent = `${record.action} • ${record.namaPasien} • ${record.nomorSurat} • ${sbarFormatPdfDate(record.createdAt)} • ${ukuranMB} MB`;
+
+                    info.appendChild(name);
+                    info.appendChild(meta);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'sbar-pdf-item-actions';
+
+                    const open = document.createElement('a');
+                    open.className = 'sbar-pdf-link';
+                    open.href = url;
+                    open.target = '_blank';
+                    open.rel = 'noopener';
+                    open.textContent = '📂 Buka PDF';
+
+                    const download = document.createElement('a');
+                    download.className = 'sbar-pdf-link download';
+                    download.href = url;
+                    download.download = record.filename;
+                    download.textContent = '⬇ Unduh';
+
+                    const del = document.createElement('button');
+                    del.type = 'button';
+                    del.className = 'sbar-pdf-delete';
+                    del.textContent = 'Hapus';
+                    del.addEventListener('click', async () => {
+                        sbarMintaPasswordHapusPdf(async () => {
+                            if (!confirm(`Hapus rekaman PDF "${record.filename}"?`)) return;
+                            try {
+                                await sbarDeletePdfRecord(record.id);
+                            } catch (error) {
+                                console.error(error);
+                                alert('Rekaman PDF tidak dapat dihapus.');
+                            }
+                        });
+                    });
+
+                    actions.appendChild(open);
+                    actions.appendChild(download);
+                    actions.appendChild(del);
+                    item.appendChild(info);
+                    item.appendChild(actions);
+                    dateGroup.appendChild(item);
+                    });
+                });
+            } catch (error) {
+                console.error('Gagal memuat rekaman PDF:', error);
+                list.innerHTML = '<div class="sbar-pdf-empty">Rekaman PDF belum dapat dimuat pada browser ini.</div>';
+            }
+        }
+
+        function initSbarPdfHistory() {
+            sbarRenderPdfHistory();
+        }
+
+        async function unduhPDFInternal(actionLabel = 'PDF dibuat') {
             markSbarNomorAsUsed();
             const btnGroup = document.getElementById('sbarActionButtons');
-            btnGroup.style.display = 'none';
+            if (btnGroup) btnGroup.style.display = 'none';
 
             const element = document.getElementById('sbarFormContainer');
+            const safePatient = sanitasiNamaFileRujukan(getSbarVal('nama_pasien'));
+            const filename = `Form_Rujukan_SBAR_${safePatient}.pdf`;
             const opt = {
                 margin:       10,
-                filename:     `Form_Rujukan_SBAR_${getSbarVal('nama_pasien').replace(/ /g, '_')}.pdf`,
+                filename,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            return html2pdf().set(opt).from(element).save().then(() => {
-                btnGroup.style.display = 'flex';
-            });
+            try {
+                const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+
+                // Unduh salinan PDF ke perangkat.
+                const downloadUrl = URL.createObjectURL(pdfBlob);
+                const anchor = document.createElement('a');
+                anchor.href = downloadUrl;
+                anchor.download = filename;
+                document.body.appendChild(anchor);
+                anchor.click();
+                anchor.remove();
+                setTimeout(() => URL.revokeObjectURL(downloadUrl), 1500);
+
+                // Rekam PDF lokal otomatis setelah proses Kirim WA dijalankan.
+                if (actionLabel === 'whatsapp') {
+                    try {
+                        await sbarAddPdfRecord(pdfBlob, filename, 'Terkirim/Disiapkan via WhatsApp');
+                    } catch (historyError) {
+                        console.error('PDF berhasil dibuat, tetapi rekaman lokal gagal disimpan:', historyError);
+                    }
+                }
+
+                return pdfBlob;
+            } finally {
+                if (btnGroup) btnGroup.style.display = 'flex';
+            }
         }
 
-        function kirimWhatsAppInternal() {
+        async function kirimWhatsAppInternal() {
             const nomorSurat = document.getElementById('sbar_nomor_surat_display').innerText;
-            unduhPDFInternal();
+            try {
+                await unduhPDFInternal('whatsapp');
+            } catch (error) {
+                console.error('Gagal membuat PDF untuk pengiriman WhatsApp:', error);
+                alert('PDF tidak berhasil dibuat. Pengiriman WhatsApp dibatalkan.');
+                return;
+            }
 
             const targetNo = "6285264444567";
 
@@ -5772,7 +6109,7 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             pesan += `🟡 *B (BACKGROUND)*:\n${getSbarVal('background')}\n\n`;
             pesan += `🔵 *A (ASSESSMENT)*:\n${getSbarVal('assessment')}\n\n`;
             pesan += `🟢 *R (RECOMMENDATION)*:\n${getSbarVal('recommendation')}\n\n`;
-            pesan += `_Catatan: Berkas PDF utuh dari form ini telah terunduh._`;
+            pesan += `_Catatan: PDF form telah dibuat dan direkam di bawah form. Silakan lampirkan PDF tersebut di WhatsApp._`;
 
             const urlWA = `https://api.whatsapp.com/send?phone=${targetNo}&text=${encodeURIComponent(pesan)}`;
 
