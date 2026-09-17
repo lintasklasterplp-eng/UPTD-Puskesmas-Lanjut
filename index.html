@@ -6107,19 +6107,35 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                 status: 'WhatsApp dikirim'
             };
 
-            let pesan = `🚨 *PANGGILAN AMBULANCE & GAWAT DARURAT* 🚨%0A%0AHalo Petugas (*${namaPetugas}*),%0ASaya membutuhkan layanan ambulance segera.%0A%0A`;
-            pesan += `*-- DATA PASIEN --*%0A`;
-            pesan += `👤 Nama: ${encodeURIComponent(namaPasien)}%0A`;
-            pesan += `📞 No HP: ${encodeURIComponent(hpPasien)}%0A`;
+            const waktuKirim = new Date().toLocaleString('id-ID', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+
+            // Pesan dibuat dari seluruh data yang diisi pada form.
+            // Tautan Google Maps dikirim sebagai URL asli agar dapat ditekan langsung di WhatsApp.
+            let pesan = `🚨 *PANGGILAN AMBULANCE & GAWAT DARURAT* 🚨\n\n`;
+            pesan += `*DATA PETUGAS*\n`;
+            pesan += `👨‍⚕️ Nama Petugas: ${namaPetugas}\n`;
+            pesan += `📞 No HP Petugas: ${hpPetugas}\n\n`;
+            pesan += `*DATA PASIEN*\n`;
+            pesan += `👤 Nama Pasien: ${namaPasien}\n`;
+            pesan += `📞 No HP Pasien: ${hpPasien}\n`;
+            pesan += `🕐 Waktu Permintaan: ${waktuKirim}\n`;
+
             if (linkMapsPasien) {
-                pesan += `📍 Lokasi GPS: %0A${encodeURIComponent(linkMapsPasien)}%0A`;
+                pesan += `📍 Lokasi Pasien / Maps:\n${linkMapsPasien}\n`;
             } else {
-                pesan += `📍 Lokasi GPS: (Tidak direkam)%0A`;
+                pesan += `📍 Lokasi Pasien / Maps: Belum direkam\n`;
             }
-            pesan += `%0AMohon segera merespon. Terima kasih.`;
+
+            pesan += `\nMohon segera merespon dan menuju lokasi pasien.\nTerima kasih.`;
+
+            // Encode seluruh pesan sekali agar format baris, tanda baca, emoji, dan URL tetap aman.
+            const pesanWA = encodeURIComponent(pesan);
 
             // Buka WhatsApp langsung saat klik, supaya popup blocker tidak menganggapnya sebagai popup async.
-            const waWindow = window.open(`https://wa.me/${formattedNomor}?text=${pesan}`, '_blank');
+            const waWindow = window.open(`https://wa.me/${formattedNomor}?text=${pesanWA}`, '_blank');
 
             try {
                 await simpanPermintaanAmbulanceSupabase(permintaan);
