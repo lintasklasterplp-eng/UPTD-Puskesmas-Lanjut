@@ -978,6 +978,7 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 .pmi-table input:focus,.pmi-table select:focus,.pmi-table textarea:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.1)}
 .pmi-delete{border:0;background:#ef4444;color:#fff;border-radius:5px;padding:5px 7px;font-size:10px;font-weight:700;cursor:pointer}
 .pmi-status{font-size:11px;font-weight:700;color:#166534;margin-left:4px}
+.pmi-print-action{display:flex;justify-content:flex-end;align-items:center;padding:12px;background:#fff;border-top:1px solid #e5e7eb}
 @media(max-width:640px){.pmi-heading h2{font-size:17px}.pmi-heading h3{font-size:13px}.pmi-toolbar{align-items:stretch}.pmi-meta,.pmi-actions{width:100%}.pmi-actions button{flex:1}.pmi-table{font-size:10px}}
 </style>
 
@@ -1388,7 +1389,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                 <div class="pmi-actions">
                                     <button type="button" class="pmi-btn pmi-btn-add" onclick="pmiTambahBaris()">+ Tambah Baris</button>
                                     <button type="button" class="pmi-btn pmi-btn-save" onclick="pmiSimpan()">💾 Simpan</button>
-                                    <button type="button" class="pmi-btn pmi-btn-print" onclick="pmiSimpanDanPrint()">Simpan/Print</button>
                                     <button type="button" class="pmi-btn pmi-btn-reset" onclick="pmiReset()">Reset</button>
                                 </div>
                             </div>
@@ -1410,6 +1410,10 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                     </thead>
                                     <tbody id="pmiTbody"></tbody>
                                 </table>
+                            </div>
+
+                            <div class="pmi-print-action">
+                                <button type="button" class="pmi-btn pmi-btn-print" onclick="pmiSimpanDanPrint()">Simpan/Print</button>
                             </div>
 
                         </div>
@@ -4670,7 +4674,7 @@ body { width:auto; }
 .pmi-heading { text-align:center !important; padding:0 0 4mm !important; background:#fff !important; color:#000 !important; border-bottom:2px solid #000 !important; }
 .pmi-heading h2 { margin:0 !important; font-size:18pt !important; color:#000 !important; }
 .pmi-heading h3 { margin:2mm 0 0 !important; font-size:11pt !important; color:#000 !important; }
-.pmi-toolbar, .pmi-note, .pmi-delete, .pmi-actions, button { display:none !important; }
+.pmi-toolbar, .pmi-print-action, .pmi-note, .pmi-delete, .pmi-actions, button { display:none !important; }
 .pmi-table-wrap { width:100% !important; overflow:visible !important; }
 .pmi-table { width:100% !important; min-width:0 !important; max-width:100% !important; table-layout:fixed !important; border-collapse:collapse !important; font-size:7.5pt !important; }
 .pmi-table th, .pmi-table td { border:1px solid #000 !important; padding:2mm 1.5mm !important; color:#000 !important; background:#fff !important; vertical-align:top !important; word-break:break-word !important; overflow-wrap:anywhere !important; }
@@ -4710,7 +4714,7 @@ body { width:auto; }
                 // Clone form dan ubah seluruh field interaktif menjadi nilai teks aktual.
                 const clone = source.cloneNode(true);
                 clone.removeAttribute('id');
-                clone.querySelectorAll('.pmi-toolbar, .pmi-note, .pmi-delete, button, input[type="hidden"]').forEach(el => el.remove());
+                clone.querySelectorAll('.pmi-toolbar, .pmi-print-action, .pmi-note, .pmi-delete, button, input[type="hidden"]').forEach(el => el.remove());
 
                 clone.querySelectorAll('input, textarea, select').forEach(el => {
                     const span = document.createElement('span');
