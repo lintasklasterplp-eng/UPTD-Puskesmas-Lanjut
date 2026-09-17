@@ -65,7 +65,7 @@
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            padding: 2px 12px;
+            padding: 1px 10px;
         }
 
         .navbar {
@@ -77,14 +77,14 @@
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             text-decoration: none;
             max-width: 100%;
         }
 
         .logo-img {
-            width: 45px;
-            height: 45px;
+            width: 38px;
+            height: 38px;
             object-fit: cover;
             border-radius: 50%;
             border: 2px solid var(--primary);
@@ -99,7 +99,7 @@
         }
 
         .logo-text {
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             font-weight: 800;
             color: var(--primary);
             line-height: 1.1;
@@ -107,7 +107,7 @@
         }
 
         .logo-subtext {
-            font-size: 0.7rem;
+            font-size: 0.62rem;
             font-weight: 600;
             color: var(--text-muted);
         }
@@ -115,11 +115,20 @@
         .top-nav-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            padding: 2px 0;
+            gap: 7px;
+            padding: 0;
+            margin: 0;
             background: transparent;
-            justify-content: flex-end;
-            flex: 1;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: auto;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: max-content;
+            max-width: calc(100% - 120px);
+            z-index: 1001;
         }
 
         .hamburger-btn {
@@ -168,10 +177,10 @@
         }
         
         @media (max-width: 900px) {
-            header { flex-direction: column; padding: 8px 12px; gap: 6px; align-items: stretch; }
+            header { flex-direction: column; padding: 4px 10px; gap: 2px; align-items: stretch; }
             .navbar { justify-content: space-between; width: 100%; }
-            .hamburger-btn { display: flex; width: 34px; height: 34px; }
-            .top-nav-bar { display: none; flex-direction: column; width: 100%; align-items: stretch; }
+            .hamburger-btn { display: flex; width: 32px; height: 32px; }
+            .top-nav-bar { position: static; transform: none; width: 100%; max-width: none; display: none; flex-direction: column; align-items: stretch; }
             .top-nav-bar.show-mobile { display: flex; }
             .nav-item, .nav-btn-h { width: 100%; text-align: left; justify-content: space-between; }
             .dropdown-content-h { position: static; transform: none; width: 100%; box-shadow: none; border: 1px solid #cbd5e1; margin-top: 5px; }
@@ -197,7 +206,7 @@
             .top-nav-bar.show-mobile .sub-dropdown > .sub-nav-btn::after {
                 content: '▾';
                 margin-left: auto;
-                font-size: 0.7rem;
+                font-size: 0.62rem;
                 transition: transform 0.2s ease;
             }
             .top-nav-bar.show-mobile .sub-dropdown.mobile-open > .sub-nav-btn::after {
@@ -210,26 +219,45 @@
         
         .nav-item { position: relative; outline: none; }
         
+        /* Navigasi Beranda: tampil sebagai tulisan saja, tanpa kotak tombol */
         .nav-btn-h {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
+            background: transparent !important;
+            border: none !important;
             color: var(--primary);
             font-weight: 700;
-            font-size: 0.8rem;
-            padding: 5px 10px;
-            border-radius: 7px;
+            font-size: 0.92rem;
+            line-height: 1.15;
+            padding: 2px 5px;
+            border-radius: 0;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: color 0.2s;
             display: flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            gap: 5px;
+            box-shadow: none !important;
         }
-        
+
+        /* Simbol dropdown pada navigasi desktop yang memiliki submenu */
+        @media (min-width: 901px) {
+            .nav-item:not(.no-dropdown) > .nav-btn-h::after {
+                content: '▾';
+                display: inline-block;
+                margin-left: 1px;
+                font-size: 0.72em;
+                line-height: 1;
+                transition: transform 0.2s ease;
+            }
+            .nav-item:not(.no-dropdown):hover > .nav-btn-h::after,
+            .nav-item:not(.no-dropdown):focus-within > .nav-btn-h::after {
+                transform: rotate(180deg);
+            }
+        }
+
         .nav-btn-h:hover, .nav-item:focus-within .nav-btn-h {
-            background: var(--primary);
-            color: #ffffff;
-            border-color: var(--primary);
+            background: transparent !important;
+            color: var(--primary-hover);
+            border: none !important;
+            box-shadow: none !important;
         }
         
         .dropdown-content-h {
@@ -763,7 +791,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            font-size: 0.7rem; 
+            font-size: 0.62rem; 
             box-shadow: 0 -4px 10px rgba(0,0,0,0.05); 
             margin-top: auto; 
             height: 35px;
