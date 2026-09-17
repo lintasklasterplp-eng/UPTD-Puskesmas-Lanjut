@@ -3010,6 +3010,10 @@ footer {
         const GUG_STORAGE_PATH = "skrining-get-up-and-go/riwayat.json";
         const PMI_STORAGE_BUCKET = "PMI";
         const PMI_STORAGE_PATH = "pemantauan-mutu-internal/pmi-data.json";
+        // Bucket khusus Ambulance. Data operasional disimpan dalam JSON dan foto petugas sebagai object terpisah.
+        const AMBULANCE_STORAGE_BUCKET = "Ambulance";
+        const AMBULANCE_STORAGE_PATH = "ambulance/ambulance-data.json";
+        const AMBULANCE_PHOTO_PREFIX = "ambulance/petugas-foto";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -5779,75 +5783,260 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             });
         }
 
-        function simpanPetugasAmbulance() {
-            const nama = document.getElementById('input-nama-petugas').value;
-            const hp = document.getElementById('input-hp-petugas').value;
-            const fileInput = document.getElementById('input-foto-petugas');
-            
-            if (!nama || !hp) {
-                alert("Harap isi nama dan nomor HP petugas secara lengkap!");
-                return;
-            }
-
-            const selesaikanSimpan = () => {
-                localStorage.setItem('ambulance_petugas_nama', nama);
-                localStorage.setItem('ambulance_petugas_hp', hp);
-                
-                document.getElementById('nama-petugas-tampil').innerText = nama;
-                document.getElementById('hp-petugas-tampil').innerText = hp;
-                
-                document.getElementById('form-edit-petugas').style.display = 'none';
-                document.getElementById('viewPetugasAmbulance').style.display = 'block';
-                alert("Data Petugas Ambulance berhasil disimpan!");
-            };
-
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    localStorage.setItem('ambulance_petugas_foto', e.target.result);
-                    const imgTampil = document.getElementById('foto-petugas-tampil');
-                    imgTampil.src = e.target.result;
-                    imgTampil.style.display = 'block';
-                    selesaikanSimpan();
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                selesaikanSimpan();
+        /* ================= PENYIMPANAN AMBULANCE KE SUPABASE STORAGE ================= */
+        // LocalStorage tetap dipakai sebagai cache/offline fallback.
+        function ambulanceBacaLocal() {
+            try {
+                const raw = localStorage.getItem('ambulance_cloud_data');
+                const parsed = raw ? JSON.parse(raw) : null;
+                return parsed && typeof parsed === 'object' ? parsed : null;
+            } catch (e) {
+                console.warn('Data Ambulance lokal rusak:', e);
+                return null;
             }
         }
 
-        function muatDataPetugasAmbulance() {
-            const nama = localStorage.getItem('ambulance_petugas_nama') || "Belum diatur";
-            const hp = localStorage.getItem('ambulance_petugas_hp') || "Belum diatur";
-            const foto = localStorage.getItem('ambulance_petugas_foto');
-            
+        function ambulanceSimpanLocal(data) {
+            try {
+                localStorage.setItem('ambulance_cloud_data', JSON.stringify(data));
+            } catch (e) {
+                console.warn('Gagal menyimpan cache Ambulance:', e);
+            }
+        }
+
+        function ambulanceDefaultData() {
+            return {
+                version: 1,
+                updatedAt: new Date().toISOString(),
+                petugas: {
+                    nama: localStorage.getItem('ambulance_petugas_nama') || '',
+                    hp: localStorage.getItem('ambulance_petugas_hp') || '',
+                    fotoPath: ''
+                },
+                permintaan: []
+            };
+        }
+
+        async function ambulanceAmbilDataSupabase() {
+            const { data, error } = await supabaseClient.storage
+                .from(AMBULANCE_STORAGE_BUCKET)
+                .download(AMBULANCE_STORAGE_PATH);
+
+            if (error) {
+                if (/not found|object not found|no such file/i.test(error.message || '')) {
+                    return null;
+                }
+                throw error;
+            }
+
+            const text = await data.text();
+            const parsed = JSON.parse(text);
+            return parsed && typeof parsed === 'object' ? parsed : null;
+        }
+
+        async function ambulanceSimpanDataSupabase(data) {
+            const blob = new Blob(
+                [JSON.stringify(data, null, 2)],
+                { type: 'application/json;charset=utf-8' }
+            );
+
+            const { error } = await supabaseClient.storage
+                .from(AMBULANCE_STORAGE_BUCKET)
+                .upload(AMBULANCE_STORAGE_PATH, blob, {
+                    cacheControl: '0',
+                    upsert: true,
+                    contentType: 'application/json'
+                });
+
+            if (error) throw error;
+        }
+
+        function ambulanceBlobToDataUrl(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error || new Error('Gagal membaca foto dari Supabase.'));
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function ambulanceUnggahFotoSupabase(file) {
+            if (!file) return '';
+            const extFromType = (file.type || '').split('/')[1] || 'jpg';
+            const ext = extFromType === 'jpeg' ? 'jpg' : extFromType.replace(/[^a-z0-9]/gi, '') || 'jpg';
+            const path = `${AMBULANCE_PHOTO_PREFIX}.${ext}`;
+
+            const { error } = await supabaseClient.storage
+                .from(AMBULANCE_STORAGE_BUCKET)
+                .upload(path, file, {
+                    cacheControl: '3600',
+                    upsert: true,
+                    contentType: file.type || 'image/jpeg'
+                });
+            if (error) throw error;
+            return path;
+        }
+
+        async function ambulanceMuatFotoSupabase(path) {
+            if (!path) return '';
+            const { data, error } = await supabaseClient.storage
+                .from(AMBULANCE_STORAGE_BUCKET)
+                .download(path);
+            if (error) throw error;
+            return ambulanceBlobToDataUrl(data);
+        }
+
+        function ambulanceTampilkanPetugas(data) {
+            const nama = data?.petugas?.nama || 'Belum diatur';
+            const hp = data?.petugas?.hp || 'Belum diatur';
+            const foto = data?.petugas?.fotoDataUrl || localStorage.getItem('ambulance_petugas_foto') || '';
+
+            localStorage.setItem('ambulance_petugas_nama', nama);
+            localStorage.setItem('ambulance_petugas_hp', hp);
+            if (foto) localStorage.setItem('ambulance_petugas_foto', foto);
+
             document.getElementById('nama-petugas-tampil').innerText = nama;
             document.getElementById('hp-petugas-tampil').innerText = hp;
-            
+
             const imgTampil = document.getElementById('foto-petugas-tampil');
-            if(foto) {
+            if (foto) {
                 imgTampil.src = foto;
                 imgTampil.style.display = 'block';
             } else {
                 imgTampil.style.display = 'none';
             }
-            
-            document.getElementById('input-nama-petugas').value = nama !== "Belum diatur" ? nama : "";
-            document.getElementById('input-hp-petugas').value = hp !== "Belum diatur" ? hp : "";
-            
+
+            document.getElementById('input-nama-petugas').value = nama !== 'Belum diatur' ? nama : '';
+            document.getElementById('input-hp-petugas').value = hp !== 'Belum diatur' ? hp : '';
             document.getElementById('form-edit-petugas').style.display = 'none';
             document.getElementById('viewPetugasAmbulance').style.display = 'block';
-            
-            document.getElementById('input-nama-pasien').value = "";
-            document.getElementById('input-hp-pasien').value = "";
-            document.getElementById('input-lokasi-pasien').value = "";
-            linkMapsPasien = "";
+        }
+
+        function ambulanceTampilkanErrorCloud(prefix, error) {
+            const status = error?.statusCode || '';
+            let detail = error?.message || String(error || 'Kesalahan tidak diketahui.');
+            if (status === 401) detail = 'Akses Supabase ditolak (401).';
+            else if (status === 403) detail = 'Izin Storage Supabase ditolak (403).';
+            else if (status === 404) detail = 'Bucket/path Ambulance tidak ditemukan (404).';
+            else if (status === 409) detail = 'Object Ambulance gagal diperbarui (409).';
+            else if (/Failed to fetch|NetworkError|fetch/i.test(detail)) detail = 'Koneksi ke Supabase bermasalah.';
+            console.error(prefix, error);
+            return detail;
+        }
+
+        async function simpanPetugasAmbulance() {
+            const nama = document.getElementById('input-nama-petugas').value.trim();
+            const hp = document.getElementById('input-hp-petugas').value.trim();
+            const fileInput = document.getElementById('input-foto-petugas');
+
+            if (!nama || !hp) {
+                alert('Harap isi nama dan nomor HP petugas secara lengkap!');
+                return;
+            }
+
+            let fotoDataUrl = localStorage.getItem('ambulance_petugas_foto') || '';
+            let fotoPath = '';
+            const tombol = document.querySelector('#form-edit-petugas .btn-simpan-darurat');
+            const teksTombol = tombol ? tombol.innerHTML : '';
+            if (tombol) {
+                tombol.disabled = true;
+                tombol.innerHTML = '⏳ Menyimpan...';
+            }
+
+            try {
+                const currentLocal = ambulanceBacaLocal() || ambulanceDefaultData();
+                fotoPath = currentLocal?.petugas?.fotoPath || '';
+
+                if (fileInput.files && fileInput.files[0]) {
+                    fotoPath = await ambulanceUnggahFotoSupabase(fileInput.files[0]);
+                    fotoDataUrl = await ambulanceBlobToDataUrl(fileInput.files[0]);
+                }
+
+                const cloudData = {
+                    ...currentLocal,
+                    version: 1,
+                    updatedAt: new Date().toISOString(),
+                    petugas: { nama, hp, fotoPath, fotoDataUrl },
+                    permintaan: Array.isArray(currentLocal.permintaan) ? currentLocal.permintaan : []
+                };
+
+                // Cache lokal selalu diperbarui terlebih dahulu.
+                ambulanceSimpanLocal(cloudData);
+                localStorage.setItem('ambulance_petugas_nama', nama);
+                localStorage.setItem('ambulance_petugas_hp', hp);
+                if (fotoDataUrl) localStorage.setItem('ambulance_petugas_foto', fotoDataUrl);
+                ambulanceTampilkanPetugas(cloudData);
+
+                // Upload cloud. Jika gagal, cache lokal tetap aman.
+                await ambulanceSimpanDataSupabase(cloudData);
+                alert('Data Petugas Ambulance berhasil disimpan ke Supabase.');
+            } catch (error) {
+                ambulanceSimpanLocal({
+                    ...(ambulanceBacaLocal() || ambulanceDefaultData()),
+                    updatedAt: new Date().toISOString(),
+                    petugas: {
+                        nama,
+                        hp,
+                        fotoPath: fotoPath || '',
+                        fotoDataUrl
+                    }
+                });
+                localStorage.setItem('ambulance_petugas_nama', nama);
+                localStorage.setItem('ambulance_petugas_hp', hp);
+                if (fotoDataUrl) localStorage.setItem('ambulance_petugas_foto', fotoDataUrl);
+                ambulanceTampilkanPetugas(ambulanceBacaLocal());
+
+                const detail = ambulanceTampilkanErrorCloud('Gagal menyimpan Petugas Ambulance ke Supabase:', error);
+                alert('Data Petugas tersimpan di perangkat, tetapi GAGAL disimpan ke Supabase.\n\nMasalah: ' + detail + '\n\nPeriksa policy Storage bucket Ambulance.');
+            } finally {
+                if (tombol) {
+                    tombol.disabled = false;
+                    tombol.innerHTML = teksTombol || 'Simpan Data';
+                }
+            }
+        }
+
+        async function muatDataPetugasAmbulance() {
+            // Tampilkan cache lokal terlebih dahulu agar UI tidak menunggu jaringan.
+            const local = ambulanceBacaLocal();
+            if (local?.petugas) {
+                ambulanceTampilkanPetugas(local);
+            } else {
+                const nama = localStorage.getItem('ambulance_petugas_nama') || 'Belum diatur';
+                const hp = localStorage.getItem('ambulance_petugas_hp') || 'Belum diatur';
+                const foto = localStorage.getItem('ambulance_petugas_foto') || '';
+                ambulanceTampilkanPetugas({ petugas: { nama, hp, fotoDataUrl: foto, fotoPath: '' }, permintaan: [] });
+            }
+
+            document.getElementById('input-nama-pasien').value = '';
+            document.getElementById('input-hp-pasien').value = '';
+            document.getElementById('input-lokasi-pasien').value = '';
+            linkMapsPasien = '';
+
+            try {
+                const cloud = await ambulanceAmbilDataSupabase();
+                if (!cloud) return;
+
+                // Jika foto tersimpan sebagai object terpisah, unduh juga untuk cache/display.
+                if (cloud.petugas?.fotoPath && !cloud.petugas?.fotoDataUrl) {
+                    try {
+                        cloud.petugas.fotoDataUrl = await ambulanceMuatFotoSupabase(cloud.petugas.fotoPath);
+                    } catch (photoError) {
+                        console.warn('Foto petugas Ambulance tidak dapat dimuat:', photoError);
+                    }
+                }
+
+                ambulanceSimpanLocal(cloud);
+                ambulanceTampilkanPetugas(cloud);
+            } catch (error) {
+                console.warn('Supabase Ambulance tidak dapat dimuat. LocalStorage digunakan:', error);
+            }
         }
 
         function dapatkanLokasiPasien() {
             const inputLokasi = document.getElementById('input-lokasi-pasien');
-            inputLokasi.value = "Mencari GPS...";
-            
+            inputLokasi.value = 'Mencari GPS...';
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -5855,34 +6044,50 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                         const lon = position.coords.longitude;
                         linkMapsPasien = `https://www.google.com/maps?q=${lat},${lon}`;
                         inputLokasi.value = `Koordinat GPS terekam`;
-                        alert("Lokasi Anda berhasil direkam!");
+                        alert('Lokasi Anda berhasil direkam!');
                     },
                     (error) => {
-                        inputLokasi.value = "Gagal mengambil lokasi";
-                        alert("Gagal mendapatkan lokasi. Pastikan izin GPS aktif.");
+                        inputLokasi.value = 'Gagal mengambil lokasi';
+                        alert('Gagal mendapatkan lokasi. Pastikan izin GPS aktif.');
                     },
-                    { enableHighAccuracy: true } 
+                    { enableHighAccuracy: true }
                 );
             } else {
-                inputLokasi.value = "GPS tidak didukung";
-                alert("Fitur lokasi tidak didukung browser ini.");
+                inputLokasi.value = 'GPS tidak didukung';
+                alert('Fitur lokasi tidak didukung browser ini.');
             }
         }
 
-        function kirimPermintaanAmbulance() {
-            const namaPetugas = localStorage.getItem('ambulance_petugas_nama');
-            const hpPetugas = localStorage.getItem('ambulance_petugas_hp');
-            
-            if (!namaPetugas || !hpPetugas || namaPetugas === "Belum diatur") {
+        async function simpanPermintaanAmbulanceSupabase(data) {
+            const current = (await ambulanceAmbilDataSupabase()) || ambulanceBacaLocal() || ambulanceDefaultData();
+            const permintaan = Array.isArray(current.permintaan) ? current.permintaan : [];
+            permintaan.unshift(data);
+
+            const payload = {
+                ...current,
+                version: 1,
+                updatedAt: new Date().toISOString(),
+                permintaan: permintaan.slice(0, 500)
+            };
+            ambulanceSimpanLocal(payload);
+            await ambulanceSimpanDataSupabase(payload);
+        }
+
+        async function kirimPermintaanAmbulance() {
+            const localData = ambulanceBacaLocal();
+            const namaPetugas = localData?.petugas?.nama || localStorage.getItem('ambulance_petugas_nama');
+            const hpPetugas = localData?.petugas?.hp || localStorage.getItem('ambulance_petugas_hp');
+
+            if (!namaPetugas || !hpPetugas || namaPetugas === 'Belum diatur') {
                 alert("Data Petugas belum diatur. Klik 'Edit' terlebih dahulu.");
                 return;
             }
 
-            const namaPasien = document.getElementById('input-nama-pasien').value;
-            const hpPasien = document.getElementById('input-hp-pasien').value;
-            
+            const namaPasien = document.getElementById('input-nama-pasien').value.trim();
+            const hpPasien = document.getElementById('input-hp-pasien').value.trim();
+
             if (!namaPasien || !hpPasien) {
-                alert("Harap lengkapi Nama dan No HP Pasien!");
+                alert('Harap lengkapi Nama dan No HP Pasien!');
                 return;
             }
 
@@ -5891,18 +6096,47 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                 formattedNomor = '62' + formattedNomor.substring(1);
             }
 
+            const permintaan = {
+                id: (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`),
+                createdAt: new Date().toISOString(),
+                namaPetugas,
+                hpPetugas,
+                namaPasien,
+                hpPasien,
+                lokasiGps: linkMapsPasien || '',
+                status: 'WhatsApp dikirim'
+            };
+
             let pesan = `🚨 *PANGGILAN AMBULANCE & GAWAT DARURAT* 🚨%0A%0AHalo Petugas (*${namaPetugas}*),%0ASaya membutuhkan layanan ambulance segera.%0A%0A`;
             pesan += `*-- DATA PASIEN --*%0A`;
-            pesan += `👤 Nama: ${namaPasien}%0A`;
-            pesan += `📞 No HP: ${hpPasien}%0A`;
+            pesan += `👤 Nama: ${encodeURIComponent(namaPasien)}%0A`;
+            pesan += `📞 No HP: ${encodeURIComponent(hpPasien)}%0A`;
             if (linkMapsPasien) {
-                pesan += `📍 Lokasi GPS: %0A${linkMapsPasien}%0A`;
+                pesan += `📍 Lokasi GPS: %0A${encodeURIComponent(linkMapsPasien)}%0A`;
             } else {
                 pesan += `📍 Lokasi GPS: (Tidak direkam)%0A`;
             }
             pesan += `%0AMohon segera merespon. Terima kasih.`;
-            
-            window.open(`https://wa.me/${formattedNomor}?text=${pesan}`, '_blank');
+
+            // Buka WhatsApp langsung saat klik, supaya popup blocker tidak menganggapnya sebagai popup async.
+            const waWindow = window.open(`https://wa.me/${formattedNomor}?text=${pesan}`, '_blank');
+
+            try {
+                await simpanPermintaanAmbulanceSupabase(permintaan);
+                if (!waWindow) {
+                    alert('Permintaan tersimpan ke Supabase, tetapi WhatsApp diblokir browser. Izinkan popup untuk membuka WhatsApp.');
+                }
+            } catch (error) {
+                const detail = ambulanceTampilkanErrorCloud('Gagal menyimpan permintaan Ambulance ke Supabase:', error);
+                // Pastikan tetap tersimpan di cache lokal meskipun cloud gagal.
+                const fallback = ambulanceBacaLocal() || ambulanceDefaultData();
+                const list = Array.isArray(fallback.permintaan) ? fallback.permintaan : [];
+                if (!list.some(item => item?.id === permintaan.id)) list.unshift(permintaan);
+                fallback.permintaan = list.slice(0, 500);
+                fallback.updatedAt = new Date().toISOString();
+                ambulanceSimpanLocal(fallback);
+                alert('Permintaan Ambulance sudah dikirim melalui WhatsApp dan disimpan di perangkat, tetapi gagal disinkronkan ke Supabase.\n\nMasalah: ' + detail + '\n\nPeriksa policy Storage bucket Ambulance.');
+            }
         }
 
         function toggleLainnya() {
