@@ -977,7 +977,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 .pmi-table textarea{min-height:52px;resize:vertical;line-height:1.25}
 .pmi-table input:focus,.pmi-table select:focus,.pmi-table textarea:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.1)}
 .pmi-delete{border:0;background:#ef4444;color:#fff;border-radius:5px;padding:5px 7px;font-size:10px;font-weight:700;cursor:pointer}
-.pmi-note{padding:10px 12px;font-size:11px;color:#64748b;background:#f8fafc;border-top:1px solid #e5e7eb}
 .pmi-status{font-size:11px;font-weight:700;color:#166534;margin-left:4px}
 @media(max-width:640px){.pmi-heading h2{font-size:17px}.pmi-heading h3{font-size:13px}.pmi-toolbar{align-items:stretch}.pmi-meta,.pmi-actions{width:100%}.pmi-actions button{flex:1}.pmi-table{font-size:10px}}
 </style>
@@ -1413,9 +1412,6 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                                 </table>
                             </div>
 
-                            <div class="pmi-note">
-                                Data PMI tersimpan di browser perangkat ini melalui Local Storage. Gunakan tombol <b>Simpan</b> setelah mengisi atau mengubah data.
-                            </div>
                         </div>
                     </div>
                     <!-- AKHIR DISPLAY AREA PEMANTAUAN MUTU INTERNAL -->
@@ -6495,17 +6491,6 @@ function pwsRefreshCalendarPeriod(){
 </script>
 
 
-<div id="a4SavePrintBar" class="no-print" style="
-    position:fixed; right:18px; bottom:18px; z-index:99999;
-    display:flex; gap:8px; align-items:center;">
-    <button id="savePrintBtn" type="button" data-print="a4"
-        style="
-            border:0; border-radius:8px; padding:11px 18px;
-            font-weight:700; cursor:pointer; font-size:14px;
-            box-shadow:0 3px 10px rgba(0,0,0,.18);">
-        💾 Simpan / 🖨️ Print PDF
-    </button>
-</div>
 
 </body>
 </html>
