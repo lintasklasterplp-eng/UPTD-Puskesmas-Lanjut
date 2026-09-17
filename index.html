@@ -988,8 +988,8 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 <div id="authLoginScreen" class="auth-screen">
     <div class="auth-card">
         <div class="auth-brand">
-            <h1>UPTD PUSKESMAS LANJUT</h1>
-            <p>Silakan masukkan password untuk masuk</p>
+            <h1>LINTAS KLASTER</h1>
+            <p>UPTD PUSKESMAS LANJUT</p>
         </div>
         <div class="auth-title">Masukkan Password</div>
         <form onsubmit="event.preventDefault(); authLogin();" autocomplete="off" data-lpignore="true" data-1p-ignore="true">
@@ -2335,7 +2335,12 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                             <iframe id="rkoModuleFrame" title="Rencana Kebutuhan Obat" style="display:block; width:100%; min-height:900px; height:80vh; border:0; background:#f8fafc;"></iframe>
                         </div>
                     </div>
-            <div id="homeViewContainer"></div>
+            <div id="homeViewContainer">
+                <div style="padding:70px 20px 50px; max-width:900px; margin:0 auto;">
+                    <div style="font-size:clamp(2.6rem,7vw,5.5rem); font-weight:900; letter-spacing:3px; line-height:1.05; margin-bottom:14px;">LINTAS KLASTER</div>
+                    <div style="font-size:clamp(1.2rem,3vw,2rem); font-weight:700; letter-spacing:1.5px; opacity:0.95;">UPTD PUSKESMAS LANJUT</div>
+                </div>
+            </div>
         </div>
         
         <footer>
@@ -2777,7 +2782,8 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
             }
         }
 
-        async function muatKIRDariSupabase() {
+        async function muatKIRDariSupabase(options = {}) {
+            const silent = options.silent === true;
             try {
                 const { data, error } = await supabaseClient.storage
                     .from(KIR_STORAGE_BUCKET)
@@ -2785,10 +2791,12 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
 
                 if (error) {
                     if (/not found|object not found|no such file/i.test(error.message || '')) {
-                        alert(
-                            'Data KIR di Supabase belum ditemukan.\n\n' +
-                            `Pastikan file ${KIR_STORAGE_PATH} sudah pernah disimpan ke bucket ${KIR_STORAGE_BUCKET}.`
-                        );
+                        if (!silent) {
+                            alert(
+                                'Data KIR di Supabase belum ditemukan.\n\n' +
+                                `Pastikan file ${KIR_STORAGE_PATH} sudah pernah disimpan ke bucket ${KIR_STORAGE_BUCKET}.`
+                            );
+                        }
                         return;
                     }
                     throw error;
@@ -2801,14 +2809,16 @@ body.auth-locked > *:not(.auth-screen) { visibility:hidden; }
                 // Sinkronkan hasil cloud ke localStorage sebagai cadangan offline.
                 localStorage.setItem('kir_temp_data', JSON.stringify(kirData));
 
-                alert(`Data KIR berhasil dimuat dari Supabase: ${jumlahForm} form.`);
+                if (!silent) alert(`Data KIR berhasil dimuat dari Supabase: ${jumlahForm} form.`);
             } catch (error) {
                 console.error('Gagal memuat KIR dari Supabase:', error);
-                alert(
-                    'Gagal memuat data KIR dari Supabase.\n\n' +
-                    'Masalah: ' + (error?.message || error) + '\n\n' +
-                    'Periksa policy SELECT pada Storage bucket KIR dan pastikan nama file/path benar.'
-                );
+                if (!silent) {
+                    alert(
+                        'Gagal memuat data KIR dari Supabase.\n\n' +
+                        'Masalah: ' + (error?.message || error) + '\n\n' +
+                        'Periksa policy SELECT pada Storage bucket KIR dan pastikan nama file/path benar.'
+                    );
+                }
             }
         }
 
@@ -4676,6 +4686,11 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                 initRujukanInternalDateTime();
             } else if (categoryCode === 'inventaris' && periodIdentifier === 'kir') {
                 inventarisKirArea.style.display = 'block';
+                // Ambil data KIR terbaru dari Supabase setiap kali menu KIR dibuka.
+                // Jika belum ada data cloud atau akses gagal, form tetap dapat digunakan.
+                setTimeout(() => {
+                    muatKIRDariSupabase({silent: true});
+                }, 0);
             } else if (categoryCode === 'inventaris' && periodIdentifier === 'obhp_bmhp') {
                 obhpBmhpArea.style.display = 'block';
             } else if (categoryCode === 'monitoring' && periodIdentifier === 'upkdk') {
