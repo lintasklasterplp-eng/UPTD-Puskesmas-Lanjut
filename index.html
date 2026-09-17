@@ -3059,6 +3059,10 @@ footer {
         const GUG_STORAGE_PATH = "skrining-get-up-and-go/riwayat.json";
         const PMI_STORAGE_BUCKET = "PMI";
         const PMI_STORAGE_PATH = "pemantauan-mutu-internal/pmi-data.json";
+        // Bucket khusus Dashboard PWS. Setiap periode Minggu/Bulan/Tahun disimpan sebagai JSON
+        // sehingga data dapat dibuka kembali dari perangkat lain.
+        const PWS_STORAGE_BUCKET = "PWS";
+        const PWS_STORAGE_FOLDER = "dashboard-pws";
         // Bucket khusus Ambulance. Data operasional disimpan dalam JSON dan foto petugas sebagai object terpisah.
         const AMBULANCE_STORAGE_BUCKET = "Ambulance";
         const AMBULANCE_STORAGE_PATH = "ambulance/ambulance-data.json";
@@ -6622,7 +6626,7 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
     </script>
 
 <script id="pws-edit-mode-script">
-/* ================= PWS DASHBOARD + MODE EDIT PER DESA ================= */
+/* ================= PWS DASHBOARD + SUPABASE STORAGE ================= */
 const PWS_DISEASES = [
   {key:'diare', label:'Diare'}, {key:'hipertensi', label:'Hipertensi'},
   {key:'stroke', label:'Stroke'}, {key:'tb', label:'TB Paru'},
@@ -6632,6 +6636,7 @@ const PWS_DISEASES = [
 ];
 const PWS_STATUSES = ['k','p','s','m'];
 const PWS_STATUS_LABEL = {k:'K',p:'P',s:'S',m:'M'};
+
 /* Password ini adalah proteksi antarmuka. Karena HTML berjalan di browser,
    password client-side tidak dapat dianggap sebagai keamanan server. */
 const PWS_DESA_PASSWORDS = {
@@ -6643,10 +6648,12 @@ const PWS_DESA_PASSWORDS = {
   'Pelakak':'PWS-PELAKAK-2026'
 };
 const PWS_DESA_LIST = Object.keys(PWS_DESA_PASSWORDS);
+
 let pwsChartInstance = null;
 let pwsEditingDesa = null;
 let pwsEditingSnapshot = null;
 let pwsPendingEditDesa = null;
+let pwsSyncBusy = false;
 
 function pwsGetWeekOfMonth(date = new Date()) {
   // Minggu pelaporan dihitung berdasarkan minggu kalender (Senin-Minggu)
@@ -6667,8 +6674,6 @@ function pwsSetCurrentPeriodFromCalendar() {
   const bulan = now.getMonth() + 1;
   const tahun = now.getFullYear();
 
-  // Pastikan pilihan tahun mengikuti kalender, termasuk tahun saat ini
-  // bila sebelumnya belum tersedia di dropdown.
   const yearValues = [...tahunEl.options].map(o => Number(o.value));
   if (!yearValues.includes(tahun)) {
     const opt = document.createElement('option');
@@ -6681,7 +6686,6 @@ function pwsSetCurrentPeriodFromCalendar() {
   bulanEl.value = String(bulan);
   tahunEl.value = String(tahun);
 
-  // Tandai bahwa periode adalah periode kalender aktif.
   mingguEl.title = `Otomatis: minggu ke-${minggu} berdasarkan kalender`;
   bulanEl.title = `Otomatis: ${bulanEl.options[bulanEl.selectedIndex]?.text || ''} berdasarkan kalender`;
   tahunEl.title = `Otomatis: ${tahun} berdasarkan kalender`;
@@ -6694,43 +6698,210 @@ function pwsPeriodKey(){
   return `${tahun}-${String(bulan).padStart(2,'0')}-M${minggu}`;
 }
 function pwsStorageKey(){ return `pws_dashboard_data_${pwsPeriodKey()}`; }
+function pwsSupabasePath(){ return `${PWS_STORAGE_FOLDER}/${pwsPeriodKey()}.json`; }
+
 function pwsBlankDisease(){ return {k:0,p:0,s:0,m:0}; }
 function pwsBlankVillage(){
   const obj = {};
   PWS_DISEASES.forEach(d => obj[d.key] = pwsBlankDisease());
   return obj;
 }
+
+function pwsEmptyData(){
+  return Object.fromEntries(PWS_DESA_LIST.map(d => [d, pwsBlankVillage()]));
+}
+
+function pwsNormalizeData(input){
+  const parsed = (input && typeof input === 'object' && !Array.isArray(input)) ? input : {};
+  PWS_DESA_LIST.forEach(desa => {
+    if(!parsed[desa] || typeof parsed[desa] !== 'object') parsed[desa] = pwsBlankVillage();
+    PWS_DISEASES.forEach(d => {
+      if(!parsed[desa][d.key] || typeof parsed[desa][d.key] !== 'object'){
+        parsed[desa][d.key] = pwsBlankDisease();
+      }
+      PWS_STATUSES.forEach(st => {
+        parsed[desa][d.key][st] = Math.max(0, Number(parsed[desa][d.key][st]) || 0);
+      });
+    });
+  });
+  return parsed;
+}
+
 function pwsLoadData(){
   try{
     const raw = localStorage.getItem(pwsStorageKey());
-    const parsed = raw ? JSON.parse(raw) : {};
-    PWS_DESA_LIST.forEach(desa => {
-      if(!parsed[desa]) parsed[desa] = pwsBlankVillage();
-      PWS_DISEASES.forEach(d => {
-        if(!parsed[desa][d.key]) parsed[desa][d.key] = pwsBlankDisease();
-        PWS_STATUSES.forEach(st => parsed[desa][d.key][st] = Number(parsed[desa][d.key][st]) || 0);
-      });
-    });
-    return parsed;
-  }catch(e){ console.warn('PWS data rusak, membuat data baru.', e); return Object.fromEntries(PWS_DESA_LIST.map(d=>[d,pwsBlankVillage()])); }
+    return pwsNormalizeData(raw ? JSON.parse(raw) : {});
+  }catch(e){
+    console.warn('PWS local data rusak, membuat data baru.', e);
+    return pwsEmptyData();
+  }
 }
-function pwsSaveData(data){ localStorage.setItem(pwsStorageKey(), JSON.stringify(data)); }
-function pwsEscape(value){ return String(value ?? '').replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+
+function pwsSaveLocalData(data){
+  localStorage.setItem(pwsStorageKey(), JSON.stringify(pwsNormalizeData(JSON.parse(JSON.stringify(data)))));
+}
+
+function pwsSetSyncStatus(text, type='info'){
+  const el = document.getElementById('pws-sync-status');
+  if(!el) return;
+  el.textContent = text;
+  el.className = 'text-[10px] font-bold px-2 py-1 rounded-full';
+  if(type === 'success'){
+    el.classList.add('bg-emerald-100','text-emerald-700');
+  }else if(type === 'error'){
+    el.classList.add('bg-red-100','text-red-700');
+  }else if(type === 'warning'){
+    el.classList.add('bg-amber-100','text-amber-700');
+  }else{
+    el.classList.add('bg-slate-100','text-slate-600');
+  }
+}
+
+function pwsFormatError(error){
+  const status = error?.statusCode || error?.status || '';
+  const msg = error?.message || error?.error_description || String(error || '');
+  let solution = 'Periksa nama bucket PWS, Storage policy, dan koneksi internet.';
+  if(String(status) === '401'){
+    solution = 'Anon key tidak diterima atau token tidak valid. Pastikan ANON/PUBLISHABLE KEY yang dipakai adalah key project Supabase ini.';
+  }else if(String(status) === '403'){
+    solution = 'Policy Storage menolak akses. Pastikan policy SELECT, INSERT, dan UPDATE untuk bucket PWS sudah dibuat.';
+  }else if(String(status) === '404'){
+    solution = 'Bucket PWS belum dibuat, atau path file tidak ditemukan.';
+  }else if(/Failed to fetch|NetworkError|fetch/i.test(msg)){
+    solution = 'Koneksi browser ke Supabase gagal. Cek internet, extension/firewall, dan URL project.';
+  }else if(/duplicate|already exists/i.test(msg)){
+    solution = 'File sudah ada. Kode ini memakai upsert=true agar file periode PWS dapat diperbarui.';
+  }
+  return `HTTP ${status || '-'}\nMasalah: ${msg}\nSolusi: ${solution}`;
+}
+
+async function pwsSaveToSupabase(data){
+  const payload = {
+    version: 1,
+    module: 'Dashboard PWS',
+    period_key: pwsPeriodKey(),
+    saved_at: new Date().toISOString(),
+    data: pwsNormalizeData(JSON.parse(JSON.stringify(data)))
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const { data: result, error } = await supabaseClient.storage
+    .from(PWS_STORAGE_BUCKET)
+    .upload(
+      pwsSupabasePath(),
+      blob,
+      {
+        cacheControl: '3600',
+        contentType: 'application/json',
+        upsert: true
+      }
+    );
+
+  if(error) throw error;
+  return result;
+}
+
+async function pwsLoadFromSupabase(options = {}){
+  const silent = options.silent === true;
+  try{
+    pwsSyncBusy = true;
+    pwsSetSyncStatus('☁️ Memuat PWS...', 'info');
+
+    const { data, error } = await supabaseClient.storage
+      .from(PWS_STORAGE_BUCKET)
+      .download(pwsSupabasePath());
+
+    if(error){
+      const msg = error?.message || '';
+      if(/not found|object not found|no such file|404/i.test(msg)){
+        pwsSyncBusy = false;
+        pwsSetSyncStatus('Belum ada file online', 'warning');
+        pwsRenderTable();
+        return false;
+      }
+      throw error;
+    }
+
+    const rawText = await data.text();
+    const parsed = JSON.parse(rawText);
+    const remoteData = parsed?.data ? parsed.data : parsed;
+
+    pwsSaveLocalData(remoteData);
+    pwsSyncBusy = false;
+    pwsSetSyncStatus(`☁️ Tersinkron ${new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`, 'success');
+    pwsRenderTable();
+    return true;
+  }catch(error){
+    pwsSyncBusy = false;
+    pwsSetSyncStatus('Supabase gagal', 'error');
+    console.error('Gagal memuat PWS dari Supabase:', error);
+
+    if(!silent){
+      alert('PWS tetap dibuka dari penyimpanan perangkat.\n\n' + pwsFormatError(error));
+    }
+    pwsRenderTable();
+    return false;
+  }
+}
+
+async function pwsTestSupabase(showAlert = true){
+  try{
+    pwsSetSyncStatus('🔎 Tes Supabase...', 'info');
+    const { data, error } = await supabaseClient.storage
+      .from(PWS_STORAGE_BUCKET)
+      .list('', { limit: 10, sortBy: { column: 'name', order: 'asc' } });
+
+    if(error) throw error;
+
+    pwsSetSyncStatus('✓ Bucket PWS terhubung', 'success');
+    if(showAlert){
+      alert(
+        'Koneksi bucket PWS berhasil.\n\n' +
+        `Bucket: ${PWS_STORAGE_BUCKET}\n` +
+        `File teratas terbaca: ${Array.isArray(data) ? data.length : 0}`
+      );
+    }
+    return true;
+  }catch(error){
+    pwsSetSyncStatus('Bucket PWS bermasalah', 'error');
+    console.error('Tes bucket PWS gagal:', error);
+    if(showAlert) alert('Tes koneksi bucket PWS gagal.\n\n' + pwsFormatError(error));
+    return false;
+  }
+}
+
+function pwsEscape(value){
+  return String(value ?? '').replace(/[&<>'"]/g, c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
+  }[c]));
+}
+
 function pwsTotalVillage(village){
   return PWS_DISEASES.reduce((sum,d)=>sum + PWS_STATUSES.reduce((s,st)=>s+(Number(village?.[d.key]?.[st])||0),0),0);
 }
-function pwsTotalDisease(village,key,status){ return Number(village?.[key]?.[status])||0; }
+function pwsTotalDisease(village,key,status){
+  return Number(village?.[key]?.[status])||0;
+}
 function pwsInput(desa,key,status,value,disabled=true){
   const lock = disabled ? ' readonly' : '';
   return `<input class="pws-edit-input" type="number" min="0" step="1" value="${Number(value)||0}" data-desa="${pwsEscape(desa)}" data-disease="${key}" data-status="${status}"${lock} onchange="pwsInputChanged(this)" oninput="pwsInputChanged(this)">`;
 }
+
 function pwsRenderAction(desa, editing=false){
   return `<div class="pws-action-wrap" id="pws-action-${pwsEscape(desa).replace(/[^a-zA-Z0-9]/g,'-')}">
-    ${editing ? `<span class="pws-status pws-status-edit">Edit</span><button class="pws-action-btn pws-btn-save" onclick="pwsSaveVillage('${pwsEscape(desa)}')">💾 Simpan</button><button class="pws-action-btn pws-btn-cancel" onclick="pwsCancelVillage('${pwsEscape(desa)}')">Batal</button><button class="pws-action-btn pws-btn-lock" onclick="pwsLockVillage('${pwsEscape(desa)}')">🔒 Kunci</button>` : `<span class="pws-status pws-status-locked">Terkunci</span><button class="pws-action-btn pws-btn-edit" onclick="openPwsEdit('${pwsEscape(desa)}')">✏️ Edit</button>`}
+    ${editing
+      ? `<span class="pws-status pws-status-edit">Edit</span>
+         <button class="pws-action-btn pws-btn-save" onclick="pwsSaveVillage('${pwsEscape(desa)}')">💾 Simpan</button>
+         <button class="pws-action-btn pws-btn-cancel" onclick="pwsCancelVillage('${pwsEscape(desa)}')">Batal</button>
+         <button class="pws-action-btn pws-btn-lock" onclick="pwsLockVillage('${pwsEscape(desa)}')">🔒 Kunci</button>`
+      : `<span class="pws-status pws-status-locked">Terkunci</span>
+         <button class="pws-action-btn pws-btn-edit" onclick="openPwsEdit('${pwsEscape(desa)}')">✏️ Edit</button>`}
   </div>`;
 }
+
 function pwsRenderTable(){
-  const tbody = document.getElementById('table-body'); if(!tbody) return;
+  const tbody = document.getElementById('table-body');
+  if(!tbody) return;
   const data = pwsLoadData();
   let html='';
   PWS_DESA_LIST.forEach(desa=>{
@@ -6747,91 +6918,272 @@ function pwsRenderTable(){
     html += `<td class="px-1 py-1 border-l bg-white">${pwsRenderAction(desa,false)}</td></tr>`;
   });
   tbody.innerHTML=html;
-  pwsUpdateSummary(data); pwsUpdateChart(data);
+  pwsUpdateSummary(data);
+  pwsUpdateChart(data);
 }
+
 function pwsInputChanged(el){
   const row=el.closest('tr'); if(!row) return;
   const totals={k:0,p:0,s:0,m:0};
-  row.querySelectorAll('.pws-edit-input').forEach(i=>{ totals[i.dataset.status]=(totals[i.dataset.status]||0)+Math.max(0,Number(i.value)||0); });
-  PWS_STATUSES.forEach(st=>{ const cell=row.querySelector('.pws-village-total-'+st); if(cell) cell.textContent=totals[st]||0; });
+  row.querySelectorAll('.pws-edit-input').forEach(i=>{
+    totals[i.dataset.status]=(totals[i.dataset.status]||0)+Math.max(0,Number(i.value)||0);
+  });
+  PWS_STATUSES.forEach(st=>{
+    const cell=row.querySelector('.pws-village-total-'+st);
+    if(cell) cell.textContent=totals[st]||0;
+  });
 }
+
 function pwsSnapshotRow(desa){
-  const data=pwsLoadData(); return JSON.parse(JSON.stringify(data[desa] || pwsBlankVillage()));
+  const data=pwsLoadData();
+  return JSON.parse(JSON.stringify(data[desa] || pwsBlankVillage()));
 }
+
 function pwsSetRowEditing(desa,editing){
   const row=[...document.querySelectorAll('#table-body tr[data-pws-desa]')].find(r=>r.dataset.pwsDesa===desa);
   if(!row) return;
   row.classList.toggle('pws-row-editing',editing);
   row.querySelectorAll('.pws-edit-input').forEach(i=>i.readOnly=!editing);
-  const action=row.querySelector('.pws-action-wrap'); if(action) action.outerHTML=pwsRenderAction(desa,editing);
+  const action=row.querySelector('.pws-action-wrap');
+  if(action) action.outerHTML=pwsRenderAction(desa,editing);
 }
+
 function openPwsEdit(desa){
-  if(pwsEditingDesa && pwsEditingDesa!==desa){ alert(`Selesaikan atau kunci edit ${pwsEditingDesa} terlebih dahulu.`); return; }
+  if(pwsSyncBusy){
+    alert('Data PWS sedang disinkronkan. Coba lagi setelah proses selesai.');
+    return;
+  }
+  if(pwsEditingDesa && pwsEditingDesa!==desa){
+    alert(`Selesaikan atau kunci edit ${pwsEditingDesa} terlebih dahulu.`);
+    return;
+  }
   pwsPendingEditDesa=desa;
   const modal=document.getElementById('login-modal');
-  const name=document.getElementById('modal-desa-name'); const input=document.getElementById('password-input'); const err=document.getElementById('login-error');
-  if(name) name.textContent=`PWS Desa ${desa}`; if(input) input.value=''; if(err) err.classList.add('hidden');
+  const name=document.getElementById('modal-desa-name');
+  const input=document.getElementById('password-input');
+  const err=document.getElementById('login-error');
+  if(name) name.textContent=`PWS Desa ${desa}`;
+  if(input) input.value='';
+  if(err) err.classList.add('hidden');
   if(modal) modal.classList.remove('hidden');
   setTimeout(()=>input?.focus(),80);
 }
-function closeLoginModal(){ document.getElementById('login-modal')?.classList.add('hidden'); pwsPendingEditDesa=null; }
-function verifyPassword(){
-  const desa=pwsPendingEditDesa; const input=document.getElementById('password-input'); const pwd=input?.value||'';
-  if(!desa) return closeLoginModal();
-  if(pwd===PWS_DESA_PASSWORDS[desa] || pwd==='admin'){
-    pwsEditingDesa=desa; pwsEditingSnapshot=pwsSnapshotRow(desa); closeLoginModal(); pwsSetRowEditing(desa,true); pwsShowNotification(`Mode edit PWS ${desa} dibuka.`);
-  }else{ document.getElementById('login-error')?.classList.remove('hidden'); if(input){input.value='';input.focus();} }
+
+function closeLoginModal(){
+  document.getElementById('login-modal')?.classList.add('hidden');
+  pwsPendingEditDesa=null;
 }
+
+function verifyPassword(){
+  const desa=pwsPendingEditDesa;
+  const input=document.getElementById('password-input');
+  const pwd=input?.value||'';
+  if(!desa) return closeLoginModal();
+
+  if(pwd===PWS_DESA_PASSWORDS[desa] || pwd==='admin'){
+    pwsEditingDesa=desa;
+    pwsEditingSnapshot=pwsSnapshotRow(desa);
+    closeLoginModal();
+    pwsSetRowEditing(desa,true);
+    pwsShowNotification(`Mode edit PWS ${desa} dibuka.`);
+  }else{
+    document.getElementById('login-error')?.classList.remove('hidden');
+    if(input){input.value='';input.focus();}
+  }
+}
+
 function pwsReadRow(desa){
-  const row=[...document.querySelectorAll('#table-body tr[data-pws-desa]')].find(r=>r.dataset.pwsDesa===desa); const result=pwsBlankVillage();
+  const row=[...document.querySelectorAll('#table-body tr[data-pws-desa]')].find(r=>r.dataset.pwsDesa===desa);
+  const result=pwsBlankVillage();
   if(!row) return result;
-  row.querySelectorAll('.pws-edit-input').forEach(i=>{ if(result[i.dataset.disease]) result[i.dataset.disease][i.dataset.status]=Math.max(0,parseInt(i.value,10)||0); });
+  row.querySelectorAll('.pws-edit-input').forEach(i=>{
+    if(result[i.dataset.disease]){
+      result[i.dataset.disease][i.dataset.status]=Math.max(0,parseInt(i.value,10)||0);
+    }
+  });
   return result;
 }
-function pwsSaveVillage(desa){
-  if(pwsEditingDesa!==desa) return;
-  const data=pwsLoadData(); data[desa]=pwsReadRow(desa); pwsSaveData(data); pwsEditingDesa=null; pwsEditingSnapshot=null; pwsRenderTable(); pwsShowNotification(`Data PWS Desa ${desa} berhasil disimpan.`);
+
+async function pwsCommitData(data, successMessage){
+  const normalized = pwsNormalizeData(JSON.parse(JSON.stringify(data)));
+  // Simpan lokal lebih dulu sebagai fallback agar input tidak hilang jika jaringan gagal.
+  pwsSaveLocalData(normalized);
+
+  try{
+    pwsSetSyncStatus('☁️ Menyimpan...', 'info');
+    await pwsSaveToSupabase(normalized);
+    pwsSetSyncStatus(`✓ Tersimpan ${new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`, 'success');
+    pwsEditingDesa=null;
+    pwsEditingSnapshot=null;
+    pwsRenderTable();
+    pwsShowNotification(successMessage);
+    return true;
+  }catch(error){
+    pwsSetSyncStatus('Lokal tersimpan • online gagal', 'warning');
+    console.error('Gagal menyimpan PWS ke Supabase:', error);
+    alert(
+      'Data PWS tersimpan di perangkat ini, tetapi BELUM berhasil dikirim ke Supabase.\n\n' +
+      pwsFormatError(error) +
+      '\n\nPerbaiki kendala Supabase lalu tekan Simpan lagi.'
+    );
+    return false;
+  }
 }
+
+async function pwsSaveVillage(desa){
+  if(pwsEditingDesa!==desa) return;
+  const data=pwsLoadData();
+  data[desa]=pwsReadRow(desa);
+  await pwsCommitData(data, `Data PWS Desa ${desa} berhasil disimpan.`);
+}
+
 function pwsCancelVillage(desa){
   if(pwsEditingDesa!==desa) return;
-  const data=pwsLoadData(); data[desa]=pwsEditingSnapshot || pwsBlankVillage(); pwsSaveData(data); pwsEditingDesa=null; pwsEditingSnapshot=null; pwsRenderTable(); pwsShowNotification(`Perubahan PWS Desa ${desa} dibatalkan.`);
+  const data=pwsLoadData();
+  data[desa]=pwsEditingSnapshot || pwsBlankVillage();
+  pwsSaveLocalData(data);
+  pwsEditingDesa=null;
+  pwsEditingSnapshot=null;
+  pwsRenderTable();
+  pwsShowNotification(`Perubahan PWS Desa ${desa} dibatalkan.`);
 }
-function pwsLockVillage(desa){
+
+async function pwsLockVillage(desa){
   if(pwsEditingDesa!==desa) return;
-  const data=pwsLoadData(); data[desa]=pwsReadRow(desa); pwsSaveData(data); pwsEditingDesa=null; pwsEditingSnapshot=null; pwsRenderTable(); pwsShowNotification(`PWS Desa ${desa} dikunci.`);
+  const data=pwsLoadData();
+  data[desa]=pwsReadRow(desa);
+  await pwsCommitData(data, `Data PWS Desa ${desa} disimpan dan dikunci.`);
 }
-function pwsLockAll(){ if(pwsEditingDesa) pwsLockVillage(pwsEditingDesa); }
-function pwsSaveAllUnlocked(){ if(pwsEditingDesa) pwsSaveVillage(pwsEditingDesa); else pwsShowNotification('Tidak ada desa yang sedang diedit.'); }
-function pwsShowNotification(text){ const box=document.getElementById('notification'), span=document.getElementById('notification-text'); if(!box||!span) return; span.textContent=text; box.classList.remove('hidden'); clearTimeout(window.pwsNotifTimer); window.pwsNotifTimer=setTimeout(()=>box.classList.add('hidden'),3000); }
+
+function pwsLockAll(){
+  if(pwsEditingDesa) pwsLockVillage(pwsEditingDesa);
+}
+function pwsSaveAllUnlocked(){
+  if(pwsEditingDesa) pwsSaveVillage(pwsEditingDesa);
+  else pwsShowNotification('Tidak ada desa yang sedang diedit.');
+}
+
+function pwsShowNotification(text){
+  const box=document.getElementById('notification');
+  const span=document.getElementById('notification-text');
+  if(!box||!span) return;
+  span.textContent=text;
+  box.classList.remove('hidden');
+  clearTimeout(window.pwsNotifTimer);
+  window.pwsNotifTimer=setTimeout(()=>box.classList.add('hidden'),3000);
+}
+
 function pwsUpdateSummary(data){
-  PWS_DISEASES.forEach(d=>PWS_STATUSES.forEach(st=>{const el=document.getElementById(`sum-${d.key}-${st}`); if(el) el.textContent=PWS_DESA_LIST.reduce((n,desa)=>n+pwsTotalDisease(data[desa],d.key,st),0);}));
+  PWS_DISEASES.forEach(d=>PWS_STATUSES.forEach(st=>{
+    const el=document.getElementById(`sum-${d.key}-${st}`);
+    if(el) el.textContent=PWS_DESA_LIST.reduce((n,desa)=>n+pwsTotalDisease(data[desa],d.key,st),0);
+  }));
 }
+
 function pwsUpdateChart(data){
-  const canvas=document.getElementById('trendChart'); if(!canvas || typeof Chart==='undefined') return;
+  const canvas=document.getElementById('trendChart');
+  if(!canvas || typeof Chart==='undefined') return;
   const totals={k:[],p:[],s:[],m:[]};
-  PWS_STATUSES.forEach(st=>totals[st]=PWS_DISEASES.map(d=>PWS_DESA_LIST.reduce((n,desa)=>n+pwsTotalDisease(data[desa],d.key,st),0)));
+  PWS_STATUSES.forEach(st=>{
+    totals[st]=PWS_DISEASES.map(d=>PWS_DESA_LIST.reduce((n,desa)=>n+pwsTotalDisease(data[desa],d.key,st),0));
+  });
   if(pwsChartInstance) pwsChartInstance.destroy();
-  pwsChartInstance=new Chart(canvas.getContext('2d'),{type:'bar',data:{labels:PWS_DISEASES.map(d=>d.label),datasets:[
-    {label:'Kasus (K)',data:totals.k},{label:'Pantau (P)',data:totals.p},{label:'Sembuh (S)',data:totals.s},{label:'Meninggal (M)',data:totals.m}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{ticks:{font:{size:9}}},y:{beginAtZero:true,precision:0}}}});
+  pwsChartInstance=new Chart(canvas.getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:PWS_DISEASES.map(d=>d.label),
+      datasets:[
+        {label:'Kasus (K)',data:totals.k},
+        {label:'Pantau (P)',data:totals.p},
+        {label:'Sembuh (S)',data:totals.s},
+        {label:'Meninggal (M)',data:totals.m}
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom'}},
+      scales:{x:{ticks:{font:{size:9}}},y:{beginAtZero:true,precision:0}}
+    }
+  });
 }
+
 function renderTable(){ pwsRenderTable(); }
+
 function pwsAddToolbar(){
-  const area=document.getElementById('pwsDisplayArea'); if(!area || document.getElementById('pwsEditToolbar')) return;
+  const area=document.getElementById('pwsDisplayArea');
+  if(!area || document.getElementById('pwsEditToolbar')) return;
   const card=area.querySelector('.flex.flex-col.gap-4');
   if(!card) return;
-  const toolbar=document.createElement('div'); toolbar.id='pwsEditToolbar'; toolbar.className='glass-panel rounded-xl shadow-sm p-3';
-  toolbar.innerHTML=`<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2"><div><div class="font-bold text-xs text-gray-800">Mode Edit Data per Desa</div><div class="pws-edit-note">Klik <b>Edit</b> pada desa, masukkan password desa, lalu ubah K/P/S/M. Data tersimpan berdasarkan Minggu, Bulan, dan Tahun yang dipilih.</div></div><div class="pws-edit-toolbar"><button class="pws-toolbar-btn success" onclick="pwsSaveAllUnlocked()">💾 Simpan</button><button class="pws-toolbar-btn secondary" onclick="pwsLockAll()">🔒 Kunci</button></div></div>`;
+
+  const toolbar=document.createElement('div');
+  toolbar.id='pwsEditToolbar';
+  toolbar.className='glass-panel rounded-xl shadow-sm p-3';
+  toolbar.innerHTML=`
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div>
+        <div class="font-bold text-xs text-gray-800">Mode Edit Data per Desa</div>
+        <div class="pws-edit-note">
+          Klik <b>Edit</b> pada desa, masukkan password desa, lalu ubah K/P/S/M.
+          Data periode <b>Minggu, Bulan, Tahun</b> disimpan ke Supabase bucket <b>PWS</b>.
+        </div>
+        <div class="mt-1"><span id="pws-sync-status" class="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-600">Menyiapkan Supabase...</span></div>
+      </div>
+      <div class="pws-edit-toolbar">
+        <button class="pws-toolbar-btn success" onclick="pwsSaveAllUnlocked()">💾 Simpan</button>
+        <button class="pws-toolbar-btn secondary" onclick="pwsLockAll()">🔒 Kunci</button>
+        <button class="pws-toolbar-btn primary" onclick="pwsLoadFromSupabase({silent:false})">☁️ Muat</button>
+        <button class="pws-toolbar-btn primary" onclick="pwsTestSupabase(true)">🔎 Tes Supabase</button>
+      </div>
+    </div>`;
   area.insertBefore(toolbar,card);
 }
-function pwsInitFilters(){ pwsSetCurrentPeriodFromCalendar(); ['filter-minggu','filter-bulan','filter-tahun'].forEach(id=>{const el=document.getElementById(id); if(el) el.addEventListener('change',()=>{pwsEditingDesa=null;pwsEditingSnapshot=null;pwsRenderTable();});}); pwsAddToolbar(); }
-window.addEventListener('DOMContentLoaded',()=>{ pwsInitFilters(); pwsRenderTable(); });
 
-// Saat modul PWS dibuka kembali, selalu segarkan periode mengikuti kalender hari ini.
-function pwsRefreshCalendarPeriod(){
+async function pwsInitPeriod(){
   pwsSetCurrentPeriodFromCalendar();
+  pwsRenderTable();
+  await pwsLoadFromSupabase({silent:true});
 }
 
+function pwsInitFilters(){
+  pwsSetCurrentPeriodFromCalendar();
+  ['filter-minggu','filter-bulan','filter-tahun'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      el.addEventListener('change', async ()=>{
+        if(pwsEditingDesa){
+          const ok = confirm(`Desa ${pwsEditingDesa} sedang diedit. Lanjut ganti periode tanpa menyimpan perubahan?`);
+          if(!ok){
+            pwsSetCurrentPeriodFromCalendar();
+            pwsRenderTable();
+            return;
+          }
+        }
+        pwsEditingDesa=null;
+        pwsEditingSnapshot=null;
+        pwsRenderTable();
+        await pwsLoadFromSupabase({silent:true});
+      });
+    }
+  });
+  pwsAddToolbar();
+  pwsLoadFromSupabase({silent:true});
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  pwsInitFilters();
+  pwsRenderTable();
+});
+
+// Saat modul PWS dibuka kembali, selalu segarkan periode mengikuti kalender hari ini,
+// kemudian ambil data periode tersebut dari Supabase.
+async function pwsRefreshCalendarPeriod(){
+  pwsSetCurrentPeriodFromCalendar();
+  pwsEditingDesa=null;
+  pwsEditingSnapshot=null;
+  pwsRenderTable();
+  await pwsLoadFromSupabase({silent:true});
+}
 </script>
 
 
