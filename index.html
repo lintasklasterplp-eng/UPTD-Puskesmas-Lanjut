@@ -894,12 +894,6 @@
         .sbar-btn-pdf:hover { background-color: #b91c1c; }
         .sbar-btn-reset { background-color: #64748b; color: white; }
         .sbar-pdf-history { margin: 16px auto 0; max-width: 850px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; box-shadow: 0 4px 12px rgba(15,23,42,0.05); }
-        .sbar-pdf-folder { background: linear-gradient(135deg, #fffdf3 0%, #f8fafc 100%); border: 1px solid #f4d35e; border-radius: 10px; overflow: hidden; }
-        .sbar-pdf-folder-head { display:flex; align-items:center; gap:10px; padding:10px 12px; background:#fff8dc; border-bottom:1px solid #f4d35e; }
-        .sbar-pdf-folder-icon { font-size:22px; line-height:1; }
-        .sbar-pdf-folder-name { flex:1; min-width:0; }
-        .sbar-pdf-folder-name strong { display:block; color:#7c5d00; font-size:12px; font-weight:800; }
-        .sbar-pdf-folder-name span { display:block; margin-top:2px; color:#8a7a4a; font-size:10px; }
         .sbar-pdf-history-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
         .sbar-pdf-history-header h3 { margin:0; color:#047857; font-size:13px; font-weight:800; }
         .sbar-pdf-history-header p { margin:3px 0 0; color:#64748b; font-size:10px; line-height:1.4; }
@@ -2477,20 +2471,11 @@ footer {
                             <div class="sbar-pdf-history-header">
                                 <div>
                                     <h3>📚 Rekaman PDF Rujukan Internal</h3>
-                                    <p>PDF yang dikirim melalui tombol Kirim WA akan otomatis diarsipkan di folder berikut.</p>
+                                    <p>Semua PDF Rujukan Internal yang dibuat melalui tombol Unduh PDF atau Kirim WA otomatis direkam di sini.</p>
                                 </div>
                             </div>
-                            <div class="sbar-pdf-folder">
-                                <div class="sbar-pdf-folder-head">
-                                    <div class="sbar-pdf-folder-icon">📁</div>
-                                    <div class="sbar-pdf-folder-name">
-                                        <strong>Rekaman PDF Rujukan Internal</strong>
-                                        <span>Folder arsip PDF • tersimpan permanen di perangkat/browser ini sampai dihapus admin</span>
-                                    </div>
-                                </div>
-                                <div id="sbarPdfHistoryList" class="sbar-pdf-history-list">
-                                    <div class="sbar-pdf-empty">Belum ada rekaman PDF. Setelah PDF dikirim, rekamannya otomatis masuk ke folder ini.</div>
-                                </div>
+                            <div id="sbarPdfHistoryList" class="sbar-pdf-history-list">
+                                <div class="sbar-pdf-empty">Belum ada rekaman PDF. Setelah PDF dibuat, rekamannya otomatis muncul di sini.</div>
                             </div>
                         </div>
                     </div>
@@ -3078,6 +3063,9 @@ footer {
         const AMBULANCE_STORAGE_BUCKET = "Ambulance";
         const AMBULANCE_STORAGE_PATH = "ambulance/ambulance-data.json";
         const AMBULANCE_PHOTO_PREFIX = "ambulance/petugas-foto";
+        // Bucket khusus PDF Rujukan Internal agar arsip tersedia lintas perangkat.
+        const SBAR_PDF_BUCKET = "RUJUKAN INTERNAL";
+        const SBAR_PDF_FOLDER = "rujukan-internal";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -5799,7 +5787,7 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             
             sbarNomorUsed = false;
             updateSbarNomorDisplay();
-            sbarRenderPdfHistory();
+            initSbarPdfHistory();
         }
 
         function getSbarVal(id) {
@@ -5820,10 +5808,9 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                 .slice(0, 80) || 'tanpa-nama';
         }
 
-        const SBAR_PDF_DB_NAME = 'puskesmas_sbar_pdf_history_v1';
-        const SBAR_PDF_STORE_NAME = 'pdf_records';
         const SBAR_PDF_DELETE_PASSWORD = 'admin';
         let sbarPdfObjectUrls = [];
+        let sbarPdfMigrationPromise = null;
 
         function sbarMintaPasswordHapusPdf(onSuccess) {
             showPasswordPrompt(
@@ -5840,84 +5827,93 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             );
         }
 
-        function sbarOpenPdfDb() {
-            return new Promise((resolve, reject) => {
-                if (!('indexedDB' in window)) {
-                    reject(new Error('IndexedDB tidak tersedia di browser ini.'));
-                    return;
-                }
-                const request = indexedDB.open(SBAR_PDF_DB_NAME, 1);
-                request.onupgradeneeded = () => {
-                    const db = request.result;
-                    if (!db.objectStoreNames.contains(SBAR_PDF_STORE_NAME)) {
-                        const store = db.createObjectStore(SBAR_PDF_STORE_NAME, { keyPath: 'id', autoIncrement: true });
-                        store.createIndex('createdAt', 'createdAt', { unique: false });
-                    }
-                };
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error || new Error('Gagal membuka penyimpanan PDF.'));
-            });
+        function sbarNormalisasiFileName(value) {
+            return String(value || 'rujukan-internal')
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-zA-Z0-9._,;!*$@=+?()'\-\s]+/g, '_')
+                .trim()
+                .replace(/\s+/g, '_')
+                .slice(0, 120) || 'rujukan-internal';
         }
 
-        async function sbarAddPdfRecord(blob, filename, actionLabel) {
-            const record = {
-                filename,
-                blob,
-                folder: 'Rekaman PDF Rujukan Internal',
-                action: actionLabel || 'PDF dibuat',
-                nomorSurat: document.getElementById('sbar_nomor_surat_display')?.innerText?.trim() || '-',
-                namaPasien: getSbarRawVal('nama_pasien') || '-',
-                createdAt: new Date().toISOString(),
-                mimeType: blob?.type || 'application/pdf',
-                size: Number(blob?.size || 0)
-            };
-            const db = await sbarOpenPdfDb();
-            await new Promise((resolve, reject) => {
-                const tx = db.transaction(SBAR_PDF_STORE_NAME, 'readwrite');
-                tx.objectStore(SBAR_PDF_STORE_NAME).add(record);
-                tx.oncomplete = resolve;
-                tx.onerror = () => reject(tx.error || new Error('Gagal merekam PDF.'));
-            });
-            db.close();
-            await sbarPrunePdfHistory();
-            await sbarRenderPdfHistory();
+        function sbarBuildCloudPath(filename) {
+            const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
+            const unique = Math.random().toString(36).slice(2, 8);
+            return `${SBAR_PDF_FOLDER}/${stamp}_${unique}_${sbarNormalisasiFileName(filename)}`;
         }
 
-        async function sbarGetPdfRecords() {
-            const db = await sbarOpenPdfDb();
-            const records = await new Promise((resolve, reject) => {
-                const tx = db.transaction(SBAR_PDF_STORE_NAME, 'readonly');
-                const req = tx.objectStore(SBAR_PDF_STORE_NAME).index('createdAt').getAll();
-                req.onsuccess = () => resolve(req.result || []);
-                req.onerror = () => reject(req.error || new Error('Gagal membaca rekaman PDF.'));
-            });
-            db.close();
-            return records.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        function sbarDisplayFileName(name) {
+            const raw = String(name || '');
+            return raw.replace(/^\d{14}_[a-z0-9]{6}_/i, '') || raw || 'Rujukan_Internal.pdf';
         }
 
-        async function sbarPrunePdfHistory(maxRecords = 30) {
-            const records = await sbarGetPdfRecords();
-            if (records.length <= maxRecords) return;
-            const remove = records.slice(maxRecords);
-            const db = await sbarOpenPdfDb();
-            await new Promise((resolve, reject) => {
-                const tx = db.transaction(SBAR_PDF_STORE_NAME, 'readwrite');
-                remove.forEach(item => tx.objectStore(SBAR_PDF_STORE_NAME).delete(item.id));
-                tx.oncomplete = resolve;
-                tx.onerror = () => reject(tx.error || new Error('Gagal merapikan riwayat PDF.'));
-            });
-            db.close();
+        async function sbarListPdfRecords() {
+            const { data, error } = await supabaseClient.storage
+                .from(SBAR_PDF_BUCKET)
+                .list(SBAR_PDF_FOLDER, {
+                    limit: 100,
+                    sortBy: { column: 'created_at', order: 'desc' }
+                });
+
+            if (error) throw error;
+
+            return (Array.isArray(data) ? data : [])
+                .filter(item => item && item.name && /\.pdf$/i.test(item.name))
+                .map(item => ({
+                    path: `${SBAR_PDF_FOLDER}/${item.name}`,
+                    filename: item.name,
+                    createdAt: item.created_at || item.updated_at || new Date().toISOString(),
+                    size: Number(item.metadata?.size || 0),
+                    mimeType: item.metadata?.mimetype || item.metadata?.mimeType || 'application/pdf'
+                }))
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         }
 
-        async function sbarDeletePdfRecord(id) {
-            const db = await sbarOpenPdfDb();
-            await new Promise((resolve, reject) => {
-                const tx = db.transaction(SBAR_PDF_STORE_NAME, 'readwrite');
-                tx.objectStore(SBAR_PDF_STORE_NAME).delete(id);
-                tx.oncomplete = resolve;
-                tx.onerror = () => reject(tx.error || new Error('Gagal menghapus rekaman PDF.'));
-            });
-            db.close();
+        async function sbarUploadPdfToSupabase(blob, filename, actionLabel) {
+            if (!(blob instanceof Blob)) {
+                throw new Error('Data PDF tidak valid.');
+            }
+
+            const cloudPath = sbarBuildCloudPath(filename);
+            const { error } = await supabaseClient.storage
+                .from(SBAR_PDF_BUCKET)
+                .upload(cloudPath, blob, {
+                    cacheControl: '3600',
+                    upsert: false,
+                    contentType: 'application/pdf'
+                });
+
+            if (error) throw error;
+
+            // Metadata ringkas disimpan sebagai cache lokal, sedangkan PDF utamanya tersimpan di Supabase.
+            try {
+                localStorage.setItem('sbar_last_cloud_upload', JSON.stringify({
+                    path: cloudPath,
+                    filename,
+                    action: actionLabel || 'PDF dibuat',
+                    nomorSurat: document.getElementById('sbar_nomor_surat_display')?.innerText?.trim() || '-',
+                    namaPasien: getSbarRawVal('nama_pasien') || '-',
+                    createdAt: new Date().toISOString()
+                }));
+            } catch (_) {}
+
+            return cloudPath;
+        }
+
+        async function sbarDownloadPdfBlob(path) {
+            const { data, error } = await supabaseClient.storage
+                .from(SBAR_PDF_BUCKET)
+                .download(path);
+            if (error) throw error;
+            return data;
+        }
+
+        async function sbarDeletePdfRecord(path) {
+            const { error } = await supabaseClient.storage
+                .from(SBAR_PDF_BUCKET)
+                .remove([path]);
+            if (error) throw error;
             await sbarRenderPdfHistory();
         }
 
@@ -5935,37 +5931,18 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
 
             sbarPdfObjectUrls.forEach(url => URL.revokeObjectURL(url));
             sbarPdfObjectUrls = [];
+            list.innerHTML = '<div class="sbar-pdf-empty">Memuat rekaman PDF dari Supabase...</div>';
 
             try {
-                const records = await sbarGetPdfRecords();
+                const records = await sbarListPdfRecords();
                 list.innerHTML = '';
 
                 if (!records.length) {
-                    list.innerHTML = '<div class="sbar-pdf-empty">Belum ada rekaman PDF. Setelah PDF dibuat atau dikirim, rekamannya muncul otomatis di sini.</div>';
+                    list.innerHTML = '<div class="sbar-pdf-empty">Belum ada rekaman PDF di Supabase Storage.</div>';
                     return;
                 }
 
-                const groups = {};
                 records.forEach(record => {
-                    const dateKey = String(record.createdAt || '').slice(0, 10) || 'tanpa-tanggal';
-                    if (!groups[dateKey]) groups[dateKey] = [];
-                    groups[dateKey].push(record);
-                });
-
-                Object.keys(groups).sort().reverse().forEach(dateKey => {
-                    const dateGroup = document.createElement('div');
-                    dateGroup.className = 'sbar-pdf-date-group';
-                    const dateTitle = document.createElement('div');
-                    dateTitle.className = 'sbar-pdf-date-title';
-                    dateTitle.textContent = '📂 ' + (dateKey === 'tanpa-tanggal' ? 'Tanggal tidak diketahui' : new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(new Date(dateKey + 'T00:00:00')));
-                    dateGroup.appendChild(dateTitle);
-                    list.appendChild(dateGroup);
-
-                    groups[dateKey].forEach(record => {
-                    const pdfBlob = record.blob instanceof Blob ? record.blob : new Blob([record.blob], { type: record.mimeType || 'application/pdf' });
-                    const url = URL.createObjectURL(pdfBlob);
-                    sbarPdfObjectUrls.push(url);
-
                     const item = document.createElement('div');
                     item.className = 'sbar-pdf-item';
 
@@ -5974,12 +5951,12 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
 
                     const name = document.createElement('div');
                     name.className = 'sbar-pdf-item-name';
-                    name.textContent = '📄 ' + record.filename;
+                    name.textContent = '📄 ' + sbarDisplayFileName(record.filename);
 
                     const meta = document.createElement('div');
                     meta.className = 'sbar-pdf-item-meta';
-                    const ukuranMB = ((Number(record.size || 0)) / (1024 * 1024)).toFixed(2);
-                    meta.textContent = `${record.action} • ${record.namaPasien} • ${record.nomorSurat} • ${sbarFormatPdfDate(record.createdAt)} • ${ukuranMB} MB`;
+                    const ukuranMB = record.size ? (record.size / (1024 * 1024)).toFixed(2) : '-';
+                    meta.textContent = `Tersimpan di Supabase • ${sbarFormatPdfDate(record.createdAt)} • ${ukuranMB} MB`;
 
                     info.appendChild(name);
                     info.appendChild(meta);
@@ -5987,31 +5964,68 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                     const actions = document.createElement('div');
                     actions.className = 'sbar-pdf-item-actions';
 
-                    const open = document.createElement('a');
+                    const open = document.createElement('button');
+                    open.type = 'button';
                     open.className = 'sbar-pdf-link';
-                    open.href = url;
-                    open.target = '_blank';
-                    open.rel = 'noopener';
                     open.textContent = '📂 Buka PDF';
+                    open.addEventListener('click', async () => {
+                        const old = open.textContent;
+                        open.disabled = true;
+                        open.textContent = '⏳ Membuka...';
+                        try {
+                            const blob = await sbarDownloadPdfBlob(record.path);
+                            const url = URL.createObjectURL(blob);
+                            sbarPdfObjectUrls.push(url);
+                            window.open(url, '_blank', 'noopener');
+                            setTimeout(() => URL.revokeObjectURL(url), 120000);
+                        } catch (error) {
+                            console.error(error);
+                            alert('PDF tidak dapat dibuka dari Supabase. Periksa koneksi dan policy Storage SELECT.');
+                        } finally {
+                            open.disabled = false;
+                            open.textContent = old;
+                        }
+                    });
 
-                    const download = document.createElement('a');
+                    const download = document.createElement('button');
+                    download.type = 'button';
                     download.className = 'sbar-pdf-link download';
-                    download.href = url;
-                    download.download = record.filename;
                     download.textContent = '⬇ Unduh';
+                    download.addEventListener('click', async () => {
+                        const old = download.textContent;
+                        download.disabled = true;
+                        download.textContent = '⏳ Mengunduh...';
+                        try {
+                            const blob = await sbarDownloadPdfBlob(record.path);
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = sbarDisplayFileName(record.filename);
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            setTimeout(() => URL.revokeObjectURL(url), 1500);
+                        } catch (error) {
+                            console.error(error);
+                            alert('PDF tidak dapat diunduh dari Supabase.');
+                        } finally {
+                            download.disabled = false;
+                            download.textContent = old;
+                        }
+                    });
 
                     const del = document.createElement('button');
                     del.type = 'button';
                     del.className = 'sbar-pdf-delete';
                     del.textContent = 'Hapus';
-                    del.addEventListener('click', async () => {
+                    del.addEventListener('click', () => {
                         sbarMintaPasswordHapusPdf(async () => {
-                            if (!confirm(`Hapus rekaman PDF "${record.filename}"?`)) return;
+                            if (!confirm(`Hapus rekaman PDF "${sbarDisplayFileName(record.filename)}" dari Supabase?`)) return;
                             try {
-                                await sbarDeletePdfRecord(record.id);
+                                await sbarDeletePdfRecord(record.path);
                             } catch (error) {
                                 console.error(error);
-                                alert('Rekaman PDF tidak dapat dihapus.');
+                                alert('Rekaman PDF tidak dapat dihapus dari Supabase. Periksa policy Storage DELETE.');
                             }
                         });
                     });
@@ -6021,17 +6035,82 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                     actions.appendChild(del);
                     item.appendChild(info);
                     item.appendChild(actions);
-                    dateGroup.appendChild(item);
-                    });
+                    list.appendChild(item);
                 });
             } catch (error) {
-                console.error('Gagal memuat rekaman PDF:', error);
-                list.innerHTML = '<div class="sbar-pdf-empty">Rekaman PDF belum dapat dimuat pada browser ini.</div>';
+                console.error('Gagal memuat rekaman PDF Supabase:', error);
+                list.innerHTML = '<div class="sbar-pdf-empty">Rekaman PDF Supabase belum dapat dimuat. Pastikan bucket "RUJUKAN INTERNAL" dan policy Storage sudah dibuat.</div>';
             }
         }
 
-        function initSbarPdfHistory() {
-            sbarRenderPdfHistory();
+        async function sbarMigrateLegacyIndexedDbToSupabase() {
+            if (!('indexedDB' in window)) return;
+
+            if (sbarPdfMigrationPromise) return sbarPdfMigrationPromise;
+            sbarPdfMigrationPromise = (async () => {
+                let db;
+                try {
+                    db = await new Promise((resolve, reject) => {
+                        const req = indexedDB.open('puskesmas_sbar_pdf_history_v1', 1);
+                        req.onerror = () => reject(req.error || new Error('Gagal membuka arsip lokal lama.'));
+                        req.onupgradeneeded = () => {
+                            try { req.transaction?.abort(); } catch (_) {}
+                        };
+                        req.onsuccess = () => resolve(req.result);
+                    });
+
+                    if (!db.objectStoreNames.contains('pdf_records')) return;
+                    const records = await new Promise((resolve, reject) => {
+                        const tx = db.transaction('pdf_records', 'readonly');
+                        const req = tx.objectStore('pdf_records').getAll();
+                        req.onsuccess = () => resolve(req.result || []);
+                        req.onerror = () => reject(req.error || new Error('Gagal membaca arsip lokal lama.'));
+                    });
+                    db.close();
+                    db = null;
+
+                    for (const record of records) {
+                        if (!record || record.supabasePath) continue;
+                        const blob = record.blob instanceof Blob
+                            ? record.blob
+                            : new Blob([record.blob], { type: record.mimeType || 'application/pdf' });
+                        const path = await sbarUploadPdfToSupabase(
+                            blob,
+                            record.filename || 'Rujukan_Internal.pdf',
+                            record.action || 'Migrasi arsip lama'
+                        );
+
+                        try {
+                            const db2 = await new Promise((resolve, reject) => {
+                                const req = indexedDB.open('puskesmas_sbar_pdf_history_v1', 1);
+                                req.onerror = () => reject(req.error);
+                                req.onsuccess = () => resolve(req.result);
+                            });
+                            await new Promise((resolve, reject) => {
+                                const tx = db2.transaction('pdf_records', 'readwrite');
+                                const updated = { ...record, supabasePath: path, migratedAt: new Date().toISOString() };
+                                tx.objectStore('pdf_records').put(updated);
+                                tx.oncomplete = resolve;
+                                tx.onerror = () => reject(tx.error);
+                            });
+                            db2.close();
+                        } catch (markError) {
+                            console.warn('PDF sudah dipindah ke Supabase tetapi penanda lokal gagal disimpan:', markError);
+                        }
+                    }
+                } catch (error) {
+                    // Tidak menghentikan aplikasi jika arsip lokal lama tidak tersedia.
+                    console.warn('Migrasi arsip PDF lama ke Supabase belum selesai:', error);
+                } finally {
+                    try { db?.close(); } catch (_) {}
+                }
+            })();
+            return sbarPdfMigrationPromise;
+        }
+
+        async function initSbarPdfHistory() {
+            await sbarMigrateLegacyIndexedDbToSupabase();
+            await sbarRenderPdfHistory();
         }
 
         async function unduhPDFInternal(actionLabel = 'PDF dibuat') {
@@ -6063,13 +6142,16 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                 anchor.remove();
                 setTimeout(() => URL.revokeObjectURL(downloadUrl), 1500);
 
-                // Rekam PDF lokal otomatis setelah proses Kirim WA dijalankan.
-                if (actionLabel === 'whatsapp') {
-                    try {
-                        await sbarAddPdfRecord(pdfBlob, filename, 'Terkirim/Disiapkan via WhatsApp');
-                    } catch (historyError) {
-                        console.error('PDF berhasil dibuat, tetapi rekaman lokal gagal disimpan:', historyError);
-                    }
+                // Setiap PDF yang dibuat otomatis diarsipkan ke Supabase Storage.
+                try {
+                    const rekamanLabel = actionLabel === 'whatsapp'
+                        ? 'Terkirim/Disiapkan via WhatsApp'
+                        : 'Dibuat melalui Unduh PDF';
+                    await sbarUploadPdfToSupabase(pdfBlob, filename, rekamanLabel);
+                    await sbarRenderPdfHistory();
+                } catch (historyError) {
+                    console.error('PDF berhasil dibuat, tetapi upload Supabase gagal:', historyError);
+                    alert('PDF berhasil dibuat dan diunduh, tetapi belum masuk ke Supabase Storage. Pastikan bucket "RUJUKAN INTERNAL" dan policy Storage tersedia.');
                 }
 
                 return pdfBlob;
