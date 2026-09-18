@@ -2042,6 +2042,133 @@ footer {
   }
 </style>
 
+<style id="background-title-responsive-fix">
+  /* Judul background dipusatkan sebagai satu kelompok agar konsisten di desktop,
+     HP portrait, dan HP landscape. */
+  #homeViewContainer::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  .lintas-klaster-art {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(92vw, 900px) !important;
+    max-width: 900px !important;
+    padding: 0 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .lintas-klaster-art .uptd-bg-title {
+    font-family: 'Montserrat', Arial, sans-serif !important;
+    font-size: clamp(0.78rem, 1.8vw, 1.15rem) !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.24em !important;
+    color: rgba(22,56,93,0.34) !important;
+    white-space: nowrap !important;
+    margin: 0 0 12px !important;
+    text-align: center !important;
+    text-shadow: 0 1px 3px rgba(255,255,255,0.42) !important;
+  }
+
+  .lintas-klaster-art .lintas {
+    font-size: clamp(3.5rem, 8.8vw, 7.8rem) !important;
+    line-height: 0.84 !important;
+    margin: 0 !important;
+  }
+
+  .lintas-klaster-art .klaster {
+    font-size: clamp(2.15rem, 5.8vw, 5.4rem) !important;
+    line-height: 0.98 !important;
+    margin: 0 0 0 0.16em !important;
+  }
+
+  .lintas-klaster-art .ornament {
+    width: min(70vw, 500px) !important;
+    margin-top: 18px !important;
+  }
+
+  /* HP portrait dan landscape: tetap tepat di tengah area konten yang tersedia. */
+  @media (max-width: 700px) {
+    .lintas-klaster-art {
+      width: 100% !important;
+      padding: 0 10px !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+    }
+
+    .lintas-klaster-art .uptd-bg-title {
+      font-size: clamp(0.62rem, 3.0vw, 0.92rem) !important;
+      letter-spacing: 0.13em !important;
+      margin-bottom: 10px !important;
+      white-space: nowrap !important;
+    }
+
+    .lintas-klaster-art .lintas {
+      font-size: clamp(2.85rem, 15.5vw, 4.85rem) !important;
+      line-height: 0.86 !important;
+    }
+
+    .lintas-klaster-art .klaster {
+      font-size: clamp(1.62rem, 8.9vw, 3.05rem) !important;
+      line-height: 0.98 !important;
+      letter-spacing: 0.08em !important;
+      margin-left: 0.08em !important;
+    }
+
+    .lintas-klaster-art .ornament {
+      width: min(82vw, 360px) !important;
+      margin-top: 14px !important;
+    }
+  }
+
+  /* HP landscape dengan tinggi pendek: ukuran sedikit diringkas agar seluruh kelompok
+     tetap terlihat tanpa keluar dari area tengah. */
+  @media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
+    .lintas-klaster-art .uptd-bg-title {
+      font-size: clamp(0.56rem, 2.1vw, 0.76rem) !important;
+      margin-bottom: 6px !important;
+    }
+
+    .lintas-klaster-art .lintas {
+      font-size: clamp(2.3rem, 11.5vh, 3.8rem) !important;
+    }
+
+    .lintas-klaster-art .klaster {
+      font-size: clamp(1.3rem, 7vh, 2.25rem) !important;
+    }
+
+    .lintas-klaster-art .ornament {
+      margin-top: 9px !important;
+    }
+  }
+
+  @media (max-width: 700px) and (max-height: 620px) and (orientation: portrait) {
+    .lintas-klaster-art .uptd-bg-title {
+      font-size: 0.62rem !important;
+      margin-bottom: 8px !important;
+    }
+
+    .lintas-klaster-art .lintas {
+      font-size: clamp(2.45rem, 13.8vw, 4rem) !important;
+    }
+
+    .lintas-klaster-art .klaster {
+      font-size: clamp(1.38rem, 7.8vw, 2.55rem) !important;
+    }
+  }
+</style>
+
 </head>
 <body>
 
@@ -3431,7 +3558,8 @@ footer {
                         </div>
                     </div>
             <div id="homeViewContainer">
-    <div class="lintas-klaster-art" aria-label="Lintas Klaster">
+    <div class="lintas-klaster-art" aria-label="UPTD PUSKESMAS LANJUT - Lintas Klaster">
+        <div class="uptd-bg-title">UPTD PUSKESMAS LANJUT</div>
         <div class="lintas">Lintas</div>
         <div class="klaster">Klaster</div>
         <div class="ornament"></div>
