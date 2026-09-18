@@ -346,7 +346,11 @@
 
 
 
-        /* ================= ARSIP PPT LOKMIN - SUPABASE ================= */
+        .amb-rt-panel #ambRealtimeState[data-type="ok"] { color:#047857 !important; }
+.amb-rt-panel #ambRealtimeState[data-type="warn"] { color:#b91c1c !important; }
+.amb-rt-panel #ambRealtimeState[data-type="info"] { color:#64748b !important; }
+
+/* ================= ARSIP PPT LOKMIN - SUPABASE ================= */
         /* Penampil PPT Lokmin memenuhi area di antara header dan footer.
            Running text pada footer tetap terlihat. */
         :root { --app-header-height: 60px; --app-footer-height: 35px; }
@@ -3570,6 +3574,7 @@ footer {
                                     <div>
                                         <div class="amb-rt-title">Pemantauan Ambulance Realtime</div>
                                         <div class="amb-rt-sub">Pasien/keluarga dapat melihat status dan posisi petugas. Petugas dapat memperbarui status dan mengirim GPS.</div>
+                                        <div id="ambRealtimeState" data-type="info" style="margin-top:5px;font-size:.68rem;font-weight:800;color:#64748b;">Memeriksa koneksi realtime…</div>
                                     </div>
                                     <div class="amb-rt-tabs">
                                         <button type="button" class="amb-rt-tab active" id="ambTabPasien" onclick="ambulanceSetMode('pasien')">Pasien / Keluarga</button>
@@ -4054,11 +4059,10 @@ footer {
         // sehingga data dapat dibuka kembali dari perangkat lain.
         const PWS_STORAGE_BUCKET = "PWS";
         const PWS_STORAGE_FOLDER = "dashboard-pws";
-        // Bucket khusus Ambulance. Bucket hanya untuk foto petugas; data operasional tersimpan di tabel Supabase.
+        // Bucket khusus Ambulance. Data operasional disimpan dalam JSON dan foto petugas sebagai object terpisah.
         const AMBULANCE_STORAGE_BUCKET = "Ambulance";
         const AMBULANCE_STORAGE_PATH = "ambulance/ambulance-data.json";
         // Realtime Ambulance: database tables (bukan Storage bucket).
-        const AMBULANCE_OFFICERS_TABLE = 'ambulance_officers';
         const AMBULANCE_REQUESTS_TABLE = 'ambulance_requests';
         const AMBULANCE_LOCATIONS_TABLE = 'ambulance_locations';
         const AMBULANCE_PHOTO_PREFIX = "ambulance/petugas-foto";
@@ -8069,58 +8073,85 @@ const { data, error } = await supabaseClient.storage
             const nama = document.getElementById('input-nama-petugas').value.trim();
             const hp = document.getElementById('input-hp-petugas').value.trim();
             const fileInput = document.getElementById('input-foto-petugas');
+
             if (!nama || !hp) {
                 alert('Harap isi nama dan nomor HP petugas secara lengkap!');
                 return;
             }
+
+            let fotoDataUrl = localStorage.getItem('ambulance_petugas_foto') || '';
             let fotoPath = '';
             const tombol = document.querySelector('#form-edit-petugas .btn-simpan-darurat');
             const teksTombol = tombol ? tombol.innerHTML : '';
-            if (tombol) { tombol.disabled = true; tombol.innerHTML = '⏳ Menyimpan...'; }
+            if (tombol) {
+                tombol.disabled = true;
+                tombol.innerHTML = '⏳ Menyimpan...';
+            }
+
             try {
+                const currentLocal = ambulanceBacaLocal() || ambulanceDefaultData();
+                fotoPath = currentLocal?.petugas?.fotoPath || '';
+
                 if (fileInput.files && fileInput.files[0]) {
                     fotoPath = await ambulanceUnggahFotoSupabase(fileInput.files[0]);
-                } else {
-                    fotoPath = localStorage.getItem('ambulance_petugas_foto_path') || '';
+                    fotoDataUrl = await ambulanceBlobToDataUrl(fileInput.files[0]);
                 }
-                const payload = {
-                    nama,
-                    hp,
-                    foto_path: fotoPath || null,
-                    active: true,
-                    updated_at: new Date().toISOString()
-                };
-                let query = supabaseClient.from(AMBULANCE_OFFICERS_TABLE).upsert(payload, { onConflict: 'hp' });
-                let result = await query.select('*').single();
-                if (result.error) throw result.error;
-                const officer = result.data;
-                ambCurrentOfficerId = officer.id;
-                localStorage.setItem('ambulance_petugas_id', officer.id);
-                localStorage.setItem('ambulance_petugas_nama', officer.nama);
-                localStorage.setItem('ambulance_petugas_hp', officer.hp);
-                localStorage.setItem('ambulance_petugas_foto_path', officer.foto_path || '');
 
-                let fotoDataUrl = localStorage.getItem('ambulance_petugas_foto') || '';
-                if (officer.foto_path) {
-                    try { fotoDataUrl = await ambulanceMuatFotoSupabase(officer.foto_path); }
-                    catch (photoError) { console.warn('Foto petugas tidak dapat dimuat:', photoError); }
-                }
+                const cloudData = {
+                    ...currentLocal,
+                    version: 1,
+                    updatedAt: new Date().toISOString(),
+                    petugas: { nama, hp, fotoPath, fotoDataUrl },
+                    permintaan: Array.isArray(currentLocal.permintaan) ? currentLocal.permintaan : []
+                };
+
+                // Cache lokal selalu diperbarui terlebih dahulu.
+                ambulanceSimpanLocal(cloudData);
+                localStorage.setItem('ambulance_petugas_nama', nama);
+                localStorage.setItem('ambulance_petugas_hp', hp);
                 if (fotoDataUrl) localStorage.setItem('ambulance_petugas_foto', fotoDataUrl);
-                ambulanceTampilkanPetugas({ petugas: { nama: officer.nama, hp: officer.hp, fotoPath: officer.foto_path || '', fotoDataUrl }, permintaan: [] });
-                alert('Data Petugas Ambulance berhasil disimpan ke tabel Supabase.');
+                ambulanceTampilkanPetugas(cloudData);
+
+                // Upload cloud. Jika gagal, cache lokal tetap aman.
+                await ambulanceSimpanDataSupabase(cloudData);
+                alert('Data Petugas Ambulance berhasil disimpan ke Supabase.');
             } catch (error) {
-                ambulanceSimpanLocal({ ...(ambulanceBacaLocal() || ambulanceDefaultData()), updatedAt: new Date().toISOString(), petugas: { nama, hp, fotoPath, fotoDataUrl: localStorage.getItem('ambulance_petugas_foto') || '' } });
-                const detail = ambulanceTampilkanErrorCloud('Gagal menyimpan Petugas Ambulance ke tabel Supabase:', error);
-                alert('Data petugas tersimpan sebagai cache perangkat, tetapi gagal disimpan ke tabel Supabase.\n\nMasalah: ' + detail + '\n\nJalankan SQL Ambulance dan periksa policy tabel.');
+                ambulanceSimpanLocal({
+                    ...(ambulanceBacaLocal() || ambulanceDefaultData()),
+                    updatedAt: new Date().toISOString(),
+                    petugas: {
+                        nama,
+                        hp,
+                        fotoPath: fotoPath || '',
+                        fotoDataUrl
+                    }
+                });
+                localStorage.setItem('ambulance_petugas_nama', nama);
+                localStorage.setItem('ambulance_petugas_hp', hp);
+                if (fotoDataUrl) localStorage.setItem('ambulance_petugas_foto', fotoDataUrl);
+                ambulanceTampilkanPetugas(ambulanceBacaLocal());
+
+                const detail = ambulanceTampilkanErrorCloud('Gagal menyimpan Petugas Ambulance ke Supabase:', error);
+                alert('Data Petugas tersimpan di perangkat, tetapi GAGAL disimpan ke Supabase.\n\nMasalah: ' + detail + '\n\nPeriksa policy Storage bucket Ambulance.');
             } finally {
-                if (tombol) { tombol.disabled = false; tombol.innerHTML = teksTombol || 'Simpan Data'; }
+                if (tombol) {
+                    tombol.disabled = false;
+                    tombol.innerHTML = teksTombol || 'Simpan Data';
+                }
             }
         }
 
         async function muatDataPetugasAmbulance() {
+            // Tampilkan cache lokal terlebih dahulu agar UI tidak menunggu jaringan.
             const local = ambulanceBacaLocal();
-            if (local?.petugas) ambulanceTampilkanPetugas(local);
-            else ambulanceTampilkanPetugas({ petugas: { nama: localStorage.getItem('ambulance_petugas_nama') || 'Belum diatur', hp: localStorage.getItem('ambulance_petugas_hp') || 'Belum diatur', fotoDataUrl: localStorage.getItem('ambulance_petugas_foto') || '', fotoPath: localStorage.getItem('ambulance_petugas_foto_path') || '' }, permintaan: [] });
+            if (local?.petugas) {
+                ambulanceTampilkanPetugas(local);
+            } else {
+                const nama = localStorage.getItem('ambulance_petugas_nama') || 'Belum diatur';
+                const hp = localStorage.getItem('ambulance_petugas_hp') || 'Belum diatur';
+                const foto = localStorage.getItem('ambulance_petugas_foto') || '';
+                ambulanceTampilkanPetugas({ petugas: { nama, hp, fotoDataUrl: foto, fotoPath: '' }, permintaan: [] });
+            }
 
             document.getElementById('input-nama-pasien').value = '';
             document.getElementById('input-hp-pasien').value = '';
@@ -8129,26 +8160,22 @@ const { data, error } = await supabaseClient.storage
             linkMapsPasien = '';
 
             try {
-                const { data, error } = await supabaseClient.from(AMBULANCE_OFFICERS_TABLE)
-                    .select('*').eq('active', true).order('updated_at', { ascending: false }).limit(1);
-                if (error) throw error;
-                const officer = Array.isArray(data) ? data[0] : data;
-                if (!officer) return;
-                ambCurrentOfficerId = officer.id;
-                localStorage.setItem('ambulance_petugas_id', officer.id);
-                localStorage.setItem('ambulance_petugas_nama', officer.nama || '');
-                localStorage.setItem('ambulance_petugas_hp', officer.hp || '');
-                localStorage.setItem('ambulance_petugas_foto_path', officer.foto_path || '');
-                let fotoDataUrl = '';
-                if (officer.foto_path) {
-                    try { fotoDataUrl = await ambulanceMuatFotoSupabase(officer.foto_path); localStorage.setItem('ambulance_petugas_foto', fotoDataUrl); }
-                    catch (photoError) { console.warn('Foto petugas tidak dapat dimuat:', photoError); }
+                const cloud = await ambulanceAmbilDataSupabase();
+                if (!cloud) return;
+
+                // Jika foto tersimpan sebagai object terpisah, unduh juga untuk cache/display.
+                if (cloud.petugas?.fotoPath && !cloud.petugas?.fotoDataUrl) {
+                    try {
+                        cloud.petugas.fotoDataUrl = await ambulanceMuatFotoSupabase(cloud.petugas.fotoPath);
+                    } catch (photoError) {
+                        console.warn('Foto petugas Ambulance tidak dapat dimuat:', photoError);
+                    }
                 }
-                const cache = { version: 2, updatedAt: officer.updated_at || new Date().toISOString(), petugas: { nama: officer.nama || '', hp: officer.hp || '', fotoPath: officer.foto_path || '', fotoDataUrl }, permintaan: [] };
-                ambulanceSimpanLocal(cache);
-                ambulanceTampilkanPetugas(cache);
+
+                ambulanceSimpanLocal(cloud);
+                ambulanceTampilkanPetugas(cloud);
             } catch (error) {
-                console.warn('Tabel Petugas Ambulance tidak dapat dimuat. Cache lokal digunakan:', error);
+                console.warn('Supabase Ambulance tidak dapat dimuat. LocalStorage digunakan:', error);
             }
         }
 
@@ -8308,25 +8335,27 @@ const { data, error } = await supabaseClient.storage
     </script>
 
 <script id="ambulance-realtime-script">
-/* ================= AMBULANCE & DARURAT REALTIME =================
-   Membutuhkan tabel Supabase:
-   - ambulance_requests
-   - ambulance_locations (UNIQUE request_id)
-   Realtime digunakan untuk status dan posisi petugas.
+/* ================= AMBULANCE & DARURAT REALTIME — PERBAIKAN =================
+   Desain:
+   1) ambulance_requests = sumber status/permintaan.
+   2) ambulance_locations = posisi GPS terakhir per tracking_token.
+   3) Satu channel Postgres Changes global, lalu event difilter di browser.
+      Ini menghindari masalah filter Realtime ketika konfigurasi publication/RLS
+      berubah dan memudahkan reconnect.
 */
 let ambPatientMap = null;
 let ambOfficerMap = null;
 let ambPickupMarker = null;
 let ambOfficerMarker = null;
 let ambOfficerSelfMarker = null;
-let ambRequestChannel = null;
-let ambLocationChannel = null;
+let ambRealtimeChannel = null;
+let ambRealtimeStatus = 'DISCONNECTED';
 let ambOfficerWatchId = null;
 let ambSelectedRequest = null;
 let ambActiveTrackingToken = '';
-let ambCurrentOfficerId = null;
 let ambPatientLat = null;
 let ambPatientLng = null;
+let ambRealtimeRetryTimer = null;
 
 function ambStatusLabel(status) {
     const labels = {
@@ -8335,14 +8364,9 @@ function ambStatusLabel(status) {
         dalam_perjalanan: 'Petugas Dalam Perjalanan',
         hampir_tiba: 'Petugas Hampir Tiba',
         tiba: 'Petugas Sudah Tiba',
-        selesai: 'Permintaan Selesai',
-        dibatalkan: 'Permintaan Dibatalkan'
+        selesai: 'Permintaan Selesai'
     };
     return labels[status] || status || '-';
-}
-
-function ambEsc(v) {
-    return String(v ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
 }
 
 function ambFormatDate(v) {
@@ -8350,10 +8374,14 @@ function ambFormatDate(v) {
     try { return new Date(v).toLocaleString('id-ID'); } catch (_) { return String(v); }
 }
 
+function ambEsc(v) {
+    return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+}
+
 function ambGenerateToken() {
     const now = new Date();
     const stamp = now.toISOString().replace(/\D/g,'').slice(0,14);
-    const rnd = Math.random().toString(36).slice(2, 7).toUpperCase();
+    const rnd = Math.random().toString(36).slice(2, 8).toUpperCase();
     return `AMB-${stamp}-${rnd}`;
 }
 
@@ -8363,17 +8391,23 @@ function ambTrackingUrl(token) {
     return url.toString();
 }
 
+function ambUpdateRealtimeIndicator(message, type='info') {
+    const el = document.getElementById('ambRealtimeState');
+    if (!el) return;
+    el.textContent = message;
+    el.dataset.type = type;
+}
+
 function ambulanceInitMaps() {
     if (typeof L === 'undefined') return;
-
-    if (!ambPatientMap) {
+    if (!ambPatientMap && document.getElementById('ambulancePatientMap')) {
         ambPatientMap = L.map('ambulancePatientMap', { zoomControl: true }).setView([-6.2, 106.816666], 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(ambPatientMap);
     }
-    if (!ambOfficerMap) {
+    if (!ambOfficerMap && document.getElementById('ambulanceOfficerMap')) {
         ambOfficerMap = L.map('ambulanceOfficerMap', { zoomControl: true }).setView([-6.2, 106.816666], 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -8399,8 +8433,9 @@ function ambulanceSetMode(mode) {
     if (mode === 'pasien') {
         ambulanceInitMaps();
         const token = new URL(window.location.href).searchParams.get('ambulance_track');
-        if (token) ambulanceTrackByToken(token);
+        if (token) void ambulanceTrackByToken(token);
     }
+    void ambulanceEnsureRealtime();
 }
 
 function ambulanceBukaModePetugas() {
@@ -8409,8 +8444,8 @@ function ambulanceBukaModePetugas() {
         if (pwd === 'admin' || pwd === systemPassword) {
             ambSetTab('petugas');
             ambulanceInitMaps();
-            ambulanceMuatDaftarPetugas();
-            ambulanceBerlanggananRealtimePetugas();
+            void ambulanceEnsureRealtime();
+            void ambulanceMuatDaftarPetugas();
         } else if (pwd !== '') {
             alert('Password salah.');
         }
@@ -8426,18 +8461,15 @@ function ambulanceRenderPatient(request) {
     document.getElementById('ambOfficerName').textContent = request.officer_name || 'Belum ditetapkan';
     document.getElementById('ambPatientStatusText').textContent = ambStatusLabel(request.status);
     document.getElementById('ambPatientStatusDetail').textContent =
-        request.status === 'diterima_petugas'
-            ? 'Petugas sudah menerima permintaan dan akan menjemput.'
-            : request.status === 'dalam_perjalanan'
-                ? 'Petugas sedang menuju lokasi penjemputan.'
-                : request.status === 'hampir_tiba'
-                    ? 'Petugas hampir tiba di lokasi Anda.'
-                    : request.status === 'tiba'
-                        ? 'Petugas sudah tiba di lokasi.'
-                        : `Diperbarui ${ambFormatDate(request.updated_at || request.created_at)}.`;
+        request.status === 'diterima_petugas' ? 'Petugas sudah menerima permintaan dan akan menjemput.' :
+        request.status === 'dalam_perjalanan' ? 'Petugas sedang menuju lokasi penjemputan.' :
+        request.status === 'hampir_tiba' ? 'Petugas hampir tiba di lokasi Anda.' :
+        request.status === 'tiba' ? 'Petugas sudah tiba di lokasi.' :
+        request.status === 'selesai' ? 'Permintaan ambulance telah selesai.' :
+        `Diperbarui ${ambFormatDate(request.updated_at || request.created_at)}.`;
+
     const copy = document.getElementById('ambCopyLinkBtn');
     if (copy) copy.disabled = !ambActiveTrackingToken;
-
     const box = document.getElementById('ambPatientStatusBox');
     if (box) box.classList.toggle('amb-rt-pulse', ['diterima_petugas','dalam_perjalanan','hampir_tiba'].includes(request.status));
 
@@ -8445,11 +8477,8 @@ function ambulanceRenderPatient(request) {
     ambPatientLng = Number(request.pickup_lng);
     if (ambPatientMap && Number.isFinite(ambPatientLat) && Number.isFinite(ambPatientLng)) {
         const point = [ambPatientLat, ambPatientLng];
-        if (!ambPickupMarker) {
-            ambPickupMarker = L.marker(point).addTo(ambPatientMap).bindPopup('📍 Lokasi penjemputan');
-        } else {
-            ambPickupMarker.setLatLng(point);
-        }
+        if (!ambPickupMarker) ambPickupMarker = L.marker(point).addTo(ambPatientMap).bindPopup('📍 Lokasi penjemputan');
+        else ambPickupMarker.setLatLng(point);
         ambPatientMap.setView(point, Math.max(ambPatientMap.getZoom(), 14));
     }
 }
@@ -8464,11 +8493,9 @@ function ambulanceRenderLocation(location) {
 
     if (ambPatientMap) {
         const point = [lat, lng];
-        if (!ambOfficerMarker) {
-            ambOfficerMarker = L.marker(point).addTo(ambPatientMap).bindPopup('🚑 Posisi Petugas/Pergerakan Ambulance');
-        } else {
-            ambOfficerMarker.setLatLng(point);
-        }
+        if (!ambOfficerMarker) ambOfficerMarker = L.marker(point).addTo(ambPatientMap).bindPopup('🚑 Posisi Petugas/Pergerakan Ambulance');
+        else ambOfficerMarker.setLatLng(point);
+        ambPatientMap.setView(point, Math.max(ambPatientMap.getZoom(), 14));
     }
     if (ambOfficerMap) {
         const point = [lat, lng];
@@ -8478,9 +8505,97 @@ function ambulanceRenderLocation(location) {
     }
 }
 
+async function ambulanceEnsureRealtime() {
+    if (ambRealtimeChannel) return ambRealtimeChannel;
+    if (!supabaseClient) return null;
+
+    const channelName = `ambulance-realtime-${Math.random().toString(36).slice(2,8)}`;
+    const channel = supabaseClient.channel(channelName);
+
+    channel
+        .on('postgres_changes', {
+            event: 'INSERT', schema: 'public', table: AMBULANCE_REQUESTS_TABLE
+        }, payload => {
+            const row = payload?.new;
+            if (!row) return;
+            // Pasien: ambil event untuk tracking yang sedang dibuka.
+            if (ambActiveTrackingToken && row.tracking_token === ambActiveTrackingToken) {
+                ambSelectedRequest = row;
+                ambulanceRenderPatient(row);
+            }
+            // Petugas: daftar aktif diperbarui otomatis.
+            if (document.getElementById('ambViewPetugas')?.classList.contains('active')) void ambulanceMuatDaftarPetugas();
+        })
+        .on('postgres_changes', {
+            event: 'UPDATE', schema: 'public', table: AMBULANCE_REQUESTS_TABLE
+        }, payload => {
+            const row = payload?.new;
+            if (!row) return;
+            if (ambActiveTrackingToken && row.tracking_token === ambActiveTrackingToken) {
+                ambSelectedRequest = row;
+                ambulanceRenderPatient(row);
+            }
+            if (ambSelectedRequest?.id && row.id === ambSelectedRequest.id) {
+                ambSelectedRequest = row;
+                document.getElementById('ambPetugasSelectedTitle').textContent = `${row.patient_name || '-'} — ${ambStatusLabel(row.status)}`;
+                document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${row.tracking_token || '-'} • ${ambFormatDate(row.updated_at)}`;
+            }
+            if (document.getElementById('ambViewPetugas')?.classList.contains('active')) void ambulanceMuatDaftarPetugas();
+        })
+        .on('postgres_changes', {
+            event: 'INSERT', schema: 'public', table: AMBULANCE_LOCATIONS_TABLE
+        }, payload => {
+            const row = payload?.new;
+            if (!row) return;
+            if (ambActiveTrackingToken && row.tracking_token === ambActiveTrackingToken) ambulanceRenderLocation(row);
+        })
+        .on('postgres_changes', {
+            event: 'UPDATE', schema: 'public', table: AMBULANCE_LOCATIONS_TABLE
+        }, payload => {
+            const row = payload?.new;
+            if (!row) return;
+            if (ambActiveTrackingToken && row.tracking_token === ambActiveTrackingToken) ambulanceRenderLocation(row);
+        });
+
+    ambRealtimeChannel = channel;
+    ambRealtimeStatus = 'CONNECTING';
+    ambUpdateRealtimeIndicator('Menghubungkan realtime…', 'info');
+
+    channel.subscribe(status => {
+        ambRealtimeStatus = status;
+        if (status === 'SUBSCRIBED') {
+            ambUpdateRealtimeIndicator('● Realtime terhubung', 'ok');
+            if (ambRealtimeRetryTimer) {
+                clearTimeout(ambRealtimeRetryTimer);
+                ambRealtimeRetryTimer = null;
+            }
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.warn('Realtime Ambulance:', status);
+            ambUpdateRealtimeIndicator('Realtime belum terhubung — mode WhatsApp tetap tersedia', 'warn');
+            if (ambRealtimeChannel === channel) {
+                ambRealtimeChannel = null;
+                void supabaseClient.removeChannel(channel);
+                if (!ambRealtimeRetryTimer) {
+                    ambRealtimeRetryTimer = setTimeout(() => {
+                        ambRealtimeRetryTimer = null;
+                        void ambulanceEnsureRealtime();
+                    }, 4000);
+                }
+            }
+        } else if (status === 'CLOSED') {
+            ambRealtimeStatus = 'DISCONNECTED';
+            if (ambRealtimeChannel === channel) ambRealtimeChannel = null;
+            ambUpdateRealtimeIndicator('Realtime terputus', 'warn');
+        }
+    });
+
+    return channel;
+}
+
 async function ambulanceTrackByToken(token) {
     if (!token) return;
     ambulanceInitMaps();
+    await ambulanceEnsureRealtime();
     try {
         const { data, error } = await supabaseClient
             .from(AMBULANCE_REQUESTS_TABLE)
@@ -8490,14 +8605,9 @@ async function ambulanceTrackByToken(token) {
         if (error) throw error;
         if (!data) {
             document.getElementById('ambPatientStatusText').textContent = 'Tracking tidak ditemukan';
-            document.getElementById('ambPatientStatusDetail').textContent = 'Periksa kembali nomor tracking atau link yang digunakan.';
+            document.getElementById('ambPatientStatusDetail').textContent = 'Nomor tracking belum ada di database.';
             return;
         }
-
-        if (ambRequestChannel) supabaseClient.removeChannel(ambRequestChannel);
-        if (ambLocationChannel) supabaseClient.removeChannel(ambLocationChannel);
-        ambRequestChannel = null;
-        ambLocationChannel = null;
 
         ambActiveTrackingToken = token;
         ambSelectedRequest = data;
@@ -8506,32 +8616,15 @@ async function ambulanceTrackByToken(token) {
         const { data: loc, error: locError } = await supabaseClient
             .from(AMBULANCE_LOCATIONS_TABLE)
             .select('*')
-            .eq('request_id', data.id)
+            .eq('tracking_token', token)
             .maybeSingle();
         if (!locError && loc) ambulanceRenderLocation(loc);
-
-        ambRequestChannel = supabaseClient.channel(`amb-req-${token}`)
-            .on('postgres_changes', {
-                event: '*', schema: 'public', table: AMBULANCE_REQUESTS_TABLE,
-                filter: `tracking_token=eq.${token}`
-            }, payload => {
-                if (payload.new) {
-                    ambSelectedRequest = payload.new;
-                    ambulanceRenderPatient(payload.new);
-                }
-            }).subscribe();
-
-        ambLocationChannel = supabaseClient.channel(`amb-loc-${data.id}`)
-            .on('postgres_changes', {
-                event: '*', schema: 'public', table: AMBULANCE_LOCATIONS_TABLE,
-                filter: `request_id=eq.${data.id}`
-            }, payload => {
-                if (payload.new) ambulanceRenderLocation(payload.new);
-            }).subscribe();
+        if (locError) console.warn('Lokasi awal belum tersedia:', locError.message);
     } catch (error) {
         console.error('Tracking Ambulance:', error);
-        document.getElementById('ambPatientStatusText').textContent = 'Belum dapat tersambung ke tracking';
-        document.getElementById('ambPatientStatusDetail').textContent = error?.message || 'Periksa tabel dan policy Supabase.';
+        document.getElementById('ambPatientStatusText').textContent = 'Tracking belum tersambung';
+        document.getElementById('ambPatientStatusDetail').textContent = error?.message || 'Periksa SQL, RLS, dan Realtime Supabase.';
+        ambUpdateRealtimeIndicator('Belum terhubung ke Supabase Realtime', 'warn');
     }
 }
 
@@ -8542,7 +8635,7 @@ async function ambulanceMulaiTrackingDariForm() {
         alert('Belum ada nomor tracking. Kirim permintaan Ambulance terlebih dahulu.');
         return;
     }
-    ambulanceSetMode('pasien');
+    ambSetTab('pasien');
     await ambulanceTrackByToken(token);
 }
 
@@ -8565,16 +8658,16 @@ async function ambulanceInsertRealtimeRequest(base) {
         requester_phone: base.requester_phone || '',
         condition_text: base.condition_text || '',
         pickup_address: base.pickup_address || '',
-        pickup_lat: base.pickup_lat,
-        pickup_lng: base.pickup_lng,
+        pickup_lat: Number.isFinite(Number(base.pickup_lat)) ? Number(base.pickup_lat) : null,
+        pickup_lng: Number.isFinite(Number(base.pickup_lng)) ? Number(base.pickup_lng) : null,
         status: 'menunggu_petugas',
-        officer_id: null,
         officer_name: null,
         officer_phone: null,
         eta_text: null,
-        created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
     };
+
+    // Jangan mengirim created_at agar PostgreSQL memakai DEFAULT now().
     const { data, error } = await supabaseClient
         .from(AMBULANCE_REQUESTS_TABLE)
         .insert(payload)
@@ -8582,41 +8675,6 @@ async function ambulanceInsertRealtimeRequest(base) {
         .single();
     if (error) throw error;
     return data;
-}
-
-async function ambulancePastikanPetugasAktif() {
-    if (ambCurrentOfficerId) return ambCurrentOfficerId;
-    const stored = localStorage.getItem('ambulance_petugas_id');
-    if (stored) { ambCurrentOfficerId = stored; return stored; }
-    try {
-        const { data, error } = await supabaseClient.from(AMBULANCE_OFFICERS_TABLE)
-            .select('id,nama,hp,foto_path,active,updated_at')
-            .eq('active', true).order('updated_at', { ascending: false }).limit(1);
-        if (error) throw error;
-        const officer = data?.[0];
-        if (officer) {
-            ambCurrentOfficerId = officer.id;
-            localStorage.setItem('ambulance_petugas_id', officer.id);
-            localStorage.setItem('ambulance_petugas_nama', officer.nama || '');
-            localStorage.setItem('ambulance_petugas_hp', officer.hp || '');
-            return officer.id;
-        }
-    } catch (e) { console.warn('Petugas aktif belum dapat dimuat:', e); }
-    return null;
-}
-
-async function ambulanceBerlanggananRealtimePetugas() {
-    try {
-        await ambulancePastikanPetugasAktif();
-        if (window.ambOfficerListChannel) supabaseClient.removeChannel(window.ambOfficerListChannel);
-        window.ambOfficerListChannel = supabaseClient.channel('amb-officer-all-realtime')
-            .on('postgres_changes', { event: '*', schema: 'public', table: AMBULANCE_OFFICERS_TABLE }, () => muatDataPetugasAmbulance())
-            .on('postgres_changes', { event: '*', schema: 'public', table: AMBULANCE_REQUESTS_TABLE }, () => ambulanceMuatDaftarPetugas())
-            .on('postgres_changes', { event: '*', schema: 'public', table: AMBULANCE_LOCATIONS_TABLE }, (payload) => {
-                if (payload?.new && ambSelectedRequest?.id === payload.new.request_id) ambulanceRenderLocation(payload.new);
-            })
-            .subscribe();
-    } catch (e) { console.warn('Realtime daftar petugas gagal:', e); }
 }
 
 async function ambulanceMuatDaftarPetugas() {
@@ -8641,7 +8699,7 @@ async function ambulanceMuatDaftarPetugas() {
                     <div class="amb-rt-request-name">${ambEsc(item.patient_name || '-')}</div>
                     <span class="amb-rt-badge">${ambEsc(ambStatusLabel(item.status))}</span>
                 </div>
-                <div class="amb-rt-request-meta">${ambEsc(item.condition_text || '-')}<br>Tracking: ${ambEsc(item.tracking_token)}<br>${ambEsc(ambFormatDate(item.created_at))}</div>
+                <div class="amb-rt-request-meta">${ambEsc(item.condition_text || '-')}<br>Tracking: ${ambEsc(item.tracking_token || '-')}<br>${ambEsc(ambFormatDate(item.created_at))}</div>
                 <div class="amb-rt-request-actions">
                     <button type="button" class="amb-rt-btn secondary" onclick="ambulancePilihPermintaan('${ambEsc(item.id)}')">Pilih</button>
                     ${item.status === 'menunggu_petugas' ? `<button type="button" class="amb-rt-btn" onclick="ambulancePilihDanTerima('${ambEsc(item.id)}')">Terima</button>` : ''}
@@ -8660,11 +8718,11 @@ async function ambulancePilihPermintaan(id) {
         if (error) throw error;
         ambSelectedRequest = data;
         document.getElementById('ambPetugasSelectedTitle').textContent = `${data.patient_name || '-'} — ${ambStatusLabel(data.status)}`;
-        document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token} • ${data.condition_text || '-'} • ${ambFormatDate(data.created_at)}`;
+        document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token || '-'} • ${data.condition_text || '-'} • ${ambFormatDate(data.created_at)}`;
         if (Number.isFinite(Number(data.pickup_lat)) && Number.isFinite(Number(data.pickup_lng)) && ambOfficerMap) {
             ambOfficerMap.setView([Number(data.pickup_lat), Number(data.pickup_lng)], 14);
         }
-        ambulanceMuatDaftarPetugas();
+        await ambulanceMuatDaftarPetugas();
     } catch (error) {
         alert('Gagal memilih permintaan: ' + (error?.message || error));
     }
@@ -8678,27 +8736,28 @@ async function ambulancePilihDanTerima(id) {
 async function ambulancePetugasStatus(status) {
     if (!ambSelectedRequest?.id) {
         alert('Pilih permintaan terlebih dahulu.');
-        return;
+        return false;
     }
     const nama = localStorage.getItem('ambulance_petugas_nama') || '';
     const hp = localStorage.getItem('ambulance_petugas_hp') || '';
-    const officerId = ambCurrentOfficerId || localStorage.getItem('ambulance_petugas_id') || ambSelectedRequest.officer_id || null;
     try {
         const { data, error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE)
-            .update({ status, officer_id: officerId || null, officer_name: nama || ambSelectedRequest.officer_name || null, officer_phone: hp || ambSelectedRequest.officer_phone || null, updated_at: new Date().toISOString() })
+            .update({ status, officer_name: nama || ambSelectedRequest.officer_name || null, officer_phone: hp || ambSelectedRequest.officer_phone || null, updated_at: new Date().toISOString() })
             .eq('id', ambSelectedRequest.id)
             .select('*').single();
         if (error) throw error;
         ambSelectedRequest = data;
         document.getElementById('ambPetugasSelectedTitle').textContent = `${data.patient_name || '-'} — ${ambStatusLabel(data.status)}`;
-        document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token} • ${ambFormatDate(data.updated_at)}`;
+        document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token || '-'} • ${ambFormatDate(data.updated_at)}`;
         await ambulanceMuatDaftarPetugas();
+        return true;
     } catch (error) {
         alert('Gagal mengubah status: ' + (error?.message || error));
+        return false;
     }
 }
 
-function ambulancePetugasMulaiJemput() {
+async function ambulancePetugasMulaiJemput() {
     if (!ambSelectedRequest?.id) {
         alert('Pilih permintaan terlebih dahulu.');
         return;
@@ -8707,34 +8766,48 @@ function ambulancePetugasMulaiJemput() {
         alert('Browser tidak mendukung GPS.');
         return;
     }
+
     const requestId = ambSelectedRequest.id;
-    const nama = localStorage.getItem('ambulance_petugas_nama') || '';
-    const hp = localStorage.getItem('ambulance_petugas_hp') || '';
-    ambulancePetugasStatus('dalam_perjalanan');
+    const trackingToken = ambSelectedRequest.tracking_token;
+    if (!trackingToken) {
+        alert('Permintaan ini tidak memiliki nomor tracking.');
+        return;
+    }
+
+    const statusOK = await ambulancePetugasStatus('dalam_perjalanan');
+    if (!statusOK) return;
+    await ambulanceEnsureRealtime();
+
     if (ambOfficerWatchId !== null) navigator.geolocation.clearWatch(ambOfficerWatchId);
     ambOfficerWatchId = navigator.geolocation.watchPosition(async position => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        const officerId = ambCurrentOfficerId || localStorage.getItem('ambulance_petugas_id') || null;
         try {
-            const { data, error } = await supabaseClient.from(AMBULANCE_LOCATIONS_TABLE).upsert({
-                request_id: requestId,
-                officer_id: officerId,
+            const locationPayload = {
+                tracking_token: trackingToken,
                 latitude: lat,
                 longitude: lng,
-                accuracy: position.coords.accuracy,
-                heading: position.coords.heading,
-                speed: position.coords.speed,
+                accuracy: position.coords.accuracy ?? null,
+                heading: position.coords.heading ?? null,
+                speed: position.coords.speed ?? null,
                 updated_at: new Date().toISOString()
-            }, { onConflict: 'request_id' }).select('*').single();
-            if (error) throw error;
-            ambulanceRenderLocation(data || {latitude:lat, longitude:lng, updated_at:new Date().toISOString()});
-            // Pastikan data petugas tercatat bila sebelumnya kosong.
-            if (ambSelectedRequest && (!ambSelectedRequest.officer_name || !ambSelectedRequest.officer_phone)) {
-                await supabaseClient.from(AMBULANCE_REQUESTS_TABLE).update({ officer_id:officerId||null, officer_name:nama||null, officer_phone:hp||null, updated_at:new Date().toISOString() }).eq('id', requestId);
+            };
+
+            // request_id sengaja hanya dikirim jika berupa UUID valid, supaya
+            // tabel lama dengan tipe id berbeda tidak membuat GPS gagal.
+            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(requestId))) {
+                locationPayload.request_id = requestId;
             }
+
+            const { data, error } = await supabaseClient
+                .from(AMBULANCE_LOCATIONS_TABLE)
+                .upsert(locationPayload, { onConflict: 'tracking_token' })
+                .select('*').single();
+            if (error) throw error;
+            ambulanceRenderLocation(data || locationPayload);
         } catch (error) {
             console.error('GPS Ambulance gagal dikirim:', error);
+            ambUpdateRealtimeIndicator('GPS belum tersimpan ke Supabase', 'warn');
         }
     }, error => {
         console.error(error);
@@ -8750,7 +8823,6 @@ function ambulanceHentikanGPSPetugas() {
     }
 }
 
-// Override fungsi GPS pasien agar koordinat latitude/longitude ikut disimpan ke request realtime.
 function dapatkanLokasiPasien() {
     const inputLokasi = document.getElementById('input-lokasi-pasien');
     if (!inputLokasi) return;
@@ -8763,7 +8835,7 @@ function dapatkanLokasiPasien() {
     navigator.geolocation.getCurrentPosition(position => {
         ambPatientLat = position.coords.latitude;
         ambPatientLng = position.coords.longitude;
-        linkMapsPasien = `https://www.google.com/maps?q=${ambPatientLat},${ambPatientLng}`;
+        if (typeof linkMapsPasien !== 'undefined') linkMapsPasien = `https://www.google.com/maps?q=${ambPatientLat},${ambPatientLng}`;
         inputLokasi.value = `GPS: ${ambPatientLat.toFixed(6)}, ${ambPatientLng.toFixed(6)}`;
         ambulanceInitMaps();
         if (ambPatientMap) {
@@ -8773,21 +8845,20 @@ function dapatkanLokasiPasien() {
             ambPatientMap.setView(p, 15);
         }
         alert('Lokasi Anda berhasil direkam.');
-    }, error => {
+    }, () => {
         inputLokasi.value = 'Gagal mengambil lokasi';
         alert('Gagal mendapatkan lokasi. Pastikan izin GPS aktif.');
     }, { enableHighAccuracy:true, timeout:15000, maximumAge:0 });
 }
 
-// Override pengiriman agar membuat request realtime sebelum membuka WhatsApp.
 async function kirimPermintaanAmbulance() {
-    const localData = ambulanceBacaLocal();
+    const localData = typeof ambulanceBacaLocal === 'function' ? ambulanceBacaLocal() : null;
     const namaPetugas = localData?.petugas?.nama || localStorage.getItem('ambulance_petugas_nama') || '';
     const hpPetugas = localData?.petugas?.hp || localStorage.getItem('ambulance_petugas_hp') || '';
-    const officerId = ambCurrentOfficerId || localStorage.getItem('ambulance_petugas_id') || null;
     const namaPasien = document.getElementById('input-nama-pasien')?.value.trim() || '';
     const hpPasien = document.getElementById('input-hp-pasien')?.value.trim() || '';
     const kondisiPasien = document.getElementById('input-kondisi-pasien')?.value.trim() || '';
+
     if (!namaPasien || !hpPasien || !kondisiPasien) {
         alert('Harap lengkapi Nama, No HP, dan Kondisi Pasien!');
         return;
@@ -8796,9 +8867,12 @@ async function kirimPermintaanAmbulance() {
         const lanjut = confirm('Lokasi GPS belum direkam. Permintaan tetap dikirim tanpa koordinat?');
         if (!lanjut) return;
     }
+
     const token = ambGenerateToken();
     const waktu = new Date().toLocaleString('id-ID');
     let realtimeRequest = null;
+    let realtimeError = null;
+
     try {
         realtimeRequest = await ambulanceInsertRealtimeRequest({
             tracking_token: token,
@@ -8806,44 +8880,103 @@ async function kirimPermintaanAmbulance() {
             requester_name: namaPasien,
             requester_phone: hpPasien,
             condition_text: kondisiPasien,
-            pickup_address: linkMapsPasien || '',
+            pickup_address: (typeof linkMapsPasien !== 'undefined' ? linkMapsPasien : '') || '',
             pickup_lat: ambPatientLat,
-            pickup_lng: ambPatientLng,
-            officer_id: null
+            pickup_lng: ambPatientLng
         });
         ambSelectedRequest = realtimeRequest;
         ambActiveTrackingToken = token;
         ambulanceRenderPatient(realtimeRequest);
+        ambSetTab('pasien');
+        await ambulanceEnsureRealtime();
+        void ambulanceTrackByToken(token);
+
+        // Kompatibilitas Storage lama, tetapi tidak menghalangi realtime/WhatsApp.
+        try {
+            if (typeof simpanPermintaanAmbulanceSupabase === 'function') {
+                const link = ambTrackingUrl(token);
+                await simpanPermintaanAmbulanceSupabase({
+                    id: realtimeRequest.id,
+                    createdAt: realtimeRequest.created_at,
+                    namaPetugas, hpPetugas, namaPasien, hpPasien,
+                    kondisi: kondisiPasien,
+                    lokasiGps: (typeof linkMapsPasien !== 'undefined' ? linkMapsPasien : '') || '',
+                    trackingToken: token,
+                    trackingLink: link,
+                    status: 'menunggu_petugas'
+                });
+            }
+        } catch (e) {
+            console.warn('Kompatibilitas Storage Ambulance gagal:', e);
+        }
     } catch (error) {
+        realtimeError = error;
         console.error('Realtime request gagal:', error);
-        const go = confirm('Permintaan realtime gagal disimpan ke Supabase. Tetap buka WhatsApp tanpa tracking realtime?');
-        if (!go) return;
+
+        // Tetap simpan fallback lokal; WhatsApp tidak diblokir.
+        try {
+            const fallbackCurrent = typeof ambulanceBacaLocal === 'function'
+                ? (ambulanceBacaLocal() || { permintaan: [], petugas: {} })
+                : { permintaan: [], petugas: {} };
+            const fallbackRequest = {
+                id: `LOCAL-${token}`,
+                createdAt: new Date().toISOString(),
+                namaPetugas, hpPetugas, namaPasien, hpPasien,
+                kondisi: kondisiPasien,
+                lokasiGps: (typeof linkMapsPasien !== 'undefined' ? linkMapsPasien : '') || '',
+                trackingToken: token,
+                trackingLink: '',
+                status: 'menunggu_petugas',
+                realtime: false
+            };
+            const permintaan = Array.isArray(fallbackCurrent.permintaan) ? fallbackCurrent.permintaan : [];
+            permintaan.unshift(fallbackRequest);
+            fallbackCurrent.permintaan = permintaan.slice(0, 500);
+            if (typeof ambulanceSimpanLocal === 'function') ambulanceSimpanLocal(fallbackCurrent);
+        } catch (localError) {
+            console.warn('Fallback lokal Ambulance gagal:', localError);
+        }
     }
 
-    if (realtimeRequest) {
-        ambulanceSetMode('pasien');
-        ambulanceTrackByToken(token);
-        const link = ambTrackingUrl(token);
-        const info = `\n\n🔎 Nomor Tracking: ${token}\n🔗 Link Tracking: ${link}`;
-        alert(`Permintaan Ambulance berhasil dibuat.\n\nNomor tracking: ${token}\n\nLink tracking sudah tersedia dan dapat dibagikan kepada keluarga.`);
-        try {
-            await navigator.clipboard.writeText(link);
-        } catch (_) {}
+    // WhatsApp SELALU dibuka.
+    const target = typeof formatNomorWhatsAppIndonesia === 'function'
+        ? formatNomorWhatsAppIndonesia(hpPetugas)
+        : String(hpPetugas || '').replace(/\D/g, '');
 
-        // Bila nomor petugas tersedia, tetap bantu membuka WhatsApp sebagai notifikasi.
-        const target = formatNomorWhatsAppIndonesia(hpPetugas);
-        if (target && target.length >= 10) {
-            let pesan = '🚨 *PANGGILAN AMBULANCE & GAWAT DARURAT* 🚨\n\n';
-            pesan += `👤 Pemesan/Pasien: ${namaPasien}\n📞 No HP: ${hpPasien}\n🩺 Kondisi: ${kondisiPasien}\n🕐 Waktu: ${waktu}\n`;
-            pesan += linkMapsPasien ? `📍 Lokasi: ${linkMapsPasien}\n` : '';
-            pesan += `\n🔎 Nomor Tracking: ${token}\n🔗 Link Tracking: ${link}\n\nMohon segera merespon dan menuju lokasi pasien.`;
-            const urlWA = `https://api.whatsapp.com/send?phone=${target}&text=${encodeURIComponent(pesan)}`;
+    const locationLink = (typeof linkMapsPasien !== 'undefined' ? linkMapsPasien : '') || '';
+    let pesan = `🚨 *PANGGILAN AMBULANCE & GAWAT DARURAT* 🚨\n\n`;
+    pesan += `👤 Pemesan/Pasien: ${namaPasien}\n📞 No HP: ${hpPasien}\n🩺 Kondisi: ${kondisiPasien}\n🕐 Waktu: ${waktu}\n`;
+    if (locationLink) pesan += `📍 Lokasi: ${locationLink}\n`;
+    if (realtimeRequest) {
+        pesan += `\n🔎 Nomor Tracking: ${token}\n🔗 Link Tracking: ${ambTrackingUrl(token)}\n✅ Tracking realtime aktif.`;
+    } else {
+        pesan += `\n⚠️ Tracking realtime belum tersedia.\n🆔 Referensi: ${token}`;
+    }
+    pesan += `\n\nMohon segera merespon dan menuju lokasi pasien.`;
+
+    if (target && target.length >= 10) {
+        const urlWA = `https://api.whatsapp.com/send?phone=${target}&text=${encodeURIComponent(pesan)}`;
+        const win = window.open(urlWA, '_blank');
+        if (!win) window.location.href = urlWA;
+    } else {
+        const waManual = prompt('Nomor WhatsApp petugas belum valid. Masukkan nomor WhatsApp petugas (contoh 08123456789):');
+        const manualTarget = typeof formatNomorWhatsAppIndonesia === 'function'
+            ? formatNomorWhatsAppIndonesia(waManual || '')
+            : String(waManual || '').replace(/\D/g, '');
+        if (manualTarget && manualTarget.length >= 10) {
+            const urlWA = `https://api.whatsapp.com/send?phone=${manualTarget}&text=${encodeURIComponent(pesan)}`;
             const win = window.open(urlWA, '_blank');
             if (!win) window.location.href = urlWA;
         }
     }
-}
 
+    if (realtimeError) {
+        setTimeout(() => alert('WhatsApp tetap dibuka. Tracking realtime belum tersedia; perbaiki SQL Supabase lalu coba cek tracking kembali.'), 350);
+    } else {
+        try { await navigator.clipboard.writeText(ambTrackingUrl(token)); } catch (_) {}
+        alert(`Permintaan Ambulance berhasil dikirim.\n\nNomor tracking: ${token}\n\nWhatsApp petugas sudah dibuka.`);
+    }
+}
 
 function ambulanceObservePanelVisibility() {
     const area = document.getElementById('ambulanceDisplayArea');
@@ -8861,15 +8994,19 @@ function ambulanceObservePanelVisibility() {
 
 async function ambulanceInitRealtime() {
     ambulanceInitMaps();
+    await ambulanceEnsureRealtime();
     const token = new URL(window.location.href).searchParams.get('ambulance_track');
     if (token) {
-        ambulanceSetMode('pasien');
+        ambSetTab('pasien');
         await ambulanceTrackByToken(token);
     }
 }
 
 window.addEventListener('load', () => {
-    setTimeout(() => { ambulanceObservePanelVisibility(); ambulanceInitRealtime(); }, 500);
+    setTimeout(() => {
+        ambulanceObservePanelVisibility();
+        void ambulanceInitRealtime();
+    }, 500);
 });
 </script>
 
