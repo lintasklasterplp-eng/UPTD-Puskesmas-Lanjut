@@ -2406,6 +2406,33 @@ footer {
   }
 </style>
 
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<style id="ambulance-realtime-style">
+.amb-rt-panel{margin-top:14px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;box-shadow:0 8px 22px rgba(15,23,42,.06);text-align:left}
+.amb-rt-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.amb-rt-title{font-size:.95rem;font-weight:800;color:#0f172a}
+.amb-rt-sub{font-size:.68rem;color:#64748b;margin-top:2px}
+.amb-rt-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.amb-rt-tab{border:1px solid #cbd5e1;background:#f8fafc;color:#334155;padding:7px 10px;border-radius:8px;cursor:pointer;font-weight:800;font-size:.7rem}
+.amb-rt-tab.active{background:#047857;border-color:#047857;color:#fff}
+.amb-rt-view{display:none}.amb-rt-view.active{display:block}
+.amb-rt-status{padding:10px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;margin-bottom:10px}
+.amb-rt-status strong{display:block;font-size:.9rem;color:#0f172a}.amb-rt-status span{font-size:.7rem;color:#64748b}
+.amb-rt-actions{display:flex;flex-wrap:wrap;gap:7px;margin:9px 0}
+.amb-rt-btn{border:0;border-radius:8px;padding:8px 11px;cursor:pointer;font-size:.7rem;font-weight:800;background:#047857;color:#fff}
+.amb-rt-btn.secondary{background:#eff6ff;color:#0369a1;border:1px solid #bae6fd}
+.amb-rt-btn.warning{background:#f59e0b;color:#fff}.amb-rt-btn.danger{background:#dc2626;color:#fff}.amb-rt-btn.gray{background:#e2e8f0;color:#334155}
+.amb-rt-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,420px);gap:10px}
+@media(max-width:850px){.amb-rt-grid{grid-template-columns:1fr}}
+.amb-rt-map{width:100%;height:360px;border-radius:10px;overflow:hidden;border:1px solid #cbd5e1;background:#e5e7eb}
+.amb-rt-info{display:grid;gap:7px}.amb-rt-row{display:flex;justify-content:space-between;gap:10px;padding:7px 9px;border-radius:8px;background:#f8fafc;font-size:.7rem}.amb-rt-row b{color:#0f172a}.amb-rt-row span{color:#475569;text-align:right}
+.amb-rt-token{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.74rem;font-weight:800;color:#0369a1;word-break:break-all}
+.amb-rt-list{display:grid;gap:7px;max-height:300px;overflow:auto}.amb-rt-request{border:1px solid #e2e8f0;border-radius:10px;padding:9px;background:#fff}.amb-rt-request.active{border-color:#10b981;box-shadow:0 0 0 2px rgba(16,185,129,.08)}
+.amb-rt-request-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.amb-rt-request-name{font-size:.78rem;font-weight:800;color:#0f172a}.amb-rt-badge{padding:3px 7px;border-radius:999px;font-size:.58rem;font-weight:800;background:#ecfdf5;color:#047857}.amb-rt-request-meta{margin-top:4px;font-size:.64rem;color:#64748b;line-height:1.45}.amb-rt-request-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.amb-rt-note{font-size:.63rem;color:#64748b;margin-top:7px;line-height:1.45}
+.amb-rt-pulse{animation:ambRtPulse 1.5s ease-in-out infinite}@keyframes ambRtPulse{50%{box-shadow:0 0 0 5px rgba(239,68,68,.1)}}
+</style>
 </head>
 <body>
 
@@ -3537,6 +3564,69 @@ footer {
                                     🚨 Pesan & Kirim WA
                                 </button>
                             </div>
+
+                            <div class="amb-rt-panel" id="ambulanceRealtimePanel">
+                                <div class="amb-rt-head">
+                                    <div>
+                                        <div class="amb-rt-title">Pemantauan Ambulance Realtime</div>
+                                        <div class="amb-rt-sub">Pasien/keluarga dapat melihat status dan posisi petugas. Petugas dapat memperbarui status dan mengirim GPS.</div>
+                                    </div>
+                                    <div class="amb-rt-tabs">
+                                        <button type="button" class="amb-rt-tab active" id="ambTabPasien" onclick="ambulanceSetMode('pasien')">Pasien / Keluarga</button>
+                                        <button type="button" class="amb-rt-tab" id="ambTabPetugas" onclick="ambulanceBukaModePetugas()">Mode Petugas</button>
+                                    </div>
+                                </div>
+
+                                <div class="amb-rt-view active" id="ambViewPasien">
+                                    <div class="amb-rt-status" id="ambPatientStatusBox">
+                                        <strong id="ambPatientStatusText">Belum ada permintaan aktif</strong>
+                                        <span id="ambPatientStatusDetail">Setelah permintaan dikirim, nomor tracking akan muncul di sini.</span>
+                                    </div>
+                                    <div class="amb-rt-actions">
+                                        <button type="button" class="amb-rt-btn" onclick="ambulanceMulaiTrackingDariForm()">🔄 Cek Tracking</button>
+                                        <button type="button" class="amb-rt-btn secondary" onclick="ambulanceSalinTrackingLink()" id="ambCopyLinkBtn" disabled>📋 Salin Link Tracking</button>
+                                    </div>
+                                    <div class="amb-rt-grid">
+                                        <div id="ambulancePatientMap" class="amb-rt-map"></div>
+                                        <div class="amb-rt-info">
+                                            <div class="amb-rt-row"><b>No. Tracking</b><span class="amb-rt-token" id="ambPatientToken">-</span></div>
+                                            <div class="amb-rt-row"><b>Pasien/Keluarga</b><span id="ambPatientName">-</span></div>
+                                            <div class="amb-rt-row"><b>Status</b><span id="ambPatientStatusValue">-</span></div>
+                                            <div class="amb-rt-row"><b>Petugas</b><span id="ambOfficerName">-</span></div>
+                                            <div class="amb-rt-row"><b>Update GPS</b><span id="ambOfficerLocationTime">-</span></div>
+                                            <div class="amb-rt-row"><b>Koordinat Petugas</b><span id="ambOfficerCoords">-</span></div>
+                                            <div class="amb-rt-note">Link tracking dapat dibagikan kepada keluarga. Posisi petugas hanya dikirim ketika petugas mengaktifkan pelacakan GPS.</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="amb-rt-view" id="ambViewPetugas">
+                                    <div class="amb-rt-actions">
+                                        <button type="button" class="amb-rt-btn" onclick="ambulanceMuatDaftarPetugas()">🔄 Muat Permintaan</button>
+                                        <button type="button" class="amb-rt-btn gray" onclick="ambulanceHentikanGPSPetugas()">⏹ Hentikan GPS</button>
+                                    </div>
+                                    <div class="amb-rt-grid">
+                                        <div>
+                                            <div class="amb-rt-list" id="ambPetugasRequestList"></div>
+                                        </div>
+                                        <div>
+                                            <div class="amb-rt-status" id="ambPetugasSelectedBox">
+                                                <strong id="ambPetugasSelectedTitle">Belum memilih permintaan</strong>
+                                                <span id="ambPetugasSelectedDetail">Pilih permintaan dari daftar.</span>
+                                            </div>
+                                            <div class="amb-rt-actions">
+                                                <button type="button" class="amb-rt-btn" onclick="ambulancePetugasStatus('diterima_petugas')">✅ Terima</button>
+                                                <button type="button" class="amb-rt-btn" onclick="ambulancePetugasMulaiJemput()">🚑 Mulai Jemput + GPS</button>
+                                                <button type="button" class="amb-rt-btn warning" onclick="ambulancePetugasStatus('hampir_tiba')">📍 Hampir Tiba</button>
+                                                <button type="button" class="amb-rt-btn" onclick="ambulancePetugasStatus('tiba')">🏁 Tiba</button>
+                                                <button type="button" class="amb-rt-btn danger" onclick="ambulancePetugasStatus('selesai')">✅ Selesai</button>
+                                            </div>
+                                            <div id="ambulanceOfficerMap" class="amb-rt-map" style="height:260px;margin-top:8px"></div>
+                                            <div class="amb-rt-note">Untuk mengirim GPS, browser harus mengizinkan lokasi dan halaman harus dibuka melalui HTTPS (atau lingkungan lokal yang aman).</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -3898,6 +3988,11 @@ footer {
             <div class="info-modal-body">
                 <div class="info-item"><span class="info-label">Total File</span><span class="info-value" id="statTotalFile">0</span></div>
                 <div class="info-item"><span class="info-label">Penyimpanan</span><span class="info-value" id="statStorageSize">0 MB</span></div>
+                <div class="info-item"><span class="info-label">Supabase Storage</span><span class="info-value" id="statSupabaseStorage"><span class="badge-active">Memeriksa...</span></span></div>
+                <div class="info-item" style="align-items:flex-start;">
+                    <span class="info-label">Bucket Supabase</span>
+                    <span class="info-value" id="statSupabaseBuckets" style="max-width:70%; text-align:right; line-height:1.5;">PPT-LOKMIN, APP-NOTIFIKASI, INVENTARIS, KIR, OBHPBMHP, PMI, PWS, Ambulance, RUJUKAN INTERNAL</span>
+                </div>
                 <div class="info-item"><span class="info-label">Status Sistem</span><span class="badge-active">Aktif (Local Storage)</span></div>
                 <div class="info-item"><span class="info-label">Backup Otomatis</span><span class="badge-active">Aktif</span></div>
             </div>
@@ -3962,6 +4057,9 @@ footer {
         // Bucket khusus Ambulance. Data operasional disimpan dalam JSON dan foto petugas sebagai object terpisah.
         const AMBULANCE_STORAGE_BUCKET = "Ambulance";
         const AMBULANCE_STORAGE_PATH = "ambulance/ambulance-data.json";
+        // Realtime Ambulance: database tables (bukan Storage bucket).
+        const AMBULANCE_REQUESTS_TABLE = 'ambulance_requests';
+        const AMBULANCE_LOCATIONS_TABLE = 'ambulance_locations';
         const AMBULANCE_PHOTO_PREFIX = "ambulance/petugas-foto";
         // Pusat Notifikasi lintas perangkat.
         // Catatan: gunakan nama teknis APP-NOTIFIKASI (tanpa spasi) sesuai aturan nama bucket Storage.
@@ -6263,6 +6361,21 @@ footer {
             }
         }
 
+        async function updateSupabaseStorageInfo() {
+            const statusEl = document.getElementById('statSupabaseStorage');
+            if (!statusEl) return;
+            try {
+                const { error } = await supabaseClient.storage
+                    .from(PPT_LOKMIN_STORAGE_BUCKET)
+                    .list('', { limit: 1, offset: 0 });
+                if (error) throw error;
+                statusEl.innerHTML = '<span class="badge-active">Terhubung</span>';
+            } catch (err) {
+                console.warn('Supabase Storage tidak dapat diverifikasi:', err?.message || err);
+                statusEl.innerHTML = '<span class="badge-active" style="background:#fef2f2;color:#b91c1c;border-color:#fecaca;">Belum terhubung / tidak dapat diverifikasi</span>';
+            }
+        }
+
         async function updateSystemStats() {
             try {
                 const { data, error } = await supabaseClient.from('docs').select('*');
@@ -6274,7 +6387,12 @@ footer {
                 document.getElementById('statStorageSize').innerText = sizeStr;
             } catch (err) {
                 console.warn("Tabel Supabase 'docs' belum siap atau koneksi terbatas:", err.message);
+                const totalEl = document.getElementById('statTotalFile');
+                const sizeEl = document.getElementById('statStorageSize');
+                if (totalEl) totalEl.innerText = '—';
+                if (sizeEl) sizeEl.innerText = '—';
             }
+            await updateSupabaseStorageInfo();
         }
         updateSystemStats();
 
@@ -8211,6 +8329,544 @@ const { data, error } = await supabaseClient.storage
         }
     </script>
 
+<script id="ambulance-realtime-script">
+/* ================= AMBULANCE & DARURAT REALTIME =================
+   Membutuhkan tabel Supabase:
+   - ambulance_requests
+   - ambulance_locations (UNIQUE request_id)
+   Realtime digunakan untuk status dan posisi petugas.
+*/
+let ambPatientMap = null;
+let ambOfficerMap = null;
+let ambPickupMarker = null;
+let ambOfficerMarker = null;
+let ambOfficerSelfMarker = null;
+let ambRequestChannel = null;
+let ambLocationChannel = null;
+let ambOfficerWatchId = null;
+let ambSelectedRequest = null;
+let ambActiveTrackingToken = '';
+let ambPatientLat = null;
+let ambPatientLng = null;
+
+function ambStatusLabel(status) {
+    const labels = {
+        menunggu_petugas: 'Menunggu Petugas',
+        diterima_petugas: 'Petugas Akan Menjemput',
+        dalam_perjalanan: 'Petugas Dalam Perjalanan',
+        hampir_tiba: 'Petugas Hampir Tiba',
+        tiba: 'Petugas Sudah Tiba',
+        selesai: 'Permintaan Selesai',
+        dibatalkan: 'Permintaan Dibatalkan'
+    };
+    return labels[status] || status || '-';
+}
+
+function ambEsc(v) {
+    return String(v ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+}
+
+function ambFormatDate(v) {
+    if (!v) return '-';
+    try { return new Date(v).toLocaleString('id-ID'); } catch (_) { return String(v); }
+}
+
+function ambGenerateToken() {
+    const now = new Date();
+    const stamp = now.toISOString().replace(/\D/g,'').slice(0,14);
+    const rnd = Math.random().toString(36).slice(2, 7).toUpperCase();
+    return `AMB-${stamp}-${rnd}`;
+}
+
+function ambTrackingUrl(token) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('ambulance_track', token);
+    return url.toString();
+}
+
+function ambulanceInitMaps() {
+    if (typeof L === 'undefined') return;
+
+    if (!ambPatientMap) {
+        ambPatientMap = L.map('ambulancePatientMap', { zoomControl: true }).setView([-6.2, 106.816666], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(ambPatientMap);
+    }
+    if (!ambOfficerMap) {
+        ambOfficerMap = L.map('ambulanceOfficerMap', { zoomControl: true }).setView([-6.2, 106.816666], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(ambOfficerMap);
+    }
+}
+
+function ambSetTab(mode) {
+    const patient = mode === 'pasien';
+    document.getElementById('ambTabPasien')?.classList.toggle('active', patient);
+    document.getElementById('ambTabPetugas')?.classList.toggle('active', !patient);
+    document.getElementById('ambViewPasien')?.classList.toggle('active', patient);
+    document.getElementById('ambViewPetugas')?.classList.toggle('active', !patient);
+    setTimeout(() => {
+        if (ambPatientMap) ambPatientMap.invalidateSize();
+        if (ambOfficerMap) ambOfficerMap.invalidateSize();
+    }, 150);
+}
+
+function ambulanceSetMode(mode) {
+    ambSetTab(mode);
+    if (mode === 'pasien') {
+        ambulanceInitMaps();
+        const token = new URL(window.location.href).searchParams.get('ambulance_track');
+        if (token) ambulanceTrackByToken(token);
+    }
+}
+
+function ambulanceBukaModePetugas() {
+    showPasswordPrompt('Mode Petugas Ambulance', 'Masukkan password admin/petugas:', (success, pwd) => {
+        if (!success) return;
+        if (pwd === 'admin' || pwd === systemPassword) {
+            ambSetTab('petugas');
+            ambulanceInitMaps();
+            ambulanceMuatDaftarPetugas();
+        } else if (pwd !== '') {
+            alert('Password salah.');
+        }
+    });
+}
+
+function ambulanceRenderPatient(request) {
+    if (!request) return;
+    ambActiveTrackingToken = request.tracking_token || request.trackingToken || '';
+    document.getElementById('ambPatientToken').textContent = ambActiveTrackingToken || '-';
+    document.getElementById('ambPatientName').textContent = request.patient_name || '-';
+    document.getElementById('ambPatientStatusValue').textContent = ambStatusLabel(request.status);
+    document.getElementById('ambOfficerName').textContent = request.officer_name || 'Belum ditetapkan';
+    document.getElementById('ambPatientStatusText').textContent = ambStatusLabel(request.status);
+    document.getElementById('ambPatientStatusDetail').textContent =
+        request.status === 'diterima_petugas'
+            ? 'Petugas sudah menerima permintaan dan akan menjemput.'
+            : request.status === 'dalam_perjalanan'
+                ? 'Petugas sedang menuju lokasi penjemputan.'
+                : request.status === 'hampir_tiba'
+                    ? 'Petugas hampir tiba di lokasi Anda.'
+                    : request.status === 'tiba'
+                        ? 'Petugas sudah tiba di lokasi.'
+                        : `Diperbarui ${ambFormatDate(request.updated_at || request.created_at)}.`;
+    const copy = document.getElementById('ambCopyLinkBtn');
+    if (copy) copy.disabled = !ambActiveTrackingToken;
+
+    const box = document.getElementById('ambPatientStatusBox');
+    if (box) box.classList.toggle('amb-rt-pulse', ['diterima_petugas','dalam_perjalanan','hampir_tiba'].includes(request.status));
+
+    ambPatientLat = Number(request.pickup_lat);
+    ambPatientLng = Number(request.pickup_lng);
+    if (ambPatientMap && Number.isFinite(ambPatientLat) && Number.isFinite(ambPatientLng)) {
+        const point = [ambPatientLat, ambPatientLng];
+        if (!ambPickupMarker) {
+            ambPickupMarker = L.marker(point).addTo(ambPatientMap).bindPopup('📍 Lokasi penjemputan');
+        } else {
+            ambPickupMarker.setLatLng(point);
+        }
+        ambPatientMap.setView(point, Math.max(ambPatientMap.getZoom(), 14));
+    }
+}
+
+function ambulanceRenderLocation(location) {
+    if (!location) return;
+    const lat = Number(location.latitude);
+    const lng = Number(location.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    document.getElementById('ambOfficerLocationTime').textContent = ambFormatDate(location.updated_at);
+    document.getElementById('ambOfficerCoords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+    if (ambPatientMap) {
+        const point = [lat, lng];
+        if (!ambOfficerMarker) {
+            ambOfficerMarker = L.marker(point).addTo(ambPatientMap).bindPopup('🚑 Posisi Petugas/Pergerakan Ambulance');
+        } else {
+            ambOfficerMarker.setLatLng(point);
+        }
+    }
+    if (ambOfficerMap) {
+        const point = [lat, lng];
+        if (!ambOfficerSelfMarker) ambOfficerSelfMarker = L.marker(point).addTo(ambOfficerMap).bindPopup('🚑 Posisi Anda');
+        else ambOfficerSelfMarker.setLatLng(point);
+        ambOfficerMap.setView(point, Math.max(ambOfficerMap.getZoom(), 15));
+    }
+}
+
+async function ambulanceTrackByToken(token) {
+    if (!token) return;
+    ambulanceInitMaps();
+    try {
+        const { data, error } = await supabaseClient
+            .from(AMBULANCE_REQUESTS_TABLE)
+            .select('*')
+            .eq('tracking_token', token)
+            .maybeSingle();
+        if (error) throw error;
+        if (!data) {
+            document.getElementById('ambPatientStatusText').textContent = 'Tracking tidak ditemukan';
+            document.getElementById('ambPatientStatusDetail').textContent = 'Periksa kembali nomor tracking atau link yang digunakan.';
+            return;
+        }
+
+        if (ambRequestChannel) supabaseClient.removeChannel(ambRequestChannel);
+        if (ambLocationChannel) supabaseClient.removeChannel(ambLocationChannel);
+        ambRequestChannel = null;
+        ambLocationChannel = null;
+
+        ambActiveTrackingToken = token;
+        ambSelectedRequest = data;
+        ambulanceRenderPatient(data);
+
+        const { data: loc, error: locError } = await supabaseClient
+            .from(AMBULANCE_LOCATIONS_TABLE)
+            .select('*')
+            .eq('request_id', data.id)
+            .maybeSingle();
+        if (!locError && loc) ambulanceRenderLocation(loc);
+
+        ambRequestChannel = supabaseClient.channel(`amb-req-${token}`)
+            .on('postgres_changes', {
+                event: '*', schema: 'public', table: AMBULANCE_REQUESTS_TABLE,
+                filter: `tracking_token=eq.${token}`
+            }, payload => {
+                if (payload.new) {
+                    ambSelectedRequest = payload.new;
+                    ambulanceRenderPatient(payload.new);
+                }
+            }).subscribe();
+
+        ambLocationChannel = supabaseClient.channel(`amb-loc-${data.id}`)
+            .on('postgres_changes', {
+                event: '*', schema: 'public', table: AMBULANCE_LOCATIONS_TABLE,
+                filter: `request_id=eq.${data.id}`
+            }, payload => {
+                if (payload.new) ambulanceRenderLocation(payload.new);
+            }).subscribe();
+    } catch (error) {
+        console.error('Tracking Ambulance:', error);
+        document.getElementById('ambPatientStatusText').textContent = 'Belum dapat tersambung ke tracking';
+        document.getElementById('ambPatientStatusDetail').textContent = error?.message || 'Periksa tabel dan policy Supabase.';
+    }
+}
+
+async function ambulanceMulaiTrackingDariForm() {
+    const urlToken = new URL(window.location.href).searchParams.get('ambulance_track');
+    const token = urlToken || ambActiveTrackingToken;
+    if (!token) {
+        alert('Belum ada nomor tracking. Kirim permintaan Ambulance terlebih dahulu.');
+        return;
+    }
+    ambulanceSetMode('pasien');
+    await ambulanceTrackByToken(token);
+}
+
+async function ambulanceSalinTrackingLink() {
+    if (!ambActiveTrackingToken) return;
+    const link = ambTrackingUrl(ambActiveTrackingToken);
+    try {
+        await navigator.clipboard.writeText(link);
+        alert('Link tracking berhasil disalin.');
+    } catch (_) {
+        window.prompt('Salin link tracking berikut:', link);
+    }
+}
+
+async function ambulanceInsertRealtimeRequest(base) {
+    const payload = {
+        tracking_token: base.tracking_token,
+        patient_name: base.patient_name,
+        requester_name: base.requester_name || base.patient_name,
+        requester_phone: base.requester_phone || '',
+        condition_text: base.condition_text || '',
+        pickup_address: base.pickup_address || '',
+        pickup_lat: base.pickup_lat,
+        pickup_lng: base.pickup_lng,
+        status: 'menunggu_petugas',
+        officer_name: null,
+        officer_phone: null,
+        eta_text: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+    };
+    const { data, error } = await supabaseClient
+        .from(AMBULANCE_REQUESTS_TABLE)
+        .insert(payload)
+        .select('*')
+        .single();
+    if (error) throw error;
+    return data;
+}
+
+async function ambulanceMuatDaftarPetugas() {
+    const box = document.getElementById('ambPetugasRequestList');
+    if (!box) return;
+    box.innerHTML = '<div class="amb-rt-note">Memuat permintaan...</div>';
+    try {
+        const { data, error } = await supabaseClient
+            .from(AMBULANCE_REQUESTS_TABLE)
+            .select('*')
+            .in('status', ['menunggu_petugas','diterima_petugas','dalam_perjalanan','hampir_tiba','tiba'])
+            .order('created_at', { ascending: false })
+            .limit(50);
+        if (error) throw error;
+        if (!data?.length) {
+            box.innerHTML = '<div class="amb-rt-note">Belum ada permintaan aktif.</div>';
+            return;
+        }
+        box.innerHTML = data.map(item => `
+            <div class="amb-rt-request ${ambSelectedRequest?.id === item.id ? 'active' : ''}">
+                <div class="amb-rt-request-head">
+                    <div class="amb-rt-request-name">${ambEsc(item.patient_name || '-')}</div>
+                    <span class="amb-rt-badge">${ambEsc(ambStatusLabel(item.status))}</span>
+                </div>
+                <div class="amb-rt-request-meta">${ambEsc(item.condition_text || '-')}<br>Tracking: ${ambEsc(item.tracking_token)}<br>${ambEsc(ambFormatDate(item.created_at))}</div>
+                <div class="amb-rt-request-actions">
+                    <button type="button" class="amb-rt-btn secondary" onclick="ambulancePilihPermintaan('${ambEsc(item.id)}')">Pilih</button>
+                    ${item.status === 'menunggu_petugas' ? `<button type="button" class="amb-rt-btn" onclick="ambulancePilihDanTerima('${ambEsc(item.id)}')">Terima</button>` : ''}
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error(error);
+        box.innerHTML = `<div class="amb-rt-note" style="color:#b91c1c">Gagal memuat permintaan: ${ambEsc(error?.message || error)}</div>`;
+    }
+}
+
+async function ambulancePilihPermintaan(id) {
+    try {
+        const { data, error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE).select('*').eq('id', id).single();
+        if (error) throw error;
+        ambSelectedRequest = data;
+        document.getElementById('ambPetugasSelectedTitle').textContent = `${data.patient_name || '-'} — ${ambStatusLabel(data.status)}`;
+        document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token} • ${data.condition_text || '-'} • ${ambFormatDate(data.created_at)}`;
+        if (Number.isFinite(Number(data.pickup_lat)) && Number.isFinite(Number(data.pickup_lng)) && ambOfficerMap) {
+            ambOfficerMap.setView([Number(data.pickup_lat), Number(data.pickup_lng)], 14);
+        }
+        ambulanceMuatDaftarPetugas();
+    } catch (error) {
+        alert('Gagal memilih permintaan: ' + (error?.message || error));
+    }
+}
+
+async function ambulancePilihDanTerima(id) {
+    await ambulancePilihPermintaan(id);
+    await ambulancePetugasStatus('diterima_petugas');
+}
+
+async function ambulancePetugasStatus(status) {
+    if (!ambSelectedRequest?.id) {
+        alert('Pilih permintaan terlebih dahulu.');
+        return;
+    }
+    const nama = localStorage.getItem('ambulance_petugas_nama') || '';
+    const hp = localStorage.getItem('ambulance_petugas_hp') || '';
+    try {
+        const { data, error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE)
+            .update({ status, officer_name: nama || ambSelectedRequest.officer_name || null, officer_phone: hp || ambSelectedRequest.officer_phone || null, updated_at: new Date().toISOString() })
+            .eq('id', ambSelectedRequest.id)
+            .select('*').single();
+        if (error) throw error;
+        ambSelectedRequest = data;
+        document.getElementById('ambPetugasSelectedTitle').textContent = `${data.patient_name || '-'} — ${ambStatusLabel(data.status)}`;
+        document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token} • ${ambFormatDate(data.updated_at)}`;
+        await ambulanceMuatDaftarPetugas();
+    } catch (error) {
+        alert('Gagal mengubah status: ' + (error?.message || error));
+    }
+}
+
+function ambulancePetugasMulaiJemput() {
+    if (!ambSelectedRequest?.id) {
+        alert('Pilih permintaan terlebih dahulu.');
+        return;
+    }
+    if (!navigator.geolocation) {
+        alert('Browser tidak mendukung GPS.');
+        return;
+    }
+    const requestId = ambSelectedRequest.id;
+    const nama = localStorage.getItem('ambulance_petugas_nama') || '';
+    const hp = localStorage.getItem('ambulance_petugas_hp') || '';
+    ambulancePetugasStatus('dalam_perjalanan');
+    if (ambOfficerWatchId !== null) navigator.geolocation.clearWatch(ambOfficerWatchId);
+    ambOfficerWatchId = navigator.geolocation.watchPosition(async position => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        try {
+            const { data, error } = await supabaseClient.from(AMBULANCE_LOCATIONS_TABLE).upsert({
+                request_id: requestId,
+                latitude: lat,
+                longitude: lng,
+                accuracy: position.coords.accuracy,
+                heading: position.coords.heading,
+                speed: position.coords.speed,
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'request_id' }).select('*').single();
+            if (error) throw error;
+            ambulanceRenderLocation(data || {latitude:lat, longitude:lng, updated_at:new Date().toISOString()});
+            // Pastikan data petugas tercatat bila sebelumnya kosong.
+            if (ambSelectedRequest && (!ambSelectedRequest.officer_name || !ambSelectedRequest.officer_phone)) {
+                await supabaseClient.from(AMBULANCE_REQUESTS_TABLE).update({ officer_name:nama||null, officer_phone:hp||null, updated_at:new Date().toISOString() }).eq('id', requestId);
+            }
+        } catch (error) {
+            console.error('GPS Ambulance gagal dikirim:', error);
+        }
+    }, error => {
+        console.error(error);
+        alert('GPS petugas tidak dapat dikirim: ' + (error?.message || 'izin lokasi ditolak'));
+    }, { enableHighAccuracy:true, maximumAge:3000, timeout:10000 });
+}
+
+function ambulanceHentikanGPSPetugas() {
+    if (ambOfficerWatchId !== null) {
+        navigator.geolocation.clearWatch(ambOfficerWatchId);
+        ambOfficerWatchId = null;
+        alert('Pelacakan GPS petugas dihentikan.');
+    }
+}
+
+// Override fungsi GPS pasien agar koordinat latitude/longitude ikut disimpan ke request realtime.
+function dapatkanLokasiPasien() {
+    const inputLokasi = document.getElementById('input-lokasi-pasien');
+    if (!inputLokasi) return;
+    inputLokasi.value = 'Mencari GPS...';
+    if (!navigator.geolocation) {
+        inputLokasi.value = 'GPS tidak didukung';
+        alert('Fitur lokasi tidak didukung browser ini.');
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(position => {
+        ambPatientLat = position.coords.latitude;
+        ambPatientLng = position.coords.longitude;
+        linkMapsPasien = `https://www.google.com/maps?q=${ambPatientLat},${ambPatientLng}`;
+        inputLokasi.value = `GPS: ${ambPatientLat.toFixed(6)}, ${ambPatientLng.toFixed(6)}`;
+        ambulanceInitMaps();
+        if (ambPatientMap) {
+            const p = [ambPatientLat, ambPatientLng];
+            if (!ambPickupMarker) ambPickupMarker = L.marker(p).addTo(ambPatientMap).bindPopup('📍 Lokasi penjemputan');
+            else ambPickupMarker.setLatLng(p);
+            ambPatientMap.setView(p, 15);
+        }
+        alert('Lokasi Anda berhasil direkam.');
+    }, error => {
+        inputLokasi.value = 'Gagal mengambil lokasi';
+        alert('Gagal mendapatkan lokasi. Pastikan izin GPS aktif.');
+    }, { enableHighAccuracy:true, timeout:15000, maximumAge:0 });
+}
+
+// Override pengiriman agar membuat request realtime sebelum membuka WhatsApp.
+async function kirimPermintaanAmbulance() {
+    const localData = ambulanceBacaLocal();
+    const namaPetugas = localData?.petugas?.nama || localStorage.getItem('ambulance_petugas_nama') || '';
+    const hpPetugas = localData?.petugas?.hp || localStorage.getItem('ambulance_petugas_hp') || '';
+    const namaPasien = document.getElementById('input-nama-pasien')?.value.trim() || '';
+    const hpPasien = document.getElementById('input-hp-pasien')?.value.trim() || '';
+    const kondisiPasien = document.getElementById('input-kondisi-pasien')?.value.trim() || '';
+    if (!namaPasien || !hpPasien || !kondisiPasien) {
+        alert('Harap lengkapi Nama, No HP, dan Kondisi Pasien!');
+        return;
+    }
+    if (!ambPatientLat || !ambPatientLng) {
+        const lanjut = confirm('Lokasi GPS belum direkam. Permintaan tetap dikirim tanpa koordinat?');
+        if (!lanjut) return;
+    }
+    const token = ambGenerateToken();
+    const waktu = new Date().toLocaleString('id-ID');
+    let realtimeRequest = null;
+    try {
+        realtimeRequest = await ambulanceInsertRealtimeRequest({
+            tracking_token: token,
+            patient_name: namaPasien,
+            requester_name: namaPasien,
+            requester_phone: hpPasien,
+            condition_text: kondisiPasien,
+            pickup_address: linkMapsPasien || '',
+            pickup_lat: ambPatientLat,
+            pickup_lng: ambPatientLng
+        });
+        ambSelectedRequest = realtimeRequest;
+        ambActiveTrackingToken = token;
+        ambulanceRenderPatient(realtimeRequest);
+    } catch (error) {
+        console.error('Realtime request gagal:', error);
+        const go = confirm('Permintaan realtime gagal disimpan ke Supabase. Tetap buka WhatsApp tanpa tracking realtime?');
+        if (!go) return;
+    }
+
+    if (realtimeRequest) {
+        ambulanceSetMode('pasien');
+        ambulanceTrackByToken(token);
+        const link = ambTrackingUrl(token);
+        const info = `\n\n🔎 Nomor Tracking: ${token}\n🔗 Link Tracking: ${link}`;
+        // Simpan juga ke struktur lama agar kompatibel dengan fitur Ambulance sebelumnya.
+        try {
+            const permintaanLama = {
+                id: realtimeRequest.id,
+                createdAt: realtimeRequest.created_at,
+                namaPetugas, hpPetugas,
+                namaPasien, hpPasien,
+                kondisi:kondisiPasien,
+                lokasiGps:linkMapsPasien || '',
+                trackingToken: token,
+                trackingLink: link,
+                status:'menunggu_petugas'
+            };
+            await simpanPermintaanAmbulanceSupabase(permintaanLama);
+        } catch (e) { console.warn('Kompatibilitas Storage Ambulance gagal:', e); }
+        alert(`Permintaan Ambulance berhasil dibuat.\n\nNomor tracking: ${token}\n\nLink tracking sudah tersedia dan dapat dibagikan kepada keluarga.`);
+        try {
+            await navigator.clipboard.writeText(link);
+        } catch (_) {}
+
+        // Bila nomor petugas tersedia, tetap bantu membuka WhatsApp sebagai notifikasi.
+        const target = formatNomorWhatsAppIndonesia(hpPetugas);
+        if (target && target.length >= 10) {
+            let pesan = '🚨 *PANGGILAN AMBULANCE & GAWAT DARURAT* 🚨\n\n';
+            pesan += `👤 Pemesan/Pasien: ${namaPasien}\n📞 No HP: ${hpPasien}\n🩺 Kondisi: ${kondisiPasien}\n🕐 Waktu: ${waktu}\n`;
+            pesan += linkMapsPasien ? `📍 Lokasi: ${linkMapsPasien}\n` : '';
+            pesan += `\n🔎 Nomor Tracking: ${token}\n🔗 Link Tracking: ${link}\n\nMohon segera merespon dan menuju lokasi pasien.`;
+            const urlWA = `https://api.whatsapp.com/send?phone=${target}&text=${encodeURIComponent(pesan)}`;
+            const win = window.open(urlWA, '_blank');
+            if (!win) window.location.href = urlWA;
+        }
+    }
+}
+
+
+function ambulanceObservePanelVisibility() {
+    const area = document.getElementById('ambulanceDisplayArea');
+    if (!area || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => {
+        if (area.offsetWidth > 0) {
+            setTimeout(() => {
+                if (ambPatientMap) ambPatientMap.invalidateSize();
+                if (ambOfficerMap) ambOfficerMap.invalidateSize();
+            }, 100);
+        }
+    });
+    ro.observe(area);
+}
+
+async function ambulanceInitRealtime() {
+    ambulanceInitMaps();
+    const token = new URL(window.location.href).searchParams.get('ambulance_track');
+    if (token) {
+        ambulanceSetMode('pasien');
+        await ambulanceTrackByToken(token);
+    }
+}
+
+window.addEventListener('load', () => {
+    setTimeout(() => { ambulanceObservePanelVisibility(); ambulanceInitRealtime(); }, 500);
+});
+</script>
+
 <script id="pws-edit-mode-script">
 /* ================= PWS DASHBOARD + SUPABASE STORAGE ================= */
 const PWS_DISEASES = [
@@ -9681,6 +10337,7 @@ async function pwsRefreshCalendarPeriod(){
 
 
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </body>
 </html>
 <script>
