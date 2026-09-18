@@ -1695,6 +1695,25 @@ footer {
     letter-spacing: 0.30em;
     color: rgba(22,56,93,0.25);
     white-space: nowrap;
+    z-index: 2;
+  }
+
+  /* Logo watermark beranda: tetap terpusat, termasuk pada layar HP. */
+  .home-bg-logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(28vw, 260px);
+    height: min(28vw, 260px);
+    min-width: 150px;
+    min-height: 150px;
+    object-fit: contain;
+    opacity: 0.12;
+    filter: saturate(0.85) contrast(0.95);
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
   }
 
   #homeViewContainer::after {
@@ -1797,6 +1816,16 @@ footer {
   }
 
   @media (max-width: 700px) {
+    .home-bg-logo {
+      left: 50%;
+      top: 50%;
+      width: min(52vw, 220px);
+      height: min(52vw, 220px);
+      min-width: 145px;
+      min-height: 145px;
+      opacity: 0.14;
+    }
+
     #homeViewContainer::before {
       letter-spacing: 0.15em;
       font-size: 0.58rem;
@@ -3352,6 +3381,7 @@ footer {
                         </div>
                     </div>
             <div id="homeViewContainer">
+    <img class="home-bg-logo" src="WhatsApp Image 2026-08-23 at 21.43.36 (1).jpeg" alt="" aria-hidden="true" draggable="false">
     <div class="lintas-klaster-art" aria-label="Lintas Klaster">
         <div class="lintas">Lintas</div>
         <div class="klaster">Klaster</div>
@@ -8553,8 +8583,25 @@ async function pwsRefreshCalendarPeriod(){
 
     function loadRememberedCredentials() {
         const rememberBox = document.getElementById('authRememberLogin');
+        const passwordInput = document.getElementById('authPassword');
         const remembered = localStorage.getItem(APP_REMEMBER_LOGIN_KEY) === '1';
+
         if (rememberBox) rememberBox.checked = remembered;
+
+        if (passwordInput) {
+            if (remembered) {
+                try {
+                    const saved = JSON.parse(localStorage.getItem(REMEMBER_KEY) || 'null');
+                    const rememberedPassword = saved && typeof saved.password === 'string' ? saved.password : '';
+                    passwordInput.value = rememberedPassword;
+                } catch (e) {
+                    passwordInput.value = '';
+                }
+            } else {
+                passwordInput.value = '';
+            }
+        }
+
         return remembered;
     }
 
@@ -8563,12 +8610,20 @@ async function pwsRefreshCalendarPeriod(){
             localStorage.setItem(APP_REMEMBER_LOGIN_KEY, '1');
         } else {
             localStorage.removeItem(APP_REMEMBER_LOGIN_KEY);
+            localStorage.removeItem(REMEMBER_KEY);
         }
     }
 
     function saveRememberedCredentials(username, password, shouldRemember) {
-        // Dipertahankan untuk kompatibilitas kode lama.
-        saveRememberedAccess(shouldRemember);
+        if (shouldRemember) {
+            localStorage.setItem(APP_REMEMBER_LOGIN_KEY, '1');
+            localStorage.setItem(REMEMBER_KEY, JSON.stringify({
+                username: normalizeUsername(username || ''),
+                password: String(password || '')
+            }));
+        } else {
+            saveRememberedAccess(false);
+        }
     }
 
     window.showAuthRegister = function () {
@@ -8640,7 +8695,8 @@ async function pwsRefreshCalendarPeriod(){
             return;
         }
 
-        saveRememberedAccess(!!document.getElementById('authRememberLogin')?.checked);
+        const shouldRemember = !!document.getElementById('authRememberLogin')?.checked;
+        saveRememberedCredentials('', password, shouldRemember);
         sessionStorage.setItem(SESSION_KEY, 'authenticated');
         document.getElementById('authLoginScreen').style.display = 'none';
         document.getElementById('authRegisterScreen').style.display = 'none';
@@ -8655,7 +8711,8 @@ async function pwsRefreshCalendarPeriod(){
     window.authLogout = function () {
         try { if (typeof closeMobileMenu === 'function') closeMobileMenu(); } catch (e) {}
         sessionStorage.removeItem(SESSION_KEY);
-        saveRememberedAccess(false);
+        // Logout/kunci otomatis tidak menghapus password yang sudah diingat.
+        // Data tetap tersimpan hanya pada perangkat/browser ini sampai pengguna mematikan centang.
         document.body.classList.add('auth-locked');
         const input = document.getElementById('authPassword');
         if (input) input.value = '';
@@ -8685,6 +8742,16 @@ async function pwsRefreshCalendarPeriod(){
     });
 
     document.addEventListener('DOMContentLoaded', function () {
+        const rememberBox = document.getElementById('authRememberLogin');
+        if (rememberBox) {
+            rememberBox.addEventListener('change', function () {
+                if (!this.checked) {
+                    localStorage.removeItem(APP_REMEMBER_LOGIN_KEY);
+                    localStorage.removeItem(REMEMBER_KEY);
+                }
+            });
+        }
+
         // RESET DATA AKUN PENGGUNA - dijalankan satu kali pada file versi reset ini.
         // Hanya data autentikasi akun yang dihapus; data modul/aplikasi lain tidak disentuh.
         try {
@@ -8701,8 +8768,7 @@ async function pwsRefreshCalendarPeriod(){
         document.body.classList.add('auth-locked');
         const activeSession = sessionStorage.getItem(SESSION_KEY);
         const rememberedAccess = localStorage.getItem(APP_REMEMBER_LOGIN_KEY) === '1';
-        if (activeSession === 'authenticated' || rememberedAccess) {
-            sessionStorage.setItem(SESSION_KEY, 'authenticated');
+        if (activeSession === 'authenticated') {
             document.getElementById('authLoginScreen').style.display = 'none';
             document.getElementById('authRegisterScreen').style.display = 'none';
             document.body.classList.remove('auth-locked');
@@ -8710,6 +8776,9 @@ async function pwsRefreshCalendarPeriod(){
                 if (typeof window.resetToHome === 'function') window.resetToHome();
             } catch (e) {}
         } else {
+            // Setelah browser/web ditutup, tetap tampilkan halaman login.
+            // Bila opsi "Ingat Password" aktif, checkbox tetap tercentang dan password dipulihkan
+            // sehingga pada perangkat yang sama pengguna cukup menekan tombol "Masuk".
             document.getElementById('authLoginScreen').style.display = 'flex';
             document.getElementById('authRegisterScreen').style.display = 'none';
             setTimeout(() => {
