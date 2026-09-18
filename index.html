@@ -4054,10 +4054,11 @@ footer {
         // sehingga data dapat dibuka kembali dari perangkat lain.
         const PWS_STORAGE_BUCKET = "PWS";
         const PWS_STORAGE_FOLDER = "dashboard-pws";
-        // Bucket khusus Ambulance. Data operasional disimpan dalam JSON dan foto petugas sebagai object terpisah.
+        // Bucket khusus Ambulance. Bucket hanya untuk foto petugas; data operasional tersimpan di tabel Supabase.
         const AMBULANCE_STORAGE_BUCKET = "Ambulance";
         const AMBULANCE_STORAGE_PATH = "ambulance/ambulance-data.json";
         // Realtime Ambulance: database tables (bukan Storage bucket).
+        const AMBULANCE_OFFICERS_TABLE = 'ambulance_officers';
         const AMBULANCE_REQUESTS_TABLE = 'ambulance_requests';
         const AMBULANCE_LOCATIONS_TABLE = 'ambulance_locations';
         const AMBULANCE_PHOTO_PREFIX = "ambulance/petugas-foto";
@@ -8068,85 +8069,58 @@ const { data, error } = await supabaseClient.storage
             const nama = document.getElementById('input-nama-petugas').value.trim();
             const hp = document.getElementById('input-hp-petugas').value.trim();
             const fileInput = document.getElementById('input-foto-petugas');
-
             if (!nama || !hp) {
                 alert('Harap isi nama dan nomor HP petugas secara lengkap!');
                 return;
             }
-
-            let fotoDataUrl = localStorage.getItem('ambulance_petugas_foto') || '';
             let fotoPath = '';
             const tombol = document.querySelector('#form-edit-petugas .btn-simpan-darurat');
             const teksTombol = tombol ? tombol.innerHTML : '';
-            if (tombol) {
-                tombol.disabled = true;
-                tombol.innerHTML = '⏳ Menyimpan...';
-            }
-
+            if (tombol) { tombol.disabled = true; tombol.innerHTML = '⏳ Menyimpan...'; }
             try {
-                const currentLocal = ambulanceBacaLocal() || ambulanceDefaultData();
-                fotoPath = currentLocal?.petugas?.fotoPath || '';
-
                 if (fileInput.files && fileInput.files[0]) {
                     fotoPath = await ambulanceUnggahFotoSupabase(fileInput.files[0]);
-                    fotoDataUrl = await ambulanceBlobToDataUrl(fileInput.files[0]);
+                } else {
+                    fotoPath = localStorage.getItem('ambulance_petugas_foto_path') || '';
                 }
-
-                const cloudData = {
-                    ...currentLocal,
-                    version: 1,
-                    updatedAt: new Date().toISOString(),
-                    petugas: { nama, hp, fotoPath, fotoDataUrl },
-                    permintaan: Array.isArray(currentLocal.permintaan) ? currentLocal.permintaan : []
+                const payload = {
+                    nama,
+                    hp,
+                    foto_path: fotoPath || null,
+                    active: true,
+                    updated_at: new Date().toISOString()
                 };
+                let query = supabaseClient.from(AMBULANCE_OFFICERS_TABLE).upsert(payload, { onConflict: 'hp' });
+                let result = await query.select('*').single();
+                if (result.error) throw result.error;
+                const officer = result.data;
+                ambCurrentOfficerId = officer.id;
+                localStorage.setItem('ambulance_petugas_id', officer.id);
+                localStorage.setItem('ambulance_petugas_nama', officer.nama);
+                localStorage.setItem('ambulance_petugas_hp', officer.hp);
+                localStorage.setItem('ambulance_petugas_foto_path', officer.foto_path || '');
 
-                // Cache lokal selalu diperbarui terlebih dahulu.
-                ambulanceSimpanLocal(cloudData);
-                localStorage.setItem('ambulance_petugas_nama', nama);
-                localStorage.setItem('ambulance_petugas_hp', hp);
-                if (fotoDataUrl) localStorage.setItem('ambulance_petugas_foto', fotoDataUrl);
-                ambulanceTampilkanPetugas(cloudData);
-
-                // Upload cloud. Jika gagal, cache lokal tetap aman.
-                await ambulanceSimpanDataSupabase(cloudData);
-                alert('Data Petugas Ambulance berhasil disimpan ke Supabase.');
-            } catch (error) {
-                ambulanceSimpanLocal({
-                    ...(ambulanceBacaLocal() || ambulanceDefaultData()),
-                    updatedAt: new Date().toISOString(),
-                    petugas: {
-                        nama,
-                        hp,
-                        fotoPath: fotoPath || '',
-                        fotoDataUrl
-                    }
-                });
-                localStorage.setItem('ambulance_petugas_nama', nama);
-                localStorage.setItem('ambulance_petugas_hp', hp);
-                if (fotoDataUrl) localStorage.setItem('ambulance_petugas_foto', fotoDataUrl);
-                ambulanceTampilkanPetugas(ambulanceBacaLocal());
-
-                const detail = ambulanceTampilkanErrorCloud('Gagal menyimpan Petugas Ambulance ke Supabase:', error);
-                alert('Data Petugas tersimpan di perangkat, tetapi GAGAL disimpan ke Supabase.\n\nMasalah: ' + detail + '\n\nPeriksa policy Storage bucket Ambulance.');
-            } finally {
-                if (tombol) {
-                    tombol.disabled = false;
-                    tombol.innerHTML = teksTombol || 'Simpan Data';
+                let fotoDataUrl = localStorage.getItem('ambulance_petugas_foto') || '';
+                if (officer.foto_path) {
+                    try { fotoDataUrl = await ambulanceMuatFotoSupabase(officer.foto_path); }
+                    catch (photoError) { console.warn('Foto petugas tidak dapat dimuat:', photoError); }
                 }
+                if (fotoDataUrl) localStorage.setItem('ambulance_petugas_foto', fotoDataUrl);
+                ambulanceTampilkanPetugas({ petugas: { nama: officer.nama, hp: officer.hp, fotoPath: officer.foto_path || '', fotoDataUrl }, permintaan: [] });
+                alert('Data Petugas Ambulance berhasil disimpan ke tabel Supabase.');
+            } catch (error) {
+                ambulanceSimpanLocal({ ...(ambulanceBacaLocal() || ambulanceDefaultData()), updatedAt: new Date().toISOString(), petugas: { nama, hp, fotoPath, fotoDataUrl: localStorage.getItem('ambulance_petugas_foto') || '' } });
+                const detail = ambulanceTampilkanErrorCloud('Gagal menyimpan Petugas Ambulance ke tabel Supabase:', error);
+                alert('Data petugas tersimpan sebagai cache perangkat, tetapi gagal disimpan ke tabel Supabase.\n\nMasalah: ' + detail + '\n\nJalankan SQL Ambulance dan periksa policy tabel.');
+            } finally {
+                if (tombol) { tombol.disabled = false; tombol.innerHTML = teksTombol || 'Simpan Data'; }
             }
         }
 
         async function muatDataPetugasAmbulance() {
-            // Tampilkan cache lokal terlebih dahulu agar UI tidak menunggu jaringan.
             const local = ambulanceBacaLocal();
-            if (local?.petugas) {
-                ambulanceTampilkanPetugas(local);
-            } else {
-                const nama = localStorage.getItem('ambulance_petugas_nama') || 'Belum diatur';
-                const hp = localStorage.getItem('ambulance_petugas_hp') || 'Belum diatur';
-                const foto = localStorage.getItem('ambulance_petugas_foto') || '';
-                ambulanceTampilkanPetugas({ petugas: { nama, hp, fotoDataUrl: foto, fotoPath: '' }, permintaan: [] });
-            }
+            if (local?.petugas) ambulanceTampilkanPetugas(local);
+            else ambulanceTampilkanPetugas({ petugas: { nama: localStorage.getItem('ambulance_petugas_nama') || 'Belum diatur', hp: localStorage.getItem('ambulance_petugas_hp') || 'Belum diatur', fotoDataUrl: localStorage.getItem('ambulance_petugas_foto') || '', fotoPath: localStorage.getItem('ambulance_petugas_foto_path') || '' }, permintaan: [] });
 
             document.getElementById('input-nama-pasien').value = '';
             document.getElementById('input-hp-pasien').value = '';
@@ -8155,22 +8129,26 @@ const { data, error } = await supabaseClient.storage
             linkMapsPasien = '';
 
             try {
-                const cloud = await ambulanceAmbilDataSupabase();
-                if (!cloud) return;
-
-                // Jika foto tersimpan sebagai object terpisah, unduh juga untuk cache/display.
-                if (cloud.petugas?.fotoPath && !cloud.petugas?.fotoDataUrl) {
-                    try {
-                        cloud.petugas.fotoDataUrl = await ambulanceMuatFotoSupabase(cloud.petugas.fotoPath);
-                    } catch (photoError) {
-                        console.warn('Foto petugas Ambulance tidak dapat dimuat:', photoError);
-                    }
+                const { data, error } = await supabaseClient.from(AMBULANCE_OFFICERS_TABLE)
+                    .select('*').eq('active', true).order('updated_at', { ascending: false }).limit(1);
+                if (error) throw error;
+                const officer = Array.isArray(data) ? data[0] : data;
+                if (!officer) return;
+                ambCurrentOfficerId = officer.id;
+                localStorage.setItem('ambulance_petugas_id', officer.id);
+                localStorage.setItem('ambulance_petugas_nama', officer.nama || '');
+                localStorage.setItem('ambulance_petugas_hp', officer.hp || '');
+                localStorage.setItem('ambulance_petugas_foto_path', officer.foto_path || '');
+                let fotoDataUrl = '';
+                if (officer.foto_path) {
+                    try { fotoDataUrl = await ambulanceMuatFotoSupabase(officer.foto_path); localStorage.setItem('ambulance_petugas_foto', fotoDataUrl); }
+                    catch (photoError) { console.warn('Foto petugas tidak dapat dimuat:', photoError); }
                 }
-
-                ambulanceSimpanLocal(cloud);
-                ambulanceTampilkanPetugas(cloud);
+                const cache = { version: 2, updatedAt: officer.updated_at || new Date().toISOString(), petugas: { nama: officer.nama || '', hp: officer.hp || '', fotoPath: officer.foto_path || '', fotoDataUrl }, permintaan: [] };
+                ambulanceSimpanLocal(cache);
+                ambulanceTampilkanPetugas(cache);
             } catch (error) {
-                console.warn('Supabase Ambulance tidak dapat dimuat. LocalStorage digunakan:', error);
+                console.warn('Tabel Petugas Ambulance tidak dapat dimuat. Cache lokal digunakan:', error);
             }
         }
 
@@ -8346,6 +8324,7 @@ let ambLocationChannel = null;
 let ambOfficerWatchId = null;
 let ambSelectedRequest = null;
 let ambActiveTrackingToken = '';
+let ambCurrentOfficerId = null;
 let ambPatientLat = null;
 let ambPatientLng = null;
 
@@ -8431,6 +8410,7 @@ function ambulanceBukaModePetugas() {
             ambSetTab('petugas');
             ambulanceInitMaps();
             ambulanceMuatDaftarPetugas();
+            ambulanceBerlanggananRealtimePetugas();
         } else if (pwd !== '') {
             alert('Password salah.');
         }
@@ -8588,6 +8568,7 @@ async function ambulanceInsertRealtimeRequest(base) {
         pickup_lat: base.pickup_lat,
         pickup_lng: base.pickup_lng,
         status: 'menunggu_petugas',
+        officer_id: null,
         officer_name: null,
         officer_phone: null,
         eta_text: null,
@@ -8601,6 +8582,41 @@ async function ambulanceInsertRealtimeRequest(base) {
         .single();
     if (error) throw error;
     return data;
+}
+
+async function ambulancePastikanPetugasAktif() {
+    if (ambCurrentOfficerId) return ambCurrentOfficerId;
+    const stored = localStorage.getItem('ambulance_petugas_id');
+    if (stored) { ambCurrentOfficerId = stored; return stored; }
+    try {
+        const { data, error } = await supabaseClient.from(AMBULANCE_OFFICERS_TABLE)
+            .select('id,nama,hp,foto_path,active,updated_at')
+            .eq('active', true).order('updated_at', { ascending: false }).limit(1);
+        if (error) throw error;
+        const officer = data?.[0];
+        if (officer) {
+            ambCurrentOfficerId = officer.id;
+            localStorage.setItem('ambulance_petugas_id', officer.id);
+            localStorage.setItem('ambulance_petugas_nama', officer.nama || '');
+            localStorage.setItem('ambulance_petugas_hp', officer.hp || '');
+            return officer.id;
+        }
+    } catch (e) { console.warn('Petugas aktif belum dapat dimuat:', e); }
+    return null;
+}
+
+async function ambulanceBerlanggananRealtimePetugas() {
+    try {
+        await ambulancePastikanPetugasAktif();
+        if (window.ambOfficerListChannel) supabaseClient.removeChannel(window.ambOfficerListChannel);
+        window.ambOfficerListChannel = supabaseClient.channel('amb-officer-all-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: AMBULANCE_OFFICERS_TABLE }, () => muatDataPetugasAmbulance())
+            .on('postgres_changes', { event: '*', schema: 'public', table: AMBULANCE_REQUESTS_TABLE }, () => ambulanceMuatDaftarPetugas())
+            .on('postgres_changes', { event: '*', schema: 'public', table: AMBULANCE_LOCATIONS_TABLE }, (payload) => {
+                if (payload?.new && ambSelectedRequest?.id === payload.new.request_id) ambulanceRenderLocation(payload.new);
+            })
+            .subscribe();
+    } catch (e) { console.warn('Realtime daftar petugas gagal:', e); }
 }
 
 async function ambulanceMuatDaftarPetugas() {
@@ -8666,9 +8682,10 @@ async function ambulancePetugasStatus(status) {
     }
     const nama = localStorage.getItem('ambulance_petugas_nama') || '';
     const hp = localStorage.getItem('ambulance_petugas_hp') || '';
+    const officerId = ambCurrentOfficerId || localStorage.getItem('ambulance_petugas_id') || ambSelectedRequest.officer_id || null;
     try {
         const { data, error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE)
-            .update({ status, officer_name: nama || ambSelectedRequest.officer_name || null, officer_phone: hp || ambSelectedRequest.officer_phone || null, updated_at: new Date().toISOString() })
+            .update({ status, officer_id: officerId || null, officer_name: nama || ambSelectedRequest.officer_name || null, officer_phone: hp || ambSelectedRequest.officer_phone || null, updated_at: new Date().toISOString() })
             .eq('id', ambSelectedRequest.id)
             .select('*').single();
         if (error) throw error;
@@ -8698,9 +8715,11 @@ function ambulancePetugasMulaiJemput() {
     ambOfficerWatchId = navigator.geolocation.watchPosition(async position => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
+        const officerId = ambCurrentOfficerId || localStorage.getItem('ambulance_petugas_id') || null;
         try {
             const { data, error } = await supabaseClient.from(AMBULANCE_LOCATIONS_TABLE).upsert({
                 request_id: requestId,
+                officer_id: officerId,
                 latitude: lat,
                 longitude: lng,
                 accuracy: position.coords.accuracy,
@@ -8712,7 +8731,7 @@ function ambulancePetugasMulaiJemput() {
             ambulanceRenderLocation(data || {latitude:lat, longitude:lng, updated_at:new Date().toISOString()});
             // Pastikan data petugas tercatat bila sebelumnya kosong.
             if (ambSelectedRequest && (!ambSelectedRequest.officer_name || !ambSelectedRequest.officer_phone)) {
-                await supabaseClient.from(AMBULANCE_REQUESTS_TABLE).update({ officer_name:nama||null, officer_phone:hp||null, updated_at:new Date().toISOString() }).eq('id', requestId);
+                await supabaseClient.from(AMBULANCE_REQUESTS_TABLE).update({ officer_id:officerId||null, officer_name:nama||null, officer_phone:hp||null, updated_at:new Date().toISOString() }).eq('id', requestId);
             }
         } catch (error) {
             console.error('GPS Ambulance gagal dikirim:', error);
@@ -8765,6 +8784,7 @@ async function kirimPermintaanAmbulance() {
     const localData = ambulanceBacaLocal();
     const namaPetugas = localData?.petugas?.nama || localStorage.getItem('ambulance_petugas_nama') || '';
     const hpPetugas = localData?.petugas?.hp || localStorage.getItem('ambulance_petugas_hp') || '';
+    const officerId = ambCurrentOfficerId || localStorage.getItem('ambulance_petugas_id') || null;
     const namaPasien = document.getElementById('input-nama-pasien')?.value.trim() || '';
     const hpPasien = document.getElementById('input-hp-pasien')?.value.trim() || '';
     const kondisiPasien = document.getElementById('input-kondisi-pasien')?.value.trim() || '';
@@ -8788,7 +8808,8 @@ async function kirimPermintaanAmbulance() {
             condition_text: kondisiPasien,
             pickup_address: linkMapsPasien || '',
             pickup_lat: ambPatientLat,
-            pickup_lng: ambPatientLng
+            pickup_lng: ambPatientLng,
+            officer_id: null
         });
         ambSelectedRequest = realtimeRequest;
         ambActiveTrackingToken = token;
@@ -8804,21 +8825,6 @@ async function kirimPermintaanAmbulance() {
         ambulanceTrackByToken(token);
         const link = ambTrackingUrl(token);
         const info = `\n\n🔎 Nomor Tracking: ${token}\n🔗 Link Tracking: ${link}`;
-        // Simpan juga ke struktur lama agar kompatibel dengan fitur Ambulance sebelumnya.
-        try {
-            const permintaanLama = {
-                id: realtimeRequest.id,
-                createdAt: realtimeRequest.created_at,
-                namaPetugas, hpPetugas,
-                namaPasien, hpPasien,
-                kondisi:kondisiPasien,
-                lokasiGps:linkMapsPasien || '',
-                trackingToken: token,
-                trackingLink: link,
-                status:'menunggu_petugas'
-            };
-            await simpanPermintaanAmbulanceSupabase(permintaanLama);
-        } catch (e) { console.warn('Kompatibilitas Storage Ambulance gagal:', e); }
         alert(`Permintaan Ambulance berhasil dibuat.\n\nNomor tracking: ${token}\n\nLink tracking sudah tersedia dan dapat dibagikan kepada keluarga.`);
         try {
             await navigator.clipboard.writeText(link);
