@@ -1698,24 +1698,6 @@ footer {
     z-index: 2;
   }
 
-  /* Logo watermark beranda: tetap terpusat, termasuk pada layar HP. */
-  .home-bg-logo {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: min(28vw, 260px);
-    height: min(28vw, 260px);
-    min-width: 150px;
-    min-height: 150px;
-    object-fit: contain;
-    opacity: 0.12;
-    filter: saturate(0.85) contrast(0.95);
-    pointer-events: none;
-    user-select: none;
-    z-index: 1;
-  }
-
   #homeViewContainer::after {
     content: "";
     position: absolute;
@@ -1816,16 +1798,6 @@ footer {
   }
 
   @media (max-width: 700px) {
-    .home-bg-logo {
-      left: 50%;
-      top: 50%;
-      width: min(52vw, 220px);
-      height: min(52vw, 220px);
-      min-width: 145px;
-      min-height: 145px;
-      opacity: 0.14;
-    }
-
     #homeViewContainer::before {
       letter-spacing: 0.15em;
       font-size: 0.58rem;
@@ -1988,6 +1960,82 @@ footer {
       max-width: 340px;
       padding: 25px 20px 20px;
       border-radius: 20px;
+    }
+  }
+</style>
+
+
+<style id="mobile-home-title-fix">
+  /* Penataan khusus layar HP: judul berada di tengah area antara header dan footer.
+     Aturan ini hanya berlaku di layar <= 700px; tampilan PC/laptop tetap menggunakan desain sebelumnya. */
+  @media (max-width: 700px) {
+    #homeViewContainer {
+      min-height: 0 !important;
+      height: 100% !important;
+      padding: 18px 12px 28px !important;
+      justify-content: center !important;
+      align-items: center !important;
+      overflow: hidden !important;
+    }
+
+    #homeViewContainer::before {
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -115px) !important;
+      width: 100% !important;
+      padding: 0 12px !important;
+      font-size: clamp(0.56rem, 2.65vw, 0.82rem) !important;
+      line-height: 1.25 !important;
+      letter-spacing: 0.12em !important;
+      white-space: nowrap !important;
+      text-align: center !important;
+      z-index: 4 !important;
+    }
+
+    .lintas-klaster-art {
+      width: 100% !important;
+      max-width: 100% !important;
+      gap: 2px !important;
+      transform: translateY(28px) !important;
+      z-index: 5 !important;
+    }
+
+    .lintas-klaster-art .lintas {
+      font-size: clamp(2.45rem, 14vw, 4.2rem) !important;
+      line-height: 0.88 !important;
+      white-space: nowrap !important;
+    }
+
+    .lintas-klaster-art .klaster {
+      font-size: clamp(1.35rem, 7.8vw, 2.55rem) !important;
+      line-height: 1 !important;
+      letter-spacing: 0.08em !important;
+      white-space: nowrap !important;
+    }
+
+    .lintas-klaster-art .ornament {
+      width: min(82vw, 340px) !important;
+      margin-top: 14px !important;
+    }
+  }
+
+  /* HP pendek: rapatkan sedikit agar tetap berada di area tengah tanpa bertabrakan. */
+  @media (max-width: 700px) and (max-height: 620px) {
+    #homeViewContainer::before {
+      transform: translate(-50%, -92px) !important;
+      font-size: 0.55rem !important;
+    }
+
+    .lintas-klaster-art {
+      transform: translateY(20px) !important;
+    }
+
+    .lintas-klaster-art .lintas {
+      font-size: clamp(2.15rem, 12.5vw, 3.5rem) !important;
+    }
+
+    .lintas-klaster-art .klaster {
+      font-size: clamp(1.2rem, 7vw, 2.15rem) !important;
     }
   }
 </style>
@@ -3381,7 +3429,6 @@ footer {
                         </div>
                     </div>
             <div id="homeViewContainer">
-    <img class="home-bg-logo" src="WhatsApp Image 2026-08-23 at 21.43.36 (1).jpeg" alt="" aria-hidden="true" draggable="false">
     <div class="lintas-klaster-art" aria-label="Lintas Klaster">
         <div class="lintas">Lintas</div>
         <div class="klaster">Klaster</div>
