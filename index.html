@@ -2500,6 +2500,459 @@ footer {
 .amb-history-meta{margin-top:5px;font-size:.62rem;line-height:1.5;color:#64748b}.amb-history-token{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#0369a1;font-weight:900;word-break:break-all}.amb-history-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.amb-history-delete{border:0;border-radius:7px;padding:6px 9px;background:#fee2e2;color:#b91c1c;font-weight:900;font-size:.61rem;cursor:pointer}.amb-history-delete:hover{background:#fecaca}.amb-history-empty{padding:24px 12px;text-align:center;color:#64748b;font-size:.68rem}.amb-history-refresh{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:7px;padding:6px 9px;font-weight:800;font-size:.62rem;cursor:pointer}
 
 </style>
+
+<style id="pws-integrated-css">
+#pwsModuleIntegrated{width:100%;display:flex;flex-direction:column;}
+
+#pwsModuleIntegrated{
+  --sage:#8fae97;
+  --sage-dark:#5d7c67;
+  --sage-soft:#edf4ef;
+  --ink:#24342a;
+  --line:#d8e2da;
+  --white:#fff;
+  --danger:#b94a48;
+  --shadow:0 8px 24px rgba(29,53,37,.10);
+}
+#pwsModuleIntegrated *{box-sizing:border-box}
+#pwsModuleIntegrated{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--ink);
+  background:#f5f8f5;
+}
+#pwsModuleIntegrated .container{
+  max-width:1400px;
+  margin:0 auto;
+  padding:18px;
+}
+#pwsModuleIntegrated .header{
+  background:linear-gradient(135deg,#6f927a,#a8c2ad);
+  color:white;
+  border-radius:16px;
+  padding:22px;
+  box-shadow:var(--shadow);
+  margin-bottom:16px;
+}
+#pwsModuleIntegrated .header h1{margin:0 0 6px;font-size:28px}
+#pwsModuleIntegrated .header p{margin:0;opacity:.94}
+#pwsModuleIntegrated .grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+  align-items:start;
+}
+#pwsModuleIntegrated .map-card.full-map{
+  grid-column:1 / -1;
+}
+#pwsModuleIntegrated .map-card.full-map #map{
+  height:78vh;
+  min-height:560px;
+}
+#pwsModuleIntegrated .map-card.full-map .map-bottom-controls{
+  display:block;
+}
+#pwsModuleIntegrated .map-full-btn.active{
+  background:#5d7c67;
+  color:#fff;
+}
+#pwsModuleIntegrated #diseaseChart{
+  width:100%;
+  min-height:330px;
+  margin-top:14px;
+}
+#pwsModuleIntegrated .weekly-validation-card{
+  margin-top:14px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  overflow:hidden;
+}
+#pwsModuleIntegrated .weekly-validation-head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 14px;
+  background:#f4f8f5;
+  border-bottom:1px solid var(--line);
+}
+#pwsModuleIntegrated .weekly-badge{
+  display:inline-flex;align-items:center;white-space:nowrap;
+  padding:5px 9px;border-radius:999px;
+  border:1px solid #cfdad1;background:#fff;color:#4f6256;
+  font-size:11px;font-weight:700;
+}
+#pwsModuleIntegrated .weekly-validation-table{
+  width:100%;border-collapse:collapse;min-width:520px;font-size:12px;
+}
+#pwsModuleIntegrated .weekly-validation-table th, #pwsModuleIntegrated .weekly-validation-table td{
+  border-bottom:1px solid #e2e8e3;
+  border-right:1px solid #e2e8e3;
+  padding:7px 8px;text-align:center;
+}
+#pwsModuleIntegrated .weekly-validation-table th:first-child, #pwsModuleIntegrated .weekly-validation-table td:first-child{
+  text-align:left;
+}
+#pwsModuleIntegrated .weekly-validation-table th{background:#edf4ef;font-weight:800;}
+#pwsModuleIntegrated .weekly-validation-table .wv-k{color:#dc2626}#pwsModuleIntegrated .weekly-validation-table .wv-p{color:#ca8a04}#pwsModuleIntegrated .weekly-validation-table .wv-s{color:#16a34a}#pwsModuleIntegrated .weekly-validation-table .wv-m{color:#4b5563}
+#pwsModuleIntegrated .weekly-validation-table tfoot td{font-weight:800;background:#f5f8f5;border-top:2px solid #cfdad1;}
+#pwsModuleIntegrated .weekly-validation-note{padding:9px 12px;font-size:11px;color:#617267;background:#fbfdfb;}
+@media(max-width:700px){
+  #pwsModuleIntegrated .weekly-validation-head{align-items:flex-start;flex-direction:column}
+}
+#pwsModuleIntegrated .chart-wrap{
+  border:1px solid var(--line);
+  background:#fbfdfb;
+  border-radius:12px;
+  padding:10px;
+  overflow:auto;
+}
+#pwsModuleIntegrated .chart-empty{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:170px;
+  color:#758278;
+  font-size:13px;
+}
+@media (max-width:1200px){
+  #pwsModuleIntegrated .grid{grid-template-columns:1fr}
+  #pwsModuleIntegrated .map-card.full-map{grid-column:auto}
+}
+@media (max-width:600px){
+  #pwsModuleIntegrated .map-card.full-map #map{height:62vh;min-height:420px}
+}
+
+#pwsModuleIntegrated .card{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+#pwsModuleIntegrated .card-head{
+  padding:16px 18px;
+  border-bottom:1px solid var(--line);
+  background:var(--sage-soft);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+#pwsModuleIntegrated .card-head h2, #pwsModuleIntegrated .card-head h3{margin:0}
+#pwsModuleIntegrated .card-body{padding:16px}
+#pwsModuleIntegrated #map{
+  height:560px;
+  width:100%;
+  border-radius:0 0 16px 16px;
+}
+#pwsModuleIntegrated .official-boundary{
+  display:inline-block;
+  padding:3px 7px;
+  border-radius:999px;
+  background:#eef5ef;
+  border:1px solid #d2e0d5;
+  color:#42614c;
+}
+#pwsModuleIntegrated .village-label{
+  background:rgba(255,255,255,.92);
+  border:1px solid #9aaa9f;
+  color:#304338;
+  box-shadow:0 2px 6px rgba(0,0,0,.12);
+  font-size:12px;
+  font-weight:700;
+  padding:3px 6px;
+  border-radius:6px;
+}
+#pwsModuleIntegrated .village-label:before{display:none}
+
+#pwsModuleIntegrated .toolbar{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px
+}
+#pwsModuleIntegrated button, #pwsModuleIntegrated select, #pwsModuleIntegrated input{
+  font:inherit;
+}
+#pwsModuleIntegrated button{
+  border:0;
+  border-radius:9px;
+  padding:9px 12px;
+  cursor:pointer;
+}
+#pwsModuleIntegrated .btn{
+  background:var(--sage-dark);color:white;
+}
+#pwsModuleIntegrated .btn.secondary{
+  background:#eaf0eb;color:var(--ink);
+}
+#pwsModuleIntegrated .btn.danger{background:var(--danger);color:#fff}
+#pwsModuleIntegrated .btn:disabled{opacity:.55;cursor:not-allowed}
+#pwsModuleIntegrated .notice{
+  background:#fff9df;
+  border:1px solid #eadb93;
+  color:#655717;
+  border-radius:10px;
+  padding:10px 12px;
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.45;
+}
+#pwsModuleIntegrated .village-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+#pwsModuleIntegrated .village-btn{
+  text-align:left;
+  background:#f3f7f4;
+  border:1px solid var(--line);
+  color:var(--ink);
+}
+#pwsModuleIntegrated .village-btn.active{
+  background:var(--sage);
+  color:white;
+  border-color:var(--sage);
+}
+#pwsModuleIntegrated .meta{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:14px;
+}
+#pwsModuleIntegrated .meta-box{
+  background:#f7faf7;border:1px solid var(--line);border-radius:10px;padding:10px
+}
+#pwsModuleIntegrated .meta-box b{display:block;font-size:12px;color:#5c6e61;margin-bottom:4px}
+#pwsModuleIntegrated .meta-box span{font-weight:700}
+#pwsModuleIntegrated .table-wrap{overflow:auto}
+#pwsModuleIntegrated table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1080px;
+}
+#pwsModuleIntegrated th, #pwsModuleIntegrated td{
+  border-bottom:1px solid var(--line);
+  padding:8px;
+  vertical-align:middle;
+  text-align:left;
+}
+#pwsModuleIntegrated th{
+  background:#edf4ef;
+  position:sticky;top:0;z-index:1;
+  font-size:13px;
+}
+#pwsModuleIntegrated td{font-size:13px}
+#pwsModuleIntegrated td input{
+  width:76px;
+  border:1px solid #cdd9cf;
+  border-radius:7px;
+  padding:7px 6px;
+  background:white;
+}
+#pwsModuleIntegrated td .disease-input{width:160px}
+#pwsModuleIntegrated td .target-input{width:100px}
+#pwsModuleIntegrated .total-cell{
+  font-weight:700;
+  text-align:center;
+}
+#pwsModuleIntegrated .action-cell{
+  white-space:nowrap;
+}
+#pwsModuleIntegrated .status-dot{
+  display:inline-block;width:9px;height:9px;border-radius:50%;
+  background:#9aa9a0;margin-right:5px;
+}
+#pwsModuleIntegrated .status-dot.saved{background:#4f9862}
+#pwsModuleIntegrated .status-dot.edit{background:#d79d32}
+#pwsModuleIntegrated .pin-icon{
+  font-size:22px;
+}
+#pwsModuleIntegrated .legend{
+  display:flex;flex-wrap:wrap;gap:10px;
+  font-size:12px;
+  margin-top:10px;
+}
+#pwsModuleIntegrated .legend span{
+  display:inline-flex;align-items:center;gap:5px
+}
+#pwsModuleIntegrated .swatch{
+  width:14px;height:14px;border:1px solid #8da494;border-radius:3px;
+}
+#pwsModuleIntegrated .footer-note{
+  margin-top:12px;
+  color:#617267;
+  font-size:12px;
+}
+
+#pwsModuleIntegrated .map-lock-status{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;
+  border:1px solid #d5dfd7;background:#f7faf7;color:#5a6b60;font-size:12px;font-weight:700;
+}
+#pwsModuleIntegrated .map-lock-status.locked{background:#fff4f2;border-color:#edc9c3;color:#8b3e32}
+#pwsModuleIntegrated .status-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 14px}
+#pwsModuleIntegrated .status-chip{min-height:58px;border:1px solid var(--line);border-radius:11px;padding:8px 10px;
+  background:linear-gradient(180deg,#fbfdfb,#f3f7f4);display:flex;flex-direction:column;justify-content:center}
+#pwsModuleIntegrated .status-chip b{font-size:16px;line-height:1;margin-bottom:5px}
+#pwsModuleIntegrated .status-chip span{font-size:11px;color:#627169;line-height:1.2}
+@media (max-width:700px){#pwsModuleIntegrated .status-strip{grid-template-columns:repeat(2,minmax(0,1fr))}#pwsModuleIntegrated .status-chip:last-child{grid-column:1 / -1}}
+#pwsModuleIntegrated .modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.42);
+  display:none;align-items:center;justify-content:center;z-index:9999;
+}
+#pwsModuleIntegrated .modal{
+  background:white;width:min(520px,calc(100% - 30px));
+  border-radius:16px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.25);
+}
+#pwsModuleIntegrated .modal h3{margin-top:0}
+#pwsModuleIntegrated .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#pwsModuleIntegrated .field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+#pwsModuleIntegrated .field label{font-size:12px;font-weight:700;color:#56665b}
+#pwsModuleIntegrated .field input, #pwsModuleIntegrated .field select{
+  border:1px solid #cdd9cf;border-radius:8px;padding:9px
+}
+#pwsModuleIntegrated .modal-actions{
+  display:flex;justify-content:flex-end;gap:8px;margin-top:10px
+}
+#pwsModuleIntegrated .small{font-size:12px;color:#66746b}
+#pwsModuleIntegrated .collapse-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:#eaf0eb;
+  color:#24342a;
+  border:1px solid #d2ded5;
+}
+#pwsModuleIntegrated .collapse-arrow{font-size:14px;transition:transform .15s ease}
+#pwsModuleIntegrated .card.collapsed .collapse-arrow{transform:rotate(-90deg)}
+#pwsModuleIntegrated .card.collapsed .table-content{display:none}
+#pwsModuleIntegrated .table-content{display:block}
+
+@media (max-width:900px){
+  #pwsModuleIntegrated .grid{grid-template-columns:1fr}
+  #pwsModuleIntegrated #map{height:480px}
+}
+@media (max-width:600px){
+  #pwsModuleIntegrated .container{padding:10px}
+  #pwsModuleIntegrated .header h1{font-size:22px}
+  #pwsModuleIntegrated .meta{grid-template-columns:1fr}
+  #pwsModuleIntegrated .village-grid{grid-template-columns:1fr 1fr}
+  #pwsModuleIntegrated .village-six-grid{grid-template-columns:1fr 1fr}
+  #pwsModuleIntegrated #map{height:410px}
+}
+#pwsModuleIntegrated .village-six-grid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(145px,1fr));
+  gap:9px;
+  margin-top:12px;
+}
+#pwsModuleIntegrated .village-card{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px;
+  background:#fbfdfb;
+  cursor:pointer;
+  transition:.15s ease;
+}
+#pwsModuleIntegrated .village-card:hover{transform:translateY(-1px);box-shadow:0 6px 15px rgba(29,53,37,.08)}
+#pwsModuleIntegrated .village-card.active{outline:2px solid var(--sage-dark);background:#f0f6f1}
+#pwsModuleIntegrated .village-mini-map{
+  height:95px;
+  border-radius:8px;
+  overflow:hidden;
+  margin-bottom:8px;
+  border:1px solid #dbe4dc;
+  position:relative;
+  background:
+    linear-gradient(120deg,#d9e8d9,#ecf3ec 40%,#d7e6ed 40%,#d7e6ed 65%,#e9e3c8 65%);
+}
+#pwsModuleIntegrated .village-mini-map .mini-shape{
+  position:absolute;inset:12px 16px;
+  border:2px solid rgba(67,93,76,.65);
+  border-radius:46% 54% 52% 48%/55% 44% 56% 45%;
+}
+#pwsModuleIntegrated .village-mini-map .mini-pin{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-65%);
+  font-size:22px;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));
+}
+#pwsModuleIntegrated .village-name{font-weight:700;font-size:13px}
+#pwsModuleIntegrated .village-stats{font-size:11px;color:#617267;margin-top:4px;line-height:1.4}
+#pwsModuleIntegrated .pin-palette{
+  display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;
+}
+#pwsModuleIntegrated .pin-choice{
+  border:1px solid #cbd7ce;background:#fff;padding:6px 8px;border-radius:8px;
+  cursor:pointer;font-size:12px
+}
+#pwsModuleIntegrated .pin-choice.disease-pin{
+  min-width:145px;
+  text-align:left;
+}
+#pwsModuleIntegrated .pin-disease-label{
+  display:block;
+  font-size:11px;
+  color:#617267;
+  margin-top:2px;
+}
+#pwsModuleIntegrated .pin-color-key{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+
+#pwsModuleIntegrated .pin-choice.selected{outline:2px solid var(--sage-dark)}
+#pwsModuleIntegrated .color-dot{
+  display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-2px;margin-right:4px
+}
+
+
+
+#pwsModuleIntegrated .pin-indicator-head{display:inline-flex;align-items:center;gap:6px;justify-content:center;min-width:100%;}
+#pwsModuleIntegrated .pin-indicator-dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 0 2px rgba(255,255,255,.85),0 1px 3px rgba(0,0,0,.18)}
+#pwsModuleIntegrated .master-pws-table .disease-group{border-top:4px solid #cbd5e1;background:#f8fafb}
+#pwsModuleIntegrated .master-pws-table .disease-group .pin-indicator-head{font-size:11px}
+#pwsModuleIntegrated .master-pws-table .status-row-for-disease{background:#fafcfb}
+#pwsModuleIntegrated .pin-select-preview{display:inline-flex;align-items:center;gap:6px}
+
+/* === Master PWS table styling === */
+#pwsModuleIntegrated .pws-master-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+#pwsModuleIntegrated .master-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:#5f6c63}
+#pwsModuleIntegrated .k-text{color:#dc2626}#pwsModuleIntegrated .p-text{color:#ca8a04}#pwsModuleIntegrated .s-text{color:#16a34a}#pwsModuleIntegrated .m-text{color:#4b5563}
+#pwsModuleIntegrated .master-table-wrap{overflow-x:auto;overflow-y:visible;border:1px solid #d8e2da;border-radius:12px}
+#pwsModuleIntegrated .master-pws-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:12px;background:#fff}
+#pwsModuleIntegrated .master-pws-table th, #pwsModuleIntegrated .master-pws-table td{border-right:1px solid #e1e6e2;border-bottom:1px solid #e1e6e2;padding:6px 5px;vertical-align:middle;text-align:center;white-space:nowrap}
+#pwsModuleIntegrated .master-pws-table thead th{position:sticky;top:0;z-index:3;background:#f1f3f4;color:#374151;font-weight:700}
+#pwsModuleIntegrated .master-pws-table thead tr:nth-child(2) th{top:31px;background:#f8fafb}
+#pwsModuleIntegrated .master-pws-table .master-village-head{position:sticky;left:0;z-index:6;min-width:150px;text-align:left;padding-left:12px;box-shadow:1px 0 0 #cbd5e1}
+#pwsModuleIntegrated .master-pws-table .disease-group{min-width:146px;font-size:11px;text-transform:uppercase}
+#pwsModuleIntegrated .master-pws-table .status-th{min-width:34px;font-size:10px;padding:4px 3px}
+#pwsModuleIntegrated .master-pws-table .status-k{color:#dc2626}#pwsModuleIntegrated .master-pws-table .status-p{color:#ca8a04;background:#fff7d6}#pwsModuleIntegrated .master-pws-table .status-s{color:#16a34a}#pwsModuleIntegrated .master-pws-table .status-m{color:#4b5563}
+#pwsModuleIntegrated .master-pws-table .total-group{background:#bfdbfe!important;color:#1f2937!important;border-left:2px solid #9ca3af}
+#pwsModuleIntegrated .master-pws-table .total-status-k{color:#b91c1c;background:#dbeafe}
+#pwsModuleIntegrated .master-pws-table .total-status-p{color:#713f12;background:#facc15}
+#pwsModuleIntegrated .master-pws-table .total-status-s{color:#15803d;background:#dbeafe}
+#pwsModuleIntegrated .master-pws-table .total-status-m{color:#1f2937;background:#dbeafe}
+#pwsModuleIntegrated .master-table-body td{height:38px}
+#pwsModuleIntegrated .master-table-body .village-cell{position:sticky;left:0;z-index:2;background:#fff;text-align:left;font-weight:700;color:#111827;box-shadow:1px 0 0 #cbd5e1}
+#pwsModuleIntegrated .master-table-body .status-cell{font-weight:700;min-width:34px}
+#pwsModuleIntegrated .master-table-body .status-cell.p-cell{background:#fff7d6;color:#ca8a04}
+#pwsModuleIntegrated .master-table-body .total-cell-k{color:#b91c1c;background:#eff6ff;font-weight:800;border-left:2px solid #9ca3af}
+#pwsModuleIntegrated .master-table-body .total-cell-p{color:#713f12;background:#facc15;font-weight:900}
+#pwsModuleIntegrated .master-table-body .total-cell-s{color:#15803d;background:#eff6ff;font-weight:800}
+#pwsModuleIntegrated .master-table-body .total-cell-m{color:#1f2937;background:#eff6ff;font-weight:800}
+#pwsModuleIntegrated .master-table-body .action-cell-master{min-width:88px;border-left:1px solid #e1e6e2;background:#fff}
+#pwsModuleIntegrated .master-input{width:38px;border:1px solid #cbd5e1;border-radius:5px;padding:3px 2px;text-align:center;font-size:11px;font-weight:700;background:#fff}
+#pwsModuleIntegrated .master-input.k-input{color:#dc2626}#pwsModuleIntegrated .master-input.p-input{color:#ca8a04}#pwsModuleIntegrated .master-input.s-input{color:#16a34a}#pwsModuleIntegrated .master-input.m-input{color:#4b5563}
+#pwsModuleIntegrated .pin-remove-list{display:grid;gap:8px;max-height:260px;overflow:auto}#pwsModuleIntegrated .pin-remove-choice{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;text-align:left;border:1px solid #d5dfd7;background:#f8fbf8;border-radius:9px;padding:9px 10px}#pwsModuleIntegrated .pin-remove-choice .small{grid-column:2}#pwsModuleIntegrated .pin-remove-choice:hover{background:#eef5ef}#pwsModuleIntegrated .pin-selected-box{border:1px solid #d5dfd7;background:#f7faf7;border-radius:9px;padding:10px}
+#pwsModuleIntegrated .master-table-body .action-cell-master button{padding:5px 8px;border-radius:6px;font-size:11px}
+#pwsModuleIntegrated .master-total-p{animation:masterPulse 1.2s infinite ease-in-out}
+@keyframes masterPulse{0%,100%{opacity:1}50%{opacity:.55}}
+@media(max-width:700px){#pwsModuleIntegrated .pws-master-head{align-items:flex-start}#pwsModuleIntegrated .master-legend{gap:8px}#pwsModuleIntegrated .master-pws-table .master-village-head{min-width:125px}#pwsModuleIntegrated .master-pws-table .disease-group{min-width:132px}}
+
+
+/* === CETAK PWS A4 LANDSCAPE === */
+@media print{ @page{size:A4 landscape;margin:8mm;} }
+#pwsModuleIntegrated .print-pws-btn{background:#2563eb!important;color:#fff!important;}
+
+</style>
 </head>
 <body>
 
@@ -3740,232 +4193,250 @@ footer {
                     </div>
 
                     <div id="pwsDisplayArea" style="display: none; flex-direction: column; gap: 15px; width: 100%;">
-                        <div class="glass-panel rounded-xl shadow-sm p-3 flex flex-col sm:flex-row justify-between items-center gap-3">
-                            <div class="flex items-center space-x-2">
-                                <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                                    <i class="fa-regular fa-calendar-days text-base"></i>
-                                </div>
-                                <div>
-                                    <h2 class="text-sm font-bold text-gray-800">Periode Pelaporan PWS</h2>
-                                    <p class="text-[11px] text-gray-500">Pilih rentang waktu pelaporan mingguan.</p>
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                                <select id="filter-minggu" class="border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-medium bg-white flex-1 sm:flex-none">
-                                    <option value="1">Minggu ke-1</option>
-                                    <option value="2" selected>Minggu ke-2</option>
-                                    <option value="3">Minggu ke-3</option>
-                                    <option value="4">Minggu ke-4</option>
-                                    <option value="5">Minggu ke-5</option>
-                                </select>
-                                <select id="filter-bulan" class="border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-medium bg-white flex-1 sm:flex-none">
-                                    <option value="1">Januari</option>
-                                    <option value="2">Februari</option>
-                                    <option value="3">Maret</option>
-                                    <option value="4">April</option>
-                                    <option value="5">Mei</option>
-                                    <option value="6">Juni</option>
-                                    <option value="7">Juli</option>
-                                    <option value="8">Agustus</option>
-                                    <option value="9" selected>September</option>
-                                    <option value="10">Oktober</option>
-                                    <option value="11">November</option>
-                                    <option value="12">Desember</option>
-                                </select>
-                                <select id="filter-tahun" class="border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-medium bg-white flex-1 sm:flex-none">
-                                    <option value="2025">2025</option>
-                                    <option value="2026" selected>2026</option>
-                                </select>
-                            </div>
-                        </div>
+<div id="pwsModuleIntegrated">
+<div class="container pws-embedded-container">
 
-                        <div id="notification" class="hidden p-3 text-xs text-green-800 rounded-lg bg-green-50 shadow-sm border border-green-200 fade-in" role="alert">
-                            <span class="font-bold">Berhasil!</span> <span id="notification-text">Data telah diperbarui.</span>
-                        </div>
+  <div class="header">
+    <h1>PEMANTAUAN WILAYAH SETEMPAT (PWS)</h1>
+    <p>Kecamatan Singkep Pesisir • UPTD Puskesmas Lanjut</p>
+  </div>
 
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                            <!-- Diare -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-blue-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">Diare</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-diare-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-diare-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-diare-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-diare-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                            <!-- Hipertensi -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-red-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">Hipertensi</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-hipertensi-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-hipertensi-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-hipertensi-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-hipertensi-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                            <!-- Stroke -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-purple-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">Stroke</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-stroke-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-stroke-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-stroke-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-stroke-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                            <!-- TB Paru -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-orange-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">TB Paru</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-tb-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-tb-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-tb-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-tb-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                            <!-- Diabetes Mellitus -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-yellow-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">Diabetes</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-dm-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-dm-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-dm-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-dm-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                            <!-- Dengue -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-green-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">Dengue</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-dengue-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-dengue-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-dengue-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-dengue-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                            <!-- Ibu Hamil -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-pink-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">Ibu Hamil</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-ibuhamil-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-ibuhamil-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-ibuhamil-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-ibuhamil-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                            <!-- Stunting -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-teal-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">Stunting</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-stunting-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-stunting-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-stunting-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-stunting-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                            <!-- ODGJ -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-indigo-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">ODGJ</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-odgj-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-odgj-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-odgj-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-odgj-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                            <!-- Malaria -->
-                            <div class="glass-panel rounded-xl shadow-sm p-2.5 border-t-4 border-lime-500">
-                                <div class="flex justify-between items-start mb-1.5">
-                                    <p class="text-xs font-bold text-gray-700 uppercase">Malaria</p>
-                                    </div>
-                                <div class="grid grid-cols-4 gap-0.5 text-center border-t pt-1.5">
-                                    <div><p class="text-[8px] text-gray-500 font-bold">K</p><p id="sum-malaria-k" class="text-xs font-bold text-red-600">0</p></div>
-                                    <div class="border-l bg-yellow-50 rounded"><p class="text-[8px] text-gray-500 font-bold">P</p><p id="sum-malaria-p" class="text-xs font-bold text-yellow-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">S</p><p id="sum-malaria-s" class="text-xs font-bold text-green-600">0</p></div>
-                                    <div class="border-l"><p class="text-[8px] text-gray-500 font-bold">M</p><p id="sum-malaria-m" class="text-xs font-bold text-gray-600">0</p></div>
-                                </div>
-                            </div>
-                        </div>
+  <div class="grid">
 
-                        <div class="flex flex-col gap-4">
-                            <div class="glass-panel rounded-xl shadow-sm overflow-hidden flex flex-col">
-                                <div class="px-4 py-3 border-b border-gray-200 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                                    <h3 class="text-sm font-semibold text-gray-800">Distribusi Kasus per Wilayah (Desa)</h3>
-                                    <div class="text-[10px] text-gray-500 flex flex-wrap gap-2">
-                                        <span><span class="font-bold text-red-600">K</span>=Kasus</span>
-                                        <span><span class="font-bold text-yellow-600">P</span>=Pantau</span>
-                                        <span><span class="font-bold text-green-600">S</span>=Sembuh</span>
-                                        <span><span class="font-bold text-gray-600">M</span>=Mati</span>
-                                    </div>
-                                </div>
-                                <div class="table-container overflow-x-auto overflow-y-visible flex-grow">
-                                    <table class="min-w-full divide-y divide-gray-300 text-xs">
-                                        <thead class="bg-gray-100">
-                                            <tr>
-                                                <th rowspan="2" class="px-3 py-2 text-left font-bold text-gray-700 uppercase tracking-wider sticky left-0 bg-gray-100 z-10 shadow-[1px_0_0_0_#cbd5e1]">Nama Desa</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Diare</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Hipertensi</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Stroke</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">TB Paru</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">DM</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Dengue</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Ibu Hamil</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Stunting</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">ODGJ</th>
-                                                <th colspan="4" class="px-1 py-1 border-l border-gray-300 text-center font-bold text-gray-700">Malaria</th>
-                                                <th colspan="4" class="px-1 py-1 border-l-2 border-gray-400 bg-blue-200 text-center font-bold text-gray-800">Total PWS</th>
-                                                <th rowspan="2" class="px-3 py-2 border-l border-gray-300 text-center font-bold text-gray-700 min-w-[70px]">Aksi</th>
-                                            </tr>
-                                            <tr class="bg-gray-50 border-t border-gray-200 text-[9px]">
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-600 border-l">K</th><th class="px-0.5 py-1 text-center text-yellow-600 bg-yellow-50">P</th><th class="px-0.5 py-1 text-center text-green-600">S</th><th class="px-0.5 py-1 text-center text-gray-600">M</th>
-                                                <th class="px-0.5 py-1 text-center text-red-700 border-l-2 bg-blue-100">K</th>
-                                                <th class="px-0.5 py-1 text-center text-yellow-900 bg-yellow-300">P</th>
-                                                <th class="px-0.5 py-1 text-center text-green-700 bg-blue-100">S</th>
-                                                <th class="px-0.5 py-1 text-center text-gray-800 bg-blue-100">M</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="table-body" class="bg-white divide-y divide-gray-200"></tbody>
-                                    </table>
-                                </div>
-                            </div>
+    <section class="card map-card" id="mapCard">
+      <div class="card-head">
+        <div>
+          <h2>Peta Wilayah PWS</h2>
+          <div class="small">
+      Klik desa untuk melihat data dan menempatkan pin lokasi PWS.
+    </div>
+        </div>
+        <div class="toolbar" style="margin:0">
+          <button class="btn secondary" onclick="setBase('street')">Peta Jalan</button>
+          <button class="btn secondary" onclick="setBase('satellite')">Satelit</button>
+          <button class="btn secondary" onclick="fitAll()">Tampilkan Semua</button>
+          <button class="btn secondary" id="mapLockBtn" onclick="toggleMapLock()">🔒 Kunci Peta</button>
+          <button class="map-full-btn btn secondary" id="mapFullBtn" onclick="toggleMapFull()">Peta Penuh</button>
+          <span id="mapLockStatus" class="map-lock-status"><span>●</span> Peta bebas digeser</span>
+        </div>
+      </div>
+      <div id="map"></div>
+      <div class="card-body">
+        <div class="toolbar">
+          <select id="villageSelect" onchange="selectVillage(this.value)"></select>
+          <button class="btn" onclick="addPin()">📍 Tancap Pin PWS</button>
+          <button class="btn secondary" onclick="removePin()">✕ Cabut Pin PWS</button>
+          <span class="small" style="align-self:center">Bisa menancapkan banyak pin untuk penyakit yang sama maupun berbeda.</span>
+        </div>
 
-                            <div class="glass-panel rounded-xl shadow-sm p-4 flex flex-col w-full">
-                                <h3 class="text-sm font-semibold text-gray-800 mb-2 border-b pb-1.5">Akumulasi Penyakit</h3>
-                                <p class="text-[11px] text-gray-500 mb-3">Perbandingan kasus, pemantauan, sembuh, dan meninggal seluruh wilayah.</p>
-                                <div class="relative w-full" style="height: 280px;">
-                                    <canvas id="trendChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="meta" id="villageMeta"></div>
+
+        <div>
+          <b>Warna Pin = Indikator PWS</b>
+          <div class="pin-palette" id="pinPalette"></div>
+          <div class="small" style="margin-top:5px">
+            Setiap warna sudah ditandai untuk indikator PWS tertentu, termasuk Malaria, DM, dan HIV/AIDS. Saat pin dipilih, warna pin mengikuti indikator tersebut.
+          </div>
+        </div>
+
+        <div class="village-six-grid" id="villageSixGrid"></div>
+
+        <div class="village-grid" id="villageButtons"></div>
+
+        <div class="legend">
+          <span><i class="swatch" style="background:#dbeadf"></i> Desa Berindat</span>
+          <span><i class="swatch" style="background:#e8dfbf"></i> Desa Persing</span>
+          <span><i class="swatch" style="background:#d7e7f0"></i> Desa Sedamai</span>
+          <span><i class="swatch" style="background:#eadbd9"></i> Desa Lanjut</span>
+          <span><i class="swatch" style="background:#e2e2f2"></i> Desa Kote</span>
+          <span><i class="swatch" style="background:#e5d9ec"></i> Desa Pelakak</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="diseaseCard">
+      <div class="card-head">
+        <div>
+          <h2>Distribusi Kasus per Wilayah (Desa)</h2>
+          <div class="small">Format tabel mengikuti Master PWS: K = Kasus Baru, P = Pemantauan, S = Sembuh, M = Meninggal. Warna judul penyakit mengikuti warna pin indikator.</div>
+        </div>
+        <div class="toolbar" style="margin:0">
+          <button class="collapse-btn" onclick="toggleDiseaseTable()" title="Minimize / buka tabel">
+            <span class="collapse-arrow">▼</span><span id="collapseText">Minimize</span>
+          </button>
+        </div>
+      </div>
+      <div class="card-body table-content">
+        <div class="pws-master-head">
+          <div>
+            <b id="tableVillageName">DESA BERINDAT</b>
+            <span id="saveState" class="small"> • siap</span>
+            <span id="pwsCloudStatus" class="small" style="font-weight:700;color:#64748b">☁ Supabase: belum dimuat</span>
+          </div>
+          <div class="master-legend" aria-label="Keterangan tabel Master PWS">
+            <span><b class="k-text">K</b> = Kasus Baru</span>
+            <span><b class="p-text">P</b> = Pemantauan</span>
+            <span><b class="s-text">S</b> = Sembuh</span>
+            <span><b class="m-text">M</b> = Meninggal</span>
+          </div>
+        </div>
+
+        <div class="table-wrap master-table-wrap">
+          <table class="master-pws-table">
+            <thead id="masterTableHead">
+              <tr id="masterDiseaseGroupRow">
+                <th rowspan="2" class="master-village-head">Nama Desa</th>
+              </tr>
+              <tr id="masterStatusRow"></tr>
+            </thead>
+            <tbody id="diseaseBody" class="master-table-body"></tbody>
+          </table>
+        </div>
+
+        <div class="toolbar" style="margin-top:12px">
+          <button class="btn secondary" onclick="addDisease()">+ Tambah Penyakit</button>
+          <button class="btn danger" onclick="removeDisease()">− Hapus Penyakit</button>
+          <button class="btn" onclick="saveCurrentVillage()">Simpan Desa Ini</button>
+          <button class="btn print-pws-btn" onclick="printPwsA4()">🖨️ Print</button>
+          <button class="btn secondary" onclick="openResetModal()">Reset Semua Data</button>
+        </div>
+        <div class="footer-note">
+          Struktur mengikuti Master PWS. Kolom K/P/S/M dapat diedit melalui tombol <b>Edit</b>. Pin kasus otomatis menambah K dan P; pencabutan otomatis mengurangi K/P serta menambah S atau M.
+        </div>
+
+        <div style="margin-top:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+            <div>
+              <h3 style="margin:0">Diagram Semua Penyakit / Indikator PWS</h3>
+              <div class="small">Diagram otomatis mengikuti desa yang sedang dipilih.</div>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <div id="diseaseChart"></div>
+          </div>
+
+          <div class="weekly-validation-card" id="weeklyValidationCard">
+            <div class="weekly-validation-head">
+              <div>
+                <h3 id="weeklyValidationTitle" style="margin:0">Laporan Validasi Mingguan</h3>
+                <div class="small" id="weeklyValidationMeta">Rekapan K/P/S/M desa yang sedang dipilih.</div>
+              </div>
+              <span class="weekly-badge" id="weeklyValidationWeek">Minggu berjalan</span>
+            </div>
+            <div class="table-wrap">
+              <table class="weekly-validation-table">
+                <thead>
+                  <tr>
+                    <th>Indikator / Penyakit</th>
+                    <th class="wv-k">K</th>
+                    <th class="wv-p">P</th>
+                    <th class="wv-s">S</th>
+                    <th class="wv-m">M</th>
+                  </tr>
+                </thead>
+                <tbody id="weeklyValidationBody"></tbody>
+                <tfoot id="weeklyValidationFoot"></tfoot>
+              </table>
+            </div>
+            <div class="weekly-validation-note" id="weeklyValidationNote"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="modal-backdrop" id="pinModal">
+  <div class="modal">
+    <h3>Letakkan Pin PWS</h3>
+    <div class="small" style="margin-bottom:10px">
+      Pilih desa dan masukkan koordinat. Setelah disimpan, pin dapat digeser langsung di peta.
+    </div>
+
+    <div class="field">
+      <label>Desa</label>
+      <select id="pinVillage"></select>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label>Latitude</label>
+        <input id="pinLat" type="number" step="0.000001">
+      </div>
+      <div class="field">
+        <label>Longitude</label>
+        <input id="pinLng" type="number" step="0.000001">
+      </div>
+    </div>
+    <div class="field">
+      <label>Indikator / warna pin</label>
+      <select id="pinColorSelect"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closePinModal()">Batal</button>
+      <button class="btn" onclick="savePinFromModal()">Pasang Pin</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="mapLockModal">
+  <div class="modal">
+    <h3>Buka Kunci Peta</h3>
+    <div class="field">
+      <input id="mapAdminPassword" type="password" autocomplete="off" placeholder="Masukkan password" onkeydown="if(event.key==='Enter') confirmMapUnlock()">
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeMapLockModal()">Batal</button>
+      <button class="btn" onclick="confirmMapUnlock()">Buka Kunci</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="pinAuthModal">
+  <div class="modal">
+    <h3 id="pinAuthTitle">Otorisasi Pin</h3>
+    <div class="small" style="margin-bottom:10px">Password sama dengan password pada tombol Aksi/Edit untuk desa ini.</div>
+    <div class="field">
+      <label id="pinAuthVillageLabel">Desa</label>
+      <input id="pinAuthPassword" type="password" autocomplete="off" placeholder="Masukkan password" onkeydown="if(event.key==='Enter') confirmPinAuth()">
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closePinAuthModal()">Batal</button>
+      <button class="btn" onclick="confirmPinAuth()">Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="pinRemoveModal">
+  <div class="modal">
+    <h3>Cabut Pin PWS</h3>
+    <div class="small" id="pinRemoveInfo" style="margin-bottom:12px">Pilih pin yang akan dicabut.</div>
+    <div id="pinRemoveList" class="pin-remove-list"></div>
+    <div class="toolbar" style="margin:12px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="btn" onclick="confirmPinRemoval('s')">✅ Dicabut karena Sembuh</button>
+      <button class="btn danger" onclick="confirmPinRemoval('m')">⚫ Dicabut karena Meninggal</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closePinRemovalModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="resetDataModal">
+  <div class="modal">
+    <h3>Reset Semua Data PWS</h3>
+    <div class="small" style="margin-bottom:10px">Masukkan password untuk mereset seluruh data PWS di perangkat dan bucket Supabase PWS: angka K/P/S/M, Total PWS, penyakit tambahan, dan semua pin. Struktur 15 indikator master tetap dipertahankan.</div>
+    <div class="field">
+      <input id="resetAdminPassword" type="password" autocomplete="off" placeholder="Masukkan password" onkeydown="if(event.key==='Enter') confirmResetAllData()">
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeResetModal()">Batal</button>
+      <button class="btn danger" onclick="confirmResetAllData()">Reset Semua Data</button>
+    </div>
+  </div>
+</div>
+</div>
+</div>
 
                     <div id="slideshowDisplayArea">
                         <div class="slideshow-container" id="slideshowContainerImages"></div>
@@ -4163,6 +4634,10 @@ footer {
         // sehingga data dapat dibuka kembali dari perangkat lain.
         const PWS_STORAGE_BUCKET = "PWS";
         const PWS_STORAGE_FOLDER = "dashboard-pws";
+        const PWS_STORAGE_PATH = `${PWS_STORAGE_FOLDER}/pws-data.json`;
+        // Penanda bahwa Dashboard PWS terakhir kali direset ke kondisi kosong.
+        // Mencegah seed/default lama muncul kembali setelah reset atau reload.
+        const PWS_RESET_FLAG = "pws_all_data_reset_v1";
         // Bucket khusus Ambulance. Data operasional disimpan dalam JSON dan foto petugas sebagai object terpisah.
         const AMBULANCE_STORAGE_BUCKET = "Ambulance";
         const AMBULANCE_STORAGE_PATH = "ambulance/ambulance-data.json";
@@ -7254,8 +7729,7 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                 muatDataPetugasAmbulance();
             } else if (categoryCode === 'pws') {
                 pwsArea.style.display = 'flex';
-                pwsRefreshCalendarPeriod();
-                renderTable();
+                if (typeof activatePwsModule === 'function') activatePwsModule();
             } else {
                 uploadArea.style.display = 'block';
                 fileListArea.style.display = 'block';
@@ -10168,567 +10642,6 @@ window.addEventListener('load', () => {
 });
 </script>
 
-<script id="pws-edit-mode-script">
-/* ================= PWS DASHBOARD + SUPABASE STORAGE ================= */
-const PWS_DISEASES = [
-  {key:'diare', label:'Diare'}, {key:'hipertensi', label:'Hipertensi'},
-  {key:'stroke', label:'Stroke'}, {key:'tb', label:'TB Paru'},
-  {key:'dm', label:'DM'}, {key:'dengue', label:'Dengue'},
-  {key:'ibuhamil', label:'Ibu Hamil'}, {key:'stunting', label:'Stunting'},
-  {key:'odgj', label:'ODGJ'}, {key:'malaria', label:'Malaria'}
-];
-const PWS_STATUSES = ['k','p','s','m'];
-const PWS_STATUS_LABEL = {k:'K',p:'P',s:'S',m:'M'};
-
-/* Password ini adalah proteksi antarmuka. Karena HTML berjalan di browser,
-   password client-side tidak dapat dianggap sebagai keamanan server. */
-const PWS_DESA_PASSWORDS = {
-  'Berindat':'PWS-BERINDAT-2026',
-  'Persing':'PWS-PERSING-2026',
-  'Sedamai':'PWS-SEDAMAI-2026',
-  'Lanjut':'PWS-LANJUT-2026',
-  'Kote':'PWS-KOTE-2026',
-  'Pelakak':'PWS-PELAKAK-2026'
-};
-const PWS_DESA_LIST = Object.keys(PWS_DESA_PASSWORDS);
-
-let pwsChartInstance = null;
-let pwsEditingDesa = null;
-let pwsEditingSnapshot = null;
-let pwsPendingEditDesa = null;
-let pwsSyncBusy = false;
-
-function pwsGetWeekOfMonth(date = new Date()) {
-  // Minggu pelaporan dihitung berdasarkan minggu kalender (Senin-Minggu)
-  // yang memuat tanggal tersebut, sehingga mengikuti tampilan kalender.
-  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-  const firstDayMondayIndex = (firstDay.getDay() + 6) % 7; // Senin=0 ... Minggu=6
-  return Math.min(5, Math.floor((date.getDate() - 1 + firstDayMondayIndex) / 7) + 1);
-}
-
-function pwsSetCurrentPeriodFromCalendar() {
-  const now = new Date();
-  const mingguEl = document.getElementById('filter-minggu');
-  const bulanEl = document.getElementById('filter-bulan');
-  const tahunEl = document.getElementById('filter-tahun');
-  if (!mingguEl || !bulanEl || !tahunEl) return;
-
-  const minggu = pwsGetWeekOfMonth(now);
-  const bulan = now.getMonth() + 1;
-  const tahun = now.getFullYear();
-
-  const yearValues = [...tahunEl.options].map(o => Number(o.value));
-  if (!yearValues.includes(tahun)) {
-    const opt = document.createElement('option');
-    opt.value = String(tahun);
-    opt.textContent = String(tahun);
-    tahunEl.appendChild(opt);
-  }
-
-  mingguEl.value = String(minggu);
-  bulanEl.value = String(bulan);
-  tahunEl.value = String(tahun);
-
-  mingguEl.title = `Otomatis: minggu ke-${minggu} berdasarkan kalender`;
-  bulanEl.title = `Otomatis: ${bulanEl.options[bulanEl.selectedIndex]?.text || ''} berdasarkan kalender`;
-  tahunEl.title = `Otomatis: ${tahun} berdasarkan kalender`;
-}
-
-function pwsPeriodKey(){
-  const minggu = document.getElementById('filter-minggu')?.value || String(pwsGetWeekOfMonth());
-  const bulan = document.getElementById('filter-bulan')?.value || String(new Date().getMonth()+1);
-  const tahun = document.getElementById('filter-tahun')?.value || String(new Date().getFullYear());
-  return `${tahun}-${String(bulan).padStart(2,'0')}-M${minggu}`;
-}
-function pwsStorageKey(){ return `pws_dashboard_data_${pwsPeriodKey()}`; }
-function pwsSupabasePath(){ return `${PWS_STORAGE_FOLDER}/${pwsPeriodKey()}.json`; }
-
-function pwsBlankDisease(){ return {k:0,p:0,s:0,m:0}; }
-function pwsBlankVillage(){
-  const obj = {};
-  PWS_DISEASES.forEach(d => obj[d.key] = pwsBlankDisease());
-  return obj;
-}
-
-function pwsEmptyData(){
-  return Object.fromEntries(PWS_DESA_LIST.map(d => [d, pwsBlankVillage()]));
-}
-
-function pwsNormalizeData(input){
-  const parsed = (input && typeof input === 'object' && !Array.isArray(input)) ? input : {};
-  PWS_DESA_LIST.forEach(desa => {
-    if(!parsed[desa] || typeof parsed[desa] !== 'object') parsed[desa] = pwsBlankVillage();
-    PWS_DISEASES.forEach(d => {
-      if(!parsed[desa][d.key] || typeof parsed[desa][d.key] !== 'object'){
-        parsed[desa][d.key] = pwsBlankDisease();
-      }
-      PWS_STATUSES.forEach(st => {
-        parsed[desa][d.key][st] = Math.max(0, Number(parsed[desa][d.key][st]) || 0);
-      });
-    });
-  });
-  return parsed;
-}
-
-function pwsLoadData(){
-  try{
-    const raw = localStorage.getItem(pwsStorageKey());
-    return pwsNormalizeData(raw ? JSON.parse(raw) : {});
-  }catch(e){
-    console.warn('PWS local data rusak, membuat data baru.', e);
-    return pwsEmptyData();
-  }
-}
-
-function pwsSaveLocalData(data){
-  localStorage.setItem(pwsStorageKey(), JSON.stringify(pwsNormalizeData(JSON.parse(JSON.stringify(data)))));
-}
-
-function pwsSetSyncStatus(text, type='info'){
-  const el = document.getElementById('pws-sync-status');
-  if(!el) return;
-  el.textContent = text;
-  el.className = 'text-[10px] font-bold px-2 py-1 rounded-full';
-  if(type === 'success'){
-    el.classList.add('bg-emerald-100','text-emerald-700');
-  }else if(type === 'error'){
-    el.classList.add('bg-red-100','text-red-700');
-  }else if(type === 'warning'){
-    el.classList.add('bg-amber-100','text-amber-700');
-  }else{
-    el.classList.add('bg-slate-100','text-slate-600');
-  }
-}
-
-function pwsFormatError(error){
-  const status = error?.statusCode || error?.status || '';
-  const msg = error?.message || error?.error_description || String(error || '');
-  let solution = 'Periksa nama bucket PWS, Storage policy, dan koneksi internet.';
-  if(String(status) === '401'){
-    solution = 'Anon key tidak diterima atau token tidak valid. Pastikan ANON/PUBLISHABLE KEY yang dipakai adalah key project Supabase ini.';
-  }else if(String(status) === '403'){
-    solution = 'Policy Storage menolak akses. Pastikan policy SELECT, INSERT, dan UPDATE untuk bucket PWS sudah dibuat.';
-  }else if(String(status) === '404'){
-    solution = 'Bucket PWS belum dibuat, atau path file tidak ditemukan.';
-  }else if(/Failed to fetch|NetworkError|fetch/i.test(msg)){
-    solution = 'Koneksi browser ke Supabase gagal. Cek internet, extension/firewall, dan URL project.';
-  }else if(/duplicate|already exists/i.test(msg)){
-    solution = 'File sudah ada. Kode ini memakai upsert=true agar file periode PWS dapat diperbarui.';
-  }
-  return `HTTP ${status || '-'}\nMasalah: ${msg}\nSolusi: ${solution}`;
-}
-
-async function pwsSaveToSupabase(data){
-  const payload = {
-    version: 1,
-    module: 'Dashboard PWS',
-    period_key: pwsPeriodKey(),
-    saved_at: new Date().toISOString(),
-    data: pwsNormalizeData(JSON.parse(JSON.stringify(data)))
-  };
-
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const { data: result, error } = await supabaseClient.storage
-    .from(PWS_STORAGE_BUCKET)
-    .upload(
-      pwsSupabasePath(),
-      blob,
-      {
-        cacheControl: '3600',
-        contentType: 'application/json',
-        upsert: true
-      }
-    );
-
-  if(error) throw error;
-  return result;
-}
-
-async function pwsLoadFromSupabase(options = {}){
-  const silent = options.silent === true;
-  try{
-    pwsSyncBusy = true;
-    pwsSetSyncStatus('☁️ Memuat PWS...', 'info');
-
-    const { data, error } = await supabaseClient.storage
-      .from(PWS_STORAGE_BUCKET)
-      .download(pwsSupabasePath());
-
-    if(error){
-      const msg = error?.message || '';
-      if(/not found|object not found|no such file|404/i.test(msg)){
-        pwsSyncBusy = false;
-        pwsSetSyncStatus('Belum ada file online', 'warning');
-        pwsRenderTable();
-        return false;
-      }
-      throw error;
-    }
-
-    const rawText = await data.text();
-    const parsed = JSON.parse(rawText);
-    const remoteData = parsed?.data ? parsed.data : parsed;
-
-    pwsSaveLocalData(remoteData);
-    pwsSyncBusy = false;
-    pwsSetSyncStatus(`☁️ Tersinkron ${new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`, 'success');
-    pwsRenderTable();
-    return true;
-  }catch(error){
-    pwsSyncBusy = false;
-    pwsSetSyncStatus('Supabase gagal', 'error');
-    console.error('Gagal memuat PWS dari Supabase:', error);
-
-    if(!silent){
-      alert('PWS tetap dibuka dari penyimpanan perangkat.\n\n' + pwsFormatError(error));
-    }
-    pwsRenderTable();
-    return false;
-  }
-}
-
-async function pwsTestSupabase(showAlert = true){
-  try{
-    pwsSetSyncStatus('🔎 Tes Supabase...', 'info');
-    const { data, error } = await supabaseClient.storage
-      .from(PWS_STORAGE_BUCKET)
-      .list('', { limit: 10, sortBy: { column: 'name', order: 'asc' } });
-
-    if(error) throw error;
-
-    pwsSetSyncStatus('✓ Bucket PWS terhubung', 'success');
-    if(showAlert){
-      alert(
-        'Koneksi bucket PWS berhasil.\n\n' +
-        `Bucket: ${PWS_STORAGE_BUCKET}\n` +
-        `File teratas terbaca: ${Array.isArray(data) ? data.length : 0}`
-      );
-    }
-    return true;
-  }catch(error){
-    pwsSetSyncStatus('Bucket PWS bermasalah', 'error');
-    console.error('Tes bucket PWS gagal:', error);
-    if(showAlert) alert('Tes koneksi bucket PWS gagal.\n\n' + pwsFormatError(error));
-    return false;
-  }
-}
-
-function pwsEscape(value){
-  return String(value ?? '').replace(/[&<>'"]/g, c=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'
-  }[c]));
-}
-
-function pwsTotalVillage(village){
-  return PWS_DISEASES.reduce((sum,d)=>sum + PWS_STATUSES.reduce((s,st)=>s+(Number(village?.[d.key]?.[st])||0),0),0);
-}
-function pwsTotalDisease(village,key,status){
-  return Number(village?.[key]?.[status])||0;
-}
-function pwsInput(desa,key,status,value,disabled=true){
-  const lock = disabled ? ' readonly' : '';
-  return `<input class="pws-edit-input" type="number" min="0" step="1" value="${Number(value)||0}" data-desa="${pwsEscape(desa)}" data-disease="${key}" data-status="${status}"${lock} onchange="pwsInputChanged(this)" oninput="pwsInputChanged(this)">`;
-}
-
-function pwsRenderAction(desa, editing=false){
-  return `<div class="pws-action-wrap" id="pws-action-${pwsEscape(desa).replace(/[^a-zA-Z0-9]/g,'-')}">
-    ${editing
-      ? `<span class="pws-status pws-status-edit">Edit</span>
-         <button class="pws-action-btn pws-btn-save" onclick="pwsSaveVillage('${pwsEscape(desa)}')">💾 Simpan</button>
-         <button class="pws-action-btn pws-btn-cancel" onclick="pwsCancelVillage('${pwsEscape(desa)}')">Batal</button>
-         <button class="pws-action-btn pws-btn-lock" onclick="pwsLockVillage('${pwsEscape(desa)}')">🔒 Kunci</button>`
-      : `<span class="pws-status pws-status-locked">Terkunci</span>
-         <button class="pws-action-btn pws-btn-edit" onclick="openPwsEdit('${pwsEscape(desa)}')">✏️ Edit</button>`}
-  </div>`;
-}
-
-function pwsRenderTable(){
-  const tbody = document.getElementById('table-body');
-  if(!tbody) return;
-  const data = pwsLoadData();
-  let html='';
-  PWS_DESA_LIST.forEach(desa=>{
-    const village=data[desa] || pwsBlankVillage();
-    html += `<tr class="pws-row-locked" data-pws-desa="${pwsEscape(desa)}">
-      <td class="px-3 py-2 font-bold text-gray-800 sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#cbd5e1]">${pwsEscape(desa)}</td>`;
-    PWS_DISEASES.forEach(d=>PWS_STATUSES.forEach(st=>{
-      html += `<td class="px-0.5 py-1 text-center border-l">${pwsInput(desa,d.key,st,pwsTotalDisease(village,d.key,st),true)}</td>`;
-    }));
-    PWS_STATUSES.forEach(st=>{
-      const statusTotal=PWS_DISEASES.reduce((n,d)=>n+pwsTotalDisease(village,d.key,st),0);
-      html += `<td class="px-1 py-1 text-center font-bold bg-blue-50 border-l-2 border-gray-400 pws-village-total-${st}">${statusTotal}</td>`;
-    });
-    html += `<td class="px-1 py-1 border-l bg-white">${pwsRenderAction(desa,false)}</td></tr>`;
-  });
-  tbody.innerHTML=html;
-  pwsUpdateSummary(data);
-  pwsUpdateChart(data);
-}
-
-function pwsInputChanged(el){
-  const row=el.closest('tr'); if(!row) return;
-  const totals={k:0,p:0,s:0,m:0};
-  row.querySelectorAll('.pws-edit-input').forEach(i=>{
-    totals[i.dataset.status]=(totals[i.dataset.status]||0)+Math.max(0,Number(i.value)||0);
-  });
-  PWS_STATUSES.forEach(st=>{
-    const cell=row.querySelector('.pws-village-total-'+st);
-    if(cell) cell.textContent=totals[st]||0;
-  });
-}
-
-function pwsSnapshotRow(desa){
-  const data=pwsLoadData();
-  return JSON.parse(JSON.stringify(data[desa] || pwsBlankVillage()));
-}
-
-function pwsSetRowEditing(desa,editing){
-  const row=[...document.querySelectorAll('#table-body tr[data-pws-desa]')].find(r=>r.dataset.pwsDesa===desa);
-  if(!row) return;
-  row.classList.toggle('pws-row-editing',editing);
-  row.querySelectorAll('.pws-edit-input').forEach(i=>i.readOnly=!editing);
-  const action=row.querySelector('.pws-action-wrap');
-  if(action) action.outerHTML=pwsRenderAction(desa,editing);
-}
-
-function openPwsEdit(desa){
-  if(pwsSyncBusy){
-    alert('Data PWS sedang disinkronkan. Coba lagi setelah proses selesai.');
-    return;
-  }
-  if(pwsEditingDesa && pwsEditingDesa!==desa){
-    alert(`Selesaikan atau kunci edit ${pwsEditingDesa} terlebih dahulu.`);
-    return;
-  }
-  pwsPendingEditDesa=desa;
-  const modal=document.getElementById('login-modal');
-  const name=document.getElementById('modal-desa-name');
-  const input=document.getElementById('password-input');
-  const err=document.getElementById('login-error');
-  if(name) name.textContent=`PWS Desa ${desa}`;
-  if(input) input.value='';
-  if(err) err.classList.add('hidden');
-  if(modal) modal.classList.remove('hidden');
-  setTimeout(()=>input?.focus(),80);
-}
-
-function closeLoginModal(){
-  document.getElementById('login-modal')?.classList.add('hidden');
-  pwsPendingEditDesa=null;
-}
-
-function verifyPassword(){
-  const desa=pwsPendingEditDesa;
-  const input=document.getElementById('password-input');
-  const pwd=input?.value||'';
-  if(!desa) return closeLoginModal();
-
-  if(pwd===PWS_DESA_PASSWORDS[desa] || pwd==='admin'){
-    pwsEditingDesa=desa;
-    pwsEditingSnapshot=pwsSnapshotRow(desa);
-    closeLoginModal();
-    pwsSetRowEditing(desa,true);
-    pwsShowNotification(`Mode edit PWS ${desa} dibuka.`);
-  }else{
-    document.getElementById('login-error')?.classList.remove('hidden');
-    if(input){input.value='';input.focus();}
-  }
-}
-
-function pwsReadRow(desa){
-  const row=[...document.querySelectorAll('#table-body tr[data-pws-desa]')].find(r=>r.dataset.pwsDesa===desa);
-  const result=pwsBlankVillage();
-  if(!row) return result;
-  row.querySelectorAll('.pws-edit-input').forEach(i=>{
-    if(result[i.dataset.disease]){
-      result[i.dataset.disease][i.dataset.status]=Math.max(0,parseInt(i.value,10)||0);
-    }
-  });
-  return result;
-}
-
-async function pwsCommitData(data, successMessage){
-  const normalized = pwsNormalizeData(JSON.parse(JSON.stringify(data)));
-  // Simpan lokal lebih dulu sebagai fallback agar input tidak hilang jika jaringan gagal.
-  pwsSaveLocalData(normalized);
-
-  try{
-    pwsSetSyncStatus('☁️ Menyimpan...', 'info');
-    await pwsSaveToSupabase(normalized);
-    pwsSetSyncStatus(`✓ Tersimpan ${new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`, 'success');
-    pwsEditingDesa=null;
-    pwsEditingSnapshot=null;
-    pwsRenderTable();
-    pwsShowNotification(successMessage);
-    return true;
-  }catch(error){
-    pwsSetSyncStatus('Lokal tersimpan • online gagal', 'warning');
-    console.error('Gagal menyimpan PWS ke Supabase:', error);
-    alert(
-      'Data PWS tersimpan di perangkat ini, tetapi BELUM berhasil dikirim ke Supabase.\n\n' +
-      pwsFormatError(error) +
-      '\n\nPerbaiki kendala Supabase lalu tekan Simpan lagi.'
-    );
-    return false;
-  }
-}
-
-async function pwsSaveVillage(desa){
-  if(pwsEditingDesa!==desa) return;
-  const data=pwsLoadData();
-  data[desa]=pwsReadRow(desa);
-  await pwsCommitData(data, `Data PWS Desa ${desa} berhasil disimpan.`);
-}
-
-function pwsCancelVillage(desa){
-  if(pwsEditingDesa!==desa) return;
-  const data=pwsLoadData();
-  data[desa]=pwsEditingSnapshot || pwsBlankVillage();
-  pwsSaveLocalData(data);
-  pwsEditingDesa=null;
-  pwsEditingSnapshot=null;
-  pwsRenderTable();
-  pwsShowNotification(`Perubahan PWS Desa ${desa} dibatalkan.`);
-}
-
-async function pwsLockVillage(desa){
-  if(pwsEditingDesa!==desa) return;
-  const data=pwsLoadData();
-  data[desa]=pwsReadRow(desa);
-  await pwsCommitData(data, `Data PWS Desa ${desa} disimpan dan dikunci.`);
-}
-
-function pwsLockAll(){
-  if(pwsEditingDesa) pwsLockVillage(pwsEditingDesa);
-}
-function pwsSaveAllUnlocked(){
-  if(pwsEditingDesa) pwsSaveVillage(pwsEditingDesa);
-  else pwsShowNotification('Tidak ada desa yang sedang diedit.');
-}
-
-function pwsShowNotification(text){
-  const box=document.getElementById('notification');
-  const span=document.getElementById('notification-text');
-  if(box&&span){
-    span.textContent=text;
-    box.classList.remove('hidden');
-    clearTimeout(window.pwsNotifTimer);
-    window.pwsNotifTimer=setTimeout(()=>box.classList.add('hidden'),3000);
-  }
-  try { appNotificationAdd(text, { module: 'PWS' }); } catch (e) { console.warn('Pusat notifikasi PWS:', e); }
-}
-
-function pwsUpdateSummary(data){
-  PWS_DISEASES.forEach(d=>PWS_STATUSES.forEach(st=>{
-    const el=document.getElementById(`sum-${d.key}-${st}`);
-    if(el) el.textContent=PWS_DESA_LIST.reduce((n,desa)=>n+pwsTotalDisease(data[desa],d.key,st),0);
-  }));
-}
-
-function pwsUpdateChart(data){
-  const canvas=document.getElementById('trendChart');
-  if(!canvas || typeof Chart==='undefined') return;
-  const totals={k:[],p:[],s:[],m:[]};
-  PWS_STATUSES.forEach(st=>{
-    totals[st]=PWS_DISEASES.map(d=>PWS_DESA_LIST.reduce((n,desa)=>n+pwsTotalDisease(data[desa],d.key,st),0));
-  });
-  if(pwsChartInstance) pwsChartInstance.destroy();
-  pwsChartInstance=new Chart(canvas.getContext('2d'),{
-    type:'bar',
-    data:{
-      labels:PWS_DISEASES.map(d=>d.label),
-      datasets:[
-        {label:'Kasus (K)',data:totals.k},
-        {label:'Pantau (P)',data:totals.p},
-        {label:'Sembuh (S)',data:totals.s},
-        {label:'Meninggal (M)',data:totals.m}
-      ]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom'}},
-      scales:{x:{ticks:{font:{size:9}}},y:{beginAtZero:true,precision:0}}
-    }
-  });
-}
-
-function renderTable(){ pwsRenderTable(); }
-
-function pwsAddToolbar(){
-  const area=document.getElementById('pwsDisplayArea');
-  if(!area || document.getElementById('pwsEditToolbar')) return;
-  const card=area.querySelector('.flex.flex-col.gap-4');
-  if(!card) return;
-
-  const toolbar=document.createElement('div');
-  toolbar.id='pwsEditToolbar';
-  toolbar.className='glass-panel rounded-xl shadow-sm p-3';
-  toolbar.innerHTML=`
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-      <div>
-        <div class="font-bold text-xs text-gray-800">Mode Edit Data per Desa</div>
-        <div class="pws-edit-note">
-          Klik <b>Edit</b> pada desa, masukkan password desa, lalu ubah K/P/S/M.
-          Data periode <b>Minggu, Bulan, Tahun</b> disimpan ke Supabase bucket <b>PWS</b>.
-        </div>
-        <div class="mt-1"><span id="pws-sync-status" class="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-600">Menyiapkan Supabase...</span></div>
-      </div>
-      <div class="pws-edit-toolbar">
-        <button class="pws-toolbar-btn success" onclick="pwsSaveAllUnlocked()">💾 Simpan</button>
-        <button class="pws-toolbar-btn secondary" onclick="pwsLockAll()">🔒 Kunci</button>
-      </div>
-    </div>`;
-  area.insertBefore(toolbar,card);
-}
-
-async function pwsInitPeriod(){
-  pwsSetCurrentPeriodFromCalendar();
-  pwsRenderTable();
-  await pwsLoadFromSupabase({silent:true});
-}
-
-function pwsInitFilters(){
-  pwsSetCurrentPeriodFromCalendar();
-  ['filter-minggu','filter-bulan','filter-tahun'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el){
-      el.addEventListener('change', async ()=>{
-        if(pwsEditingDesa){
-          const ok = confirm(`Desa ${pwsEditingDesa} sedang diedit. Lanjut ganti periode tanpa menyimpan perubahan?`);
-          if(!ok){
-            pwsSetCurrentPeriodFromCalendar();
-            pwsRenderTable();
-            return;
-          }
-        }
-        pwsEditingDesa=null;
-        pwsEditingSnapshot=null;
-        pwsRenderTable();
-        await pwsLoadFromSupabase({silent:true});
-      });
-    }
-  });
-  pwsAddToolbar();
-  pwsLoadFromSupabase({silent:true});
-}
-
-window.addEventListener('DOMContentLoaded',()=>{
-  pwsInitFilters();
-  pwsRenderTable();
-});
-
-// Saat modul PWS dibuka kembali, selalu segarkan periode mengikuti kalender hari ini,
-// kemudian ambil data periode tersebut dari Supabase.
-async function pwsRefreshCalendarPeriod(){
-  pwsSetCurrentPeriodFromCalendar();
-  pwsEditingDesa=null;
-  pwsEditingSnapshot=null;
-  pwsRenderTable();
-  await pwsLoadFromSupabase({silent:true});
-}
-</script>
-
 
 <!-- ================= MODUL IKP TERINTEGRASI ================= -->
 <style>
@@ -11639,6 +11552,1968 @@ async function pwsRefreshCalendarPeriod(){
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script id="pws-integrated-script">
+/*
+  DAFTAR DESA KECAMATAN SINGKEP PESISIR:
+  Berindat, Persing, Sedamai, Lanjut, Kote, Pelakak.
+  Koordinat pusat desa digunakan sebagai titik referensi.
+
+  PENTING:
+  Poligon di bawah adalah poligon VISUAL/INDIKATIF, bukan batas hukum/administratif.
+  Untuk batas resmi, masukkan GeoJSON resmi desa masing-masing.
+*/
+
+const STORAGE_KEY = "pws_singkep_pesisir_v2";
+
+const PIN_COLORS = [
+  {key:"red",name:"Merah",hex:"#e53935",indicator:"Dengue"},
+  {key:"blue",name:"Biru",hex:"#1e88e5",indicator:"Stunting"},
+  {key:"yellow",name:"Kuning",hex:"#f9a825",indicator:"ODGJ"},
+  {key:"purple",name:"Ungu",hex:"#8e24aa",indicator:"TB Paru"},
+  {key:"orange",name:"Oranye",hex:"#fb8c00",indicator:"Pneumonia"},
+  {key:"pink",name:"Merah Muda",hex:"#d81b60",indicator:"Diare"},
+  {key:"black",name:"Hitam",hex:"#263238",indicator:"Hipertensi"},
+  {key:"cyan",name:"Sian",hex:"#00acc1",indicator:"Malaria"},
+  {key:"teal",name:"Toska",hex:"#00897b",indicator:"Diabetes Melitus"},
+  {key:"maroon",name:"Marun",hex:"#8e2c2c",indicator:"HIV/AIDS"},
+  {key:"indigo",name:"Indigo",hex:"#3949ab",indicator:"Stroke"},
+  {key:"crimson",name:"Crimson",hex:"#c62828",indicator:"DBD"},
+  {key:"sky",name:"Biru Langit",hex:"#0288d1",indicator:"ISPA"},
+  {key:"olive",name:"Olive",hex:"#7b8d1a",indicator:"Campak/Rubella"},
+  {key:"rose",name:"Rose",hex:"#ec407a",indicator:"Bumil Resti"},
+];
+
+const PIN_COLOR_PRESETS = PIN_COLORS.map(p=>({...p}));
+
+const VILLAGES = {
+  berindat: {
+    name:"Desa Berindat",
+    color:"#dbeadf",
+    center:[-0.4568,104.5720],
+    polygon:[
+      [-0.4860,104.5500],[-0.4700,104.5880],[-0.4490,104.5980],
+      [-0.4250,104.5820],[-0.4230,104.5600],[-0.4420,104.5430]
+    ]
+  },
+  persing: {
+    name:"Desa Persing",
+    color:"#e8dfbf",
+    center:[-0.4327,104.5594],
+    polygon:[
+      [-0.4560,104.5380],[-0.4400,104.5480],[-0.4200,104.5700],
+      [-0.4060,104.5550],[-0.4140,104.5350],[-0.4380,104.5260]
+    ]
+  },
+  sedamai: {
+    name:"Desa Sedamai",
+    color:"#d7e7f0",
+    center:[-0.4190,104.5459],
+    polygon:[
+      [-0.4390,104.5280],[-0.4140,104.5310],[-0.3970,104.5530],
+      [-0.3800,104.5400],[-0.3880,104.5200],[-0.4140,104.5120]
+    ]
+  },
+  lanjut: {
+    name:"Desa Lanjut",
+    color:"#eadbd9",
+    center:[-0.4035,104.5231],
+    polygon:[
+      [-0.4210,104.5030],[-0.4000,104.5080],[-0.3840,104.5290],
+      [-0.3670,104.5170],[-0.3710,104.4970],[-0.3980,104.4910]
+    ]
+  },
+  kote: {
+    name:"Desa Kote",
+    color:"#e2e2f2",
+    center:[-0.3782,104.5128],
+    polygon:[
+      [-0.3950,104.4880],[-0.3730,104.4940],[-0.3570,104.5140],
+      [-0.3470,104.5000],[-0.3540,104.4790],[-0.3810,104.4750]
+    ]
+  },
+  pelakak: {
+    name:"Desa Pelakak",
+    color:"#e5d9ec",
+    center:[-0.3502,104.4853],
+    polygon:[
+      [-0.3730,104.4600],[-0.3490,104.4650],[-0.3310,104.4870],
+      [-0.3230,104.4730],[-0.3360,104.4520],[-0.3600,104.4450]
+    ]
+  }
+};
+
+const MASTER_DISEASES = [
+  "Diare","Hipertensi","Stroke","TB Paru","Diabetes Melitus","Dengue","Stunting",
+  "ODGJ","Malaria","Pneumonia","HIV/AIDS","DBD","ISPA","Campak/Rubella","Bumil Resti"
+];
+
+const MASTER_PWS_SEEDS = {
+  berindat:{diare:[12,10,0],hipertensi:[45,12,1],stroke:[2,0,1],tb:[4,1,0],dm:[20,5,0],dengue:[1,1,0],ibuhamil:[5,4,0],stunting:[3,1,0],odgj:[2,1,0],malaria:[0,0,0],pneumonia:[0,0,0],"hiv/aids":[0,0,0]},
+  persing:{diare:[8,8,0],hipertensi:[30,10,0],stroke:[1,0,0],tb:[2,2,0],dm:[15,4,1],dengue:[0,0,0],ibuhamil:[3,2,0],stunting:[5,2,0],odgj:[1,0,0],malaria:[0,0,0],pneumonia:[0,0,0],"hiv/aids":[0,0,0]},
+  sedamai:{diare:[15,12,1],hipertensi:[50,20,2],stroke:[4,1,0],tb:[5,3,1],dm:[25,10,0],dengue:[2,2,0],ibuhamil:[8,6,0],stunting:[7,3,0],odgj:[0,0,0],malaria:[1,1,0],pneumonia:[0,0,0],"hiv/aids":[0,0,0]},
+  lanjut:{diare:[5,5,0],hipertensi:[20,15,0],stroke:[0,0,0],tb:[1,1,0],dm:[10,8,0],dengue:[0,0,0],ibuhamil:[2,2,0],stunting:[2,1,0],odgj:[1,1,0],malaria:[0,0,0],pneumonia:[0,0,0],"hiv/aids":[0,0,0]},
+  kote:{diare:[10,9,0],hipertensi:[35,15,1],stroke:[1,0,0],tb:[3,2,0],dm:[18,12,0],dengue:[1,1,0],ibuhamil:[4,3,0],stunting:[4,2,0],odgj:[0,0,0],malaria:[0,0,0],pneumonia:[0,0,0],"hiv/aids":[0,0,0]},
+  pelakak:{diare:[7,7,0],hipertensi:[25,18,0],stroke:[0,0,0],tb:[2,2,0],dm:[12,10,0],dengue:[0,0,0],ibuhamil:[2,1,0],stunting:[1,0,0],odgj:[1,0,0],malaria:[0,0,0],pneumonia:[0,0,0],"hiv/aids":[0,0,0]}
+};
+
+for(const __v of Object.keys(MASTER_PWS_SEEDS)){
+  MASTER_PWS_SEEDS[__v]["dbd"] = MASTER_PWS_SEEDS[__v]["dbd"] || [0,0,0];
+  MASTER_PWS_SEEDS[__v]["ispa"] = MASTER_PWS_SEEDS[__v]["ispa"] || [0,0,0];
+  MASTER_PWS_SEEDS[__v]["campak/rubella"] = MASTER_PWS_SEEDS[__v]["campak/rubella"] || [0,0,0];
+  MASTER_PWS_SEEDS[__v]["bumil resti"] = MASTER_PWS_SEEDS[__v]["bumil resti"] || [0,0,0];
+}
+
+const MASTER_VILLAGE_PASSWORDS = {
+  berindat:'berindat123', persing:'persing123', sedamai:'sedamai123',
+  lanjut:'lanjut123', kote:'kote123', pelakak:'pelakak123'
+};
+
+const DEFAULT_DISEASES = MASTER_DISEASES.slice();
+
+let map;
+let activeVillage = "berindat";
+let polygons = {};
+let markers = {};
+let state = loadState();
+let baseStreet, baseSatellite, activeBase;
+const ADMIN_PASSWORD = "admin";
+let mapLocked = false;
+
+function makeDiseaseRow(name, seed=[0,0,0], explicitP=null){
+  const k=Number(seed[0])||0;
+  const ss=Number(seed[1])||0;
+  const mm=Number(seed[2])||0;
+  const pp=explicitP===null ? Math.max(0,k-ss-mm) : Math.max(0,Number(explicitP)||0);
+  return {name,k,p:pp,s:ss,m:mm,editing:false,saved:true};
+}
+
+function getDiseaseSeedKey(name){
+  const n=String(name||'').trim().toLowerCase();
+  const map={
+    "diabetes melitus":"dm",
+    "ibu hamil":"ibuhamil",
+    "tb paru":"tb",
+    "hiv/aids":"hiv/aids"
+  };
+  return map[n] || n;
+}
+
+function getDefaultState(forceEmpty=false){
+  const out = {};
+  for(const key of Object.keys(VILLAGES)){
+    const seed = forceEmpty ? {} : (MASTER_PWS_SEEDS[key] || {});
+    out[key] = {
+      pins:[],
+      pin:null,
+      pinColor:"red",
+      diseases: MASTER_DISEASES.map(name=>{
+        const n = getDiseaseSeedKey(name);
+        return makeDiseaseRow(name, seed[n] || [0,0,0]);
+      })
+    };
+  }
+  return out;
+}
+
+function forceEmptyPwsState(){
+  return getDefaultState(true);
+}
+
+function isPwsResetActive(){
+  try{return localStorage.getItem(PWS_RESET_FLAG)==="1";}catch(e){return false;}
+}
+
+function normalizeDiseaseRows(rows,key,options={}){
+  const useSeeds = options.empty !== true;
+  const seed = useSeeds ? (MASTER_PWS_SEEDS[key] || {}) : {};
+  const legacyByName = new Map((Array.isArray(rows)?rows:[]).map(r=>[String(r.name||'').toLowerCase(),r]));
+  const result = [];
+  MASTER_DISEASES.forEach(name=>{
+    const old = legacyByName.get(name.toLowerCase());
+    const seedKey = getDiseaseSeedKey(name);
+    if(old && (old.k!==undefined || old.s!==undefined || old.m!==undefined)){
+      result.push(makeDiseaseRow(name,[old.k,old.s,old.m],old.p));
+    }else if(old && Array.isArray(old.months)){
+      const total=old.months.reduce((a,b)=>a+(Number(b)||0),0);
+      result.push(makeDiseaseRow(name,[total,0,0],0));
+    }else{
+      result.push(makeDiseaseRow(name, seed[seedKey] || [0,0,0]));
+    }
+  });
+
+  // Keep user-added diseases, while giving them the same K/P/S/M table structure.
+  (Array.isArray(rows)?rows:[]).forEach(old=>{
+    const name=String(old.name||'').trim();
+    if(!name || name.toLowerCase()==='ibu hamil' || MASTER_DISEASES.some(x=>x.toLowerCase()===name.toLowerCase())) return;
+    if(old.k!==undefined || old.s!==undefined || old.m!==undefined){
+      result.push(makeDiseaseRow(name,[old.k,old.s,old.m],old.p));
+    }else if(Array.isArray(old.months)){
+      result.push(makeDiseaseRow(name,[old.months.reduce((a,b)=>a+(Number(b)||0),0),0,0],0));
+    }else{
+      result.push(makeDiseaseRow(name,[0,0,0],0));
+    }
+  });
+  return result;
+}
+
+function loadState(){
+  try{
+    // Setelah reset, jangan pernah menghidupkan kembali angka seed/default lama.
+    if(isPwsResetActive()) return forceEmptyPwsState();
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const defaults = getDefaultState();
+    if(raw){
+      const parsed = JSON.parse(raw);
+      for(const k of Object.keys(defaults)){
+        if(parsed[k]){
+          defaults[k] = {...defaults[k], ...parsed[k]};
+          defaults[k].diseases = normalizeDiseaseRows(parsed[k].diseases,k);
+          let pins = Array.isArray(parsed[k].pins) ? parsed[k].pins.map((pin,idx)=>({
+            id:pin.id || `pin_${k}_${Date.now()}_${idx}`,
+            lat:Number(pin.lat), lng:Number(pin.lng),
+            indicator:pin.indicator || (PIN_COLORS.find(p=>p.key===pin.colorKey)?.indicator) || null,
+            colorKey:pin.colorKey || parsed[k].pinColor || "red",
+            countApplied:pin.countApplied!==false
+          })).filter(pin=>Number.isFinite(pin.lat)&&Number.isFinite(pin.lng)&&pin.indicator && !['ibu hamil'].includes(String(pin.indicator).toLowerCase())) : [];
+          // Migrate the old single-pin format when present.
+          if(!pins.length && parsed[k].pin && Number.isFinite(Number(parsed[k].pin.lat)) && Number.isFinite(Number(parsed[k].pin.lng))){
+            const old=parsed[k].pin;
+            const indicator=old.indicator || PIN_COLORS.find(p=>p.key===parsed[k].pinColor)?.indicator;
+            if(indicator && indicator.toLowerCase()!=='ibu hamil'){
+              pins=[{id:`pin_${k}_legacy_1`,lat:Number(old.lat),lng:Number(old.lng),indicator,colorKey:old.colorKey || parsed[k].pinColor || "red",countApplied:old.countApplied!==false}];
+            }
+          }
+          defaults[k].pins=pins;
+          defaults[k].pin=null;
+          delete defaults[k].pin;
+          if(!defaults[k].pinColor) defaults[k].pinColor = "red";
+          if(!PIN_COLORS.some(p=>p.key===defaults[k].pinColor)) defaults[k].pinColor = "red";
+        }
+      }
+    }
+    return defaults;
+  }catch(e){ console.warn("Gagal membaca penyimpanan lokal",e); }
+  return getDefaultState();
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ================= PWS SUPABASE STORAGE =================
+let pwsCloudReady = false;
+let pwsCloudBusy = false;
+let pwsCloudSaveTimer = null;
+
+function setPwsCloudStatus(text, ok=null){
+  const el=document.getElementById("pwsCloudStatus");
+  if(!el) return;
+  el.textContent=`☁ Supabase: ${text}`;
+  el.style.color = ok===true ? "#047857" : ok===false ? "#b91c1c" : "#64748b";
+}
+
+function buildPwsCloudPayload(){
+  const clean={};
+  Object.keys(VILLAGES).forEach(key=>{
+    const item=state[key] || {};
+    clean[key]={
+      pins:(Array.isArray(item.pins)?item.pins:[]).map(pin=>({
+        id:pin.id, lat:Number(pin.lat), lng:Number(pin.lng),
+        indicator:String(pin.indicator||""), colorKey:String(pin.colorKey||"red"),
+        countApplied:pin.countApplied!==false
+      })),
+      pinColor:String(item.pinColor||"red"),
+      diseases:(Array.isArray(item.diseases)?item.diseases:[]).map(d=>({
+        name:String(d.name||""), k:Number(d.k)||0, p:Number(d.p)||0,
+        s:Number(d.s)||0, m:Number(d.m)||0, saved:true, editing:false
+      }))
+    };
+  });
+  return {
+    schema: "pws-supabase-v1",
+    saved_at: new Date().toISOString(),
+    active_village: activeVillage,
+    data: clean
+  };
+}
+
+function restorePwsFromCloudPayload(payload){
+  if(!payload || payload.schema!=="pws-supabase-v1" || !payload.data) return false;
+  const incoming=payload.data;
+  const defaults=getDefaultState();
+  Object.keys(VILLAGES).forEach(key=>{
+    if(!incoming[key]) return;
+    const src=incoming[key];
+    const diseases=Array.isArray(src.diseases) ? src.diseases : [];
+    defaults[key]={
+      ...defaults[key],
+      pinColor: PIN_COLORS.some(p=>p.key===src.pinColor) ? src.pinColor : "red",
+      pins: Array.isArray(src.pins) ? src.pins.map((pin,idx)=>({
+        id:pin.id || `pin_${key}_cloud_${idx}`,
+        lat:Number(pin.lat), lng:Number(pin.lng),
+        indicator:String(pin.indicator||""),
+        colorKey:PIN_COLORS.some(p=>p.key===pin.colorKey)?pin.colorKey:(PIN_COLORS.find(p=>p.indicator.toLowerCase()===String(pin.indicator||"").toLowerCase())?.key||"red"),
+        countApplied:pin.countApplied!==false
+      })).filter(pin=>Number.isFinite(pin.lat)&&Number.isFinite(pin.lng)&&pin.indicator && !['ibu hamil'].includes(String(pin.indicator).toLowerCase())) : [],
+      diseases:normalizeDiseaseRows(diseases,key)
+    };
+  });
+  state=defaults;
+  if(VILLAGES[payload.active_village]) activeVillage=payload.active_village;
+  return true;
+}
+
+async function loadPwsFromSupabase(){
+  if(!supabaseClient){
+    setPwsCloudStatus("client Supabase tidak tersedia",false);
+    return false;
+  }
+  if(pwsCloudBusy) return false;
+  pwsCloudBusy=true;
+  setPwsCloudStatus("memuat data…");
+  try{
+    // Saat reset aktif, JANGAN pernah membaca payload cloud lama.
+    // Tulis ulang state kosong setelah mencoba membersihkan folder PWS.
+    if(isPwsResetActive()) {
+      state=forceEmptyPwsState();
+      saveState();
+      await clearPwsSupabaseFolder();
+      const savedEmpty=await savePwsToSupabase({silent:true});
+      pwsCloudReady=!!savedEmpty;
+      setPwsCloudStatus(savedEmpty ? "reset tersimpan • cloud kosong" : "reset lokal • cloud lama tidak dipulihkan",!!savedEmpty);
+      drawAllPins();
+      renderPinPalette();
+      renderDiseaseTable();
+      renderDiseaseChart();
+      updateVillageUI();
+      updateSixVillageGrid();
+      return !!savedEmpty;
+    }
+    const {data:blob,error}=await supabaseClient.storage
+      .from(PWS_STORAGE_BUCKET)
+      .download(PWS_STORAGE_PATH);
+    if(error){
+      const msg=String(error.message||error.error||error);
+      // File belum ada: gunakan data lokal tanpa menimpa cloud.
+      if(/not found|404|does not exist|no such/i.test(msg)){
+        pwsCloudReady=true;
+        setPwsCloudStatus("belum ada file cloud; siap disimpan",null);
+        return false;
+      }
+      throw error;
+    }
+    const text=await blob.text();
+    const payload=JSON.parse(text);
+    if(!restorePwsFromCloudPayload(payload)) throw new Error("Format pws-data.json tidak valid");
+    saveState();
+    drawAllPins();
+    renderPinPalette();
+    renderDiseaseTable();
+    renderDiseaseChart();
+    updateVillageUI();
+    updateSixVillageGrid();
+    pwsCloudReady=true;
+    setPwsCloudStatus(`tersambung • ${new Date(payload.saved_at||Date.now()).toLocaleString('id-ID')}`,true);
+    return true;
+  }catch(err){
+    console.warn("PWS Supabase load gagal:",err);
+    pwsCloudReady=false;
+    setPwsCloudStatus(`gagal memuat (${err.message||err})`,false);
+    return false;
+  }finally{
+    pwsCloudBusy=false;
+  }
+}
+
+function pwsStateHasData(){
+  return Object.values(VILLAGES).some(key=>{
+    const item=state[key]||{};
+    if(Array.isArray(item.pins) && item.pins.length) return true;
+    return (Array.isArray(item.diseases)?item.diseases:[]).some(d=>
+      (Number(d.k)||0)!==0 || (Number(d.p)||0)!==0 || (Number(d.s)||0)!==0 || (Number(d.m)||0)!==0
+    );
+  });
+}
+
+async function savePwsToSupabase(options={}){
+  const silent=options.silent===true;
+  // Begitu pengguna memiliki data lagi, status reset selesai.
+  if(pwsStateHasData()) localStorage.removeItem(PWS_RESET_FLAG);
+  if(!supabaseClient){
+    setPwsCloudStatus("client Supabase tidak tersedia",false);
+    return false;
+  }
+  try{
+    setPwsCloudStatus("menyimpan…");
+    const blob=new Blob([JSON.stringify(buildPwsCloudPayload(),null,2)],{type:"application/json"});
+    const {error}=await supabaseClient.storage
+      .from(PWS_STORAGE_BUCKET)
+      .upload(PWS_STORAGE_PATH,blob,{
+        cacheControl:"0", upsert:true, contentType:"application/json"
+      });
+    if(error) throw error;
+    pwsCloudReady=true;
+    setPwsCloudStatus("tersimpan",true);
+    return true;
+  }catch(err){
+    console.warn("PWS Supabase save gagal:",err);
+    setPwsCloudStatus(`gagal menyimpan (${err.message||err})`,false);
+    if(!silent) setSaveState(`lokal tersimpan • Supabase gagal: ${err.message||err}`);
+    return false;
+  }
+}
+
+function queuePwsCloudSave(){
+  if(pwsStateHasData()) localStorage.removeItem(PWS_RESET_FLAG);
+  clearTimeout(pwsCloudSaveTimer);
+  pwsCloudSaveTimer=setTimeout(()=>{ void savePwsToSupabase({silent:true}); },350);
+}
+
+async function clearPwsSupabaseFolder(){
+  try{
+    const {data:files,error}=await supabaseClient.storage
+      .from(PWS_STORAGE_BUCKET)
+      .list(PWS_STORAGE_FOLDER,{limit:1000,offset:0});
+    if(error) throw error;
+    const paths=(files||[])
+      .filter(f=>f && f.name)
+      .map(f=>`${PWS_STORAGE_FOLDER}/${f.name}`);
+    if(paths.length){
+      const {error:removeError}=await supabaseClient.storage
+        .from(PWS_STORAGE_BUCKET).remove(paths);
+      if(removeError) throw removeError;
+    }
+    return true;
+  }catch(err){
+    console.warn("PWS Supabase cleanup gagal:",err);
+    return false;
+  }
+}
+
+function getVillagePins(key){
+  const item=state[key];
+  if(!item) return [];
+  if(!Array.isArray(item.pins)) item.pins=[];
+  return item.pins;
+}
+
+function getPinDiseaseName(key,pin){
+  if(!pin) return null;
+  if(pin.indicator) return String(pin.indicator);
+  const color=PIN_COLORS.find(p=>p.key===pin.colorKey || p.key===state[key]?.pinColor);
+  return color?.indicator || null;
+}
+
+function findDiseaseRow(key,name){
+  return state[key]?.diseases?.find(d=>String(d.name||'').trim().toLowerCase()===String(name||'').trim().toLowerCase()) || null;
+}
+
+function applyPinImpact(key,pin){
+  if(!pin) return false;
+  if(pin.countApplied===true) return true;
+  const diseaseName=getPinDiseaseName(key,pin);
+  const row=findDiseaseRow(key,diseaseName);
+  if(!row) return false;
+  row.k=Math.max(0,(Number(row.k)||0)+1);
+  row.p=Math.max(0,(Number(row.p)||0)+1);
+  pin.countApplied=true;
+  return true;
+}
+
+function reversePinImpact(key,pin){
+  if(!pin) return false;
+  const diseaseName=getPinDiseaseName(key,pin);
+  const row=findDiseaseRow(key,diseaseName);
+  if(!row) return false;
+  // Setiap pin aktif mewakili 1 Kasus Baru + 1 Pemantauan.
+  // Saat pin dicabut, kontribusinya harus selalu dikurangi, termasuk pin lama
+  // yang belum memiliki penanda countApplied.
+  row.k=Math.max(0,(Number(row.k)||0)-1);
+  row.p=Math.max(0,(Number(row.p)||0)-1);
+  pin.countApplied=false;
+  return true;
+}
+
+function refreshPwsAfterPinChange(key,message){
+  saveState();
+  queuePwsCloudSave();
+  activeVillage=key;
+  renderDiseaseTable();
+  renderDiseaseChart();
+  updateVillageUI();
+  updateSixVillageGrid();
+  if(message) setSaveState(message);
+}
+
+function migratePinImpactsOnce(){
+  let changed=false;
+  Object.keys(VILLAGES).forEach(key=>{
+    const pins=getVillagePins(key);
+    const valid=[];
+    pins.forEach((pin,idx)=>{
+      if(!pin.indicator || ['ibu hamil'].includes(String(pin.indicator).toLowerCase())) { changed=true; return; }
+      if(!pin.id) {pin.id=`pin_${key}_${Date.now()}_${idx}`;changed=true;}
+      if(!pin.colorKey){
+        const c=PIN_COLORS.find(p=>p.indicator.toLowerCase()===String(pin.indicator).toLowerCase());
+        if(c){pin.colorKey=c.key;changed=true;}
+      }
+      const row=findDiseaseRow(key,pin.indicator);
+      if(row && pin.countApplied!==true){
+        row.k=Math.max(0,(Number(row.k)||0)+1);
+        row.p=Math.max(0,(Number(row.p)||0)+1);
+        pin.countApplied=true;
+        changed=true;
+      }
+      valid.push(pin);
+    });
+    if(state[key].pins.length!==valid.length){state[key].pins=valid;changed=true;}
+    state[key].pin=null;
+    state[key].pinColor=state[key].pins[0]?.colorKey || 'red';
+  });
+  if(changed) saveState();
+}
+
+function initMap(){
+  map = L.map("map").setView([-0.403,104.525],12.5);
+
+  baseStreet = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+    maxZoom:19,
+    attribution:'&copy; OpenStreetMap contributors'
+  });
+
+  baseSatellite = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom:19,
+      attribution:'Tiles &copy; Esri'
+    }
+  );
+
+  baseSatellite.addTo(map);
+  activeBase = "satellite";
+
+  for(const [key,v] of Object.entries(VILLAGES)){
+    polygons[key] = L.polygon(v.polygon,{
+      color:"#ffffff",
+      weight:6,
+      opacity:0.85,
+      dashArray:"10 8",
+      lineJoin:"round",
+      fillColor:v.color,
+      fillOpacity:.24,
+      bubblingMouseEvents:false
+    }).addTo(map);
+
+    polygons[key].on("add",()=>{
+      try{
+        // A second, thinner overlay keeps the administrative seam readable on satellite.
+        v.innerBoundary = L.polyline(v.polygon.concat([v.polygon[0]]),{
+          color:"#263238",
+          weight:2,
+          opacity:0.95,
+          dashArray:"10 8",
+          lineJoin:"round",
+          interactive:false
+        }).addTo(map);
+      }catch(e){}
+    });
+
+    polygons[key].bindTooltip(`<b>${v.name}</b>`,{sticky:true,direction:"center",className:"village-label"});
+    polygons[key].on("click",()=>selectVillage(key));
+  }
+
+  drawAllPins();
+  updateVillageUI();
+  renderDiseaseChart();
+}
+
+
+const BIG_OFFICIAL_BOUNDARY_URL = '""" + BIG_QUERY_URL + r"""';
+
+async function loadOfficialBIGBoundaries(){
+  const status=document.getElementById("officialBoundaryStatus");
+  try{
+    const res=await fetch(BIG_OFFICIAL_BOUNDARY_URL,{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const geo=await res.json();
+    if(!geo || !Array.isArray(geo.features) || !geo.features.length){
+      throw new Error("GeoJSON kosong");
+    }
+
+    // Remove fallback village polygons before drawing official polygons.
+    Object.values(polygons).forEach(p=>{ if(p) map.removeLayer(p); });
+    Object.values(VILLAGES).forEach(v=>{
+      if(v.innerBoundary && map.hasLayer(v.innerBoundary)) map.removeLayer(v.innerBoundary);
+      v.innerBoundary=null;
+    });
+
+    geo.features.forEach(feature=>{
+      const name=(feature.properties?.WADMKD || "").trim();
+      const key=Object.keys(VILLAGES).find(k=>VILLAGES[k].name.toLowerCase()===("Desa "+name).toLowerCase());
+      if(!key || !feature.geometry) return;
+
+      const v=VILLAGES[key];
+      const layer=L.geoJSON(feature,{
+        style:{
+          color:"#ffffff",
+          weight:6,
+          opacity:.90,
+          dashArray:"10 8",
+          lineJoin:"round",
+          fillColor:v.color,
+          fillOpacity:.20
+        }
+      }).addTo(map);
+
+      layer.bindTooltip(`<b>${v.name}</b>`,{
+        sticky:true,
+        direction:"center",
+        className:"village-label"
+      });
+
+      // A thin dark dashed line remains readable on satellite imagery.
+      const inner=L.geoJSON(feature,{
+        style:{
+          color:"#263238",
+          weight:2,
+          opacity:.95,
+          dashArray:"10 8",
+          fillOpacity:0,
+          interactive:false
+        }
+      }).addTo(map);
+
+      polygons[key]=layer;
+      v.innerBoundary=inner;
+
+      layer.on("click",()=>selectVillage(key));
+
+      // Gunakan titik yang benar-benar berada di dalam polygon resmi, bukan
+      // sekadar titik tengah bounding box (yang bisa berada di luar desa).
+      try{
+        const safe=findSafePointForGeoJSON(feature);
+        const c=safe || [layer.getBounds().getCenter().lat,layer.getBounds().getCenter().lng];
+        v.center=[Number(c[0].toFixed(6)),Number(c[1].toFixed(6))];
+      }catch(e){}
+    });
+
+    const count=Object.values(polygons).filter(Boolean).length;
+    if(status){
+      status.innerHTML=` • <span class="official-boundary">Batas resmi BIG: ${count}/6 desa</span>`;
+    }
+    fitAll();
+    updateSixVillageGrid();
+  }catch(err){
+    console.warn("Batas resmi BIG tidak berhasil dimuat:",err);
+    if(status){
+      status.textContent=" • Batas resmi BIG tidak termuat; memakai batas cadangan.";
+      status.style.color="#8a5b00";
+    }
+  }
+}
+
+function fitAll(){
+  const group = L.featureGroup(Object.values(polygons));
+  if(Object.keys(polygons).length) map.fitBounds(group.getBounds().pad(.08));
+}
+
+// Cari titik yang benar-benar berada di dalam batas desa.
+// Ini mencegah pusat bounding box jatuh di luar polygon desa yang bentuknya tidak beraturan.
+function findSafePointForGeoJSON(feature){
+  try{
+    if(!feature) return null;
+    const geometry = feature.type === 'Feature' ? feature.geometry : feature;
+    if(!geometry) return null;
+    const polys = geometry.type === 'Polygon' ? [geometry.coordinates] :
+                  geometry.type === 'MultiPolygon' ? geometry.coordinates : [];
+    if(!polys.length) return null;
+
+    const candidates=[];
+    for(const poly of polys){
+      const outer=Array.isArray(poly?.[0]) ? poly[0] : [];
+      if(!outer.length) continue;
+      let sx=0, sy=0;
+      outer.forEach(([x,y])=>{sx+=Number(x)||0; sy+=Number(y)||0;});
+      candidates.push([sy/outer.length, sx/outer.length]);
+      const minX=Math.min(...outer.map(pt=>Number(pt[0])));
+      const maxX=Math.max(...outer.map(pt=>Number(pt[0])));
+      const minY=Math.min(...outer.map(pt=>Number(pt[1])));
+      const maxY=Math.max(...outer.map(pt=>Number(pt[1])));
+      candidates.push([(minY+maxY)/2,(minX+maxX)/2]);
+      // Grid fallback untuk polygon cekung/sempit.
+      for(let iy=1;iy<=16;iy++) for(let ix=1;ix<=16;ix++){
+        const x=minX+(maxX-minX)*(ix/17);
+        const y=minY+(maxY-minY)*(iy/17);
+        candidates.push([y,x]);
+      }
+    }
+    for(const [lat,lng] of candidates){
+      if(pointInGeoJSON(feature,lat,lng)) return [lat,lng];
+    }
+  }catch(e){ console.warn('Gagal mencari titik aman desa:',e); }
+  return null;
+}
+
+function getSafeVillageCenter(key){
+  const v=VILLAGES[key];
+  if(!v) return null;
+  const layer=polygons[key];
+  try{
+    if(layer && typeof layer.toGeoJSON==='function'){
+      const geo=layer.toGeoJSON();
+      if(geo?.type==='FeatureCollection'){
+        for(const f of geo.features || []){
+          const pt=findSafePointForGeoJSON(f);
+          if(pt) return pt;
+        }
+      }else{
+        const pt=findSafePointForGeoJSON(geo);
+        if(pt) return pt;
+      }
+    }
+  }catch(e){}
+  if(Array.isArray(v.polygon) && v.polygon.length){
+    // Cari titik grid pada polygon cadangan juga.
+    const feature={type:'Feature',geometry:{type:'Polygon',coordinates:[[...v.polygon.map(([lat,lng])=>[lng,lat]),[v.polygon[0][1],v.polygon[0][0]]]]}};
+    const pt=findSafePointForGeoJSON(feature);
+    if(pt) return pt;
+  }
+  return v.center;
+}
+
+function ensureVillagePinCenter(key){
+  const pt=getSafeVillageCenter(key);
+  if(pt && Number.isFinite(pt[0]) && Number.isFinite(pt[1])){
+    VILLAGES[key].center=[Number(pt[0].toFixed(6)),Number(pt[1].toFixed(6))];
+  }
+  return VILLAGES[key].center;
+}
+
+function drawAllPins(){
+  for(const m of Object.values(markers)){
+    if(m) map.removeLayer(m);
+  }
+  markers={};
+  for(const [key] of Object.entries(VILLAGES)){
+    getVillagePins(key).forEach(pin=>{
+      if(pin && Number.isFinite(pin.lat) && Number.isFinite(pin.lng)){
+        markers[pin.id]=makePin(key,pin);
+      }
+    });
+  }
+}
+
+function pointInRing(point, ring){
+  const [x,y]=point;
+  let inside=false;
+  for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+    const xi=ring[i][0], yi=ring[i][1];
+    const xj=ring[j][0], yj=ring[j][1];
+    const intersect=((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/((yj-yi)||1e-12)+xi);
+    if(intersect) inside=!inside;
+  }
+  return inside;
+}
+
+function pointInGeoJSON(geo,lat,lng){
+  if(!geo || !geo.geometry) return false;
+  const g=geo.geometry;
+  if(g.type==='Polygon'){
+    const rings=g.coordinates||[];
+    if(!rings.length || !pointInRing([lng,lat],rings[0])) return false;
+    for(let i=1;i<rings.length;i++) if(pointInRing([lng,lat],rings[i])) return false;
+    return true;
+  }
+  if(g.type==='MultiPolygon'){
+    return (g.coordinates||[]).some(poly=>{
+      if(!poly.length || !pointInRing([lng,lat],poly[0])) return false;
+      for(let i=1;i<poly.length;i++) if(pointInRing([lng,lat],poly[i])) return false;
+      return true;
+    });
+  }
+  return false;
+}
+
+function isPointInsideVillage(key,lat,lng){
+  if(!VILLAGES[key] || !Number.isFinite(lat) || !Number.isFinite(lng)) return false;
+  const layer=polygons[key];
+  try{
+    if(layer && typeof layer.toGeoJSON==='function'){
+      const geo=layer.toGeoJSON();
+      if(geo?.type==='FeatureCollection'){
+        return geo.features.some(f=>pointInGeoJSON(f,lat,lng));
+      }
+      if(geo?.type==='Feature') return pointInGeoJSON(geo,lat,lng);
+    }
+  }catch(e){ console.warn('Validasi batas desa gagal, memakai poligon cadangan.',e); }
+  return pointInRing([lng,lat], VILLAGES[key].polygon.map(p=>[p[1],p[0]]));
+}
+
+function makePin(key,pin){
+  const indicatorName=String(pin.indicator||'').trim().toLowerCase();
+  // Warna pin selalu mengikuti warna indikator penyakit yang dipilih.
+  const color=PIN_COLORS.find(p=>String(p.indicator||'').trim().toLowerCase()===indicatorName)
+    || PIN_COLORS.find(p=>p.key===pin.colorKey)
+    || PIN_COLORS[0];
+  pin.colorKey=color.key;
+  pin.indicator=color.indicator;
+  saveState();
+  const villagePins=getVillagePins(key);
+  const index=Math.max(0,villagePins.findIndex(p=>p.id===pin.id))+1;
+  const icon=L.divIcon({
+    className:"pws-pin-icon",
+    html:`<div style="width:19px;height:28px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));">
+      <svg width="19" height="28" viewBox="0 0 30 44" xmlns="http://www.w3.org/2000/svg" aria-label="${escapeHtml(color.indicator)}">
+        <path d="M15 42C13.5 37.5 7 29.5 6.2 19.2A9.2 9.2 0 0 1 15 10a9.2 9.2 0 0 1 8.8 9.2C23 29.5 16.5 37.5 15 42Z" fill="${color.hex}" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="15" cy="19" r="2.35" fill="#ffffff" opacity=".98"/>
+      </svg>
+    </div>`,
+    iconSize:[19,28],
+    iconAnchor:[9.5,28],
+    popupAnchor:[0,-26]
+  });
+  const m=L.marker([pin.lat,pin.lng],{draggable:true,icon})
+    .addTo(map)
+    .bindPopup(`<b>${escapeHtml(VILLAGES[key].name)}</b><br>Pin #${index}<br>Indikator: <b>${escapeHtml(color.indicator)}</b><br><span class="small">Pin hanya boleh berada di dalam batas ${escapeHtml(VILLAGES[key].name)}.</span>`);
+  m.on("dragend",()=>{
+    const p=m.getLatLng();
+    if(!isPointInsideVillage(key,p.lat,p.lng)){
+      m.setLatLng([pin.lat,pin.lng]);
+      alert(`Pin tidak dapat dipindahkan ke luar ${VILLAGES[key].name}.`);
+      return;
+    }
+    pin.lat=Number(p.lat.toFixed(6));
+    pin.lng=Number(p.lng.toFixed(6));
+    saveState();
+    if(activeVillage===key){updateVillageUI();updateSixVillageGrid();}
+  });
+  return m;
+}
+
+let pendingPinAuthAction=null;
+let pendingPinAuthVillage=null;
+let pendingPinRemoveId=null;
+
+function openPinPasswordModal(action,villageKey){
+  pendingPinAuthAction=action;
+  pendingPinAuthVillage=villageKey;
+  const label=document.getElementById('pinAuthVillageLabel');
+  const input=document.getElementById('pinAuthPassword');
+  const title=document.getElementById('pinAuthTitle');
+  if(label) label.textContent=VILLAGES[villageKey]?.name || '';
+  if(title) title.textContent=action==='add' ? 'Otorisasi Tancap Pin' : 'Otorisasi Cabut Pin';
+  if(input){input.value='';input.focus();}
+  document.getElementById('pinAuthModal').style.display='flex';
+}
+
+function closePinAuthModal(){
+  const modal=document.getElementById('pinAuthModal');
+  if(modal) modal.style.display='none';
+  pendingPinAuthAction=null;
+  pendingPinAuthVillage=null;
+}
+
+function confirmPinAuth(){
+  const input=document.getElementById('pinAuthPassword');
+  const key=pendingPinAuthVillage;
+  if(!input || !key) return;
+  if(input.value!==MASTER_VILLAGE_PASSWORDS[key]){
+    alert('Password salah.');
+    input.select();
+    return;
+  }
+  const action=pendingPinAuthAction;
+  closePinAuthModal();
+  if(action==='add') openPinModal();
+  if(action==='remove') openPinRemovalPicker();
+}
+
+function openPinModal(){
+  const select=document.getElementById('pinVillage');
+  select.innerHTML='';
+  Object.entries(VILLAGES).forEach(([key,v])=>{
+    const o=document.createElement('option'); o.value=key;o.textContent=v.name;select.appendChild(o);
+  });
+  select.value=activeVillage;
+  select.disabled=true;
+  const safeCenter=ensureVillagePinCenter(activeVillage);
+  document.getElementById('pinLat').value=safeCenter[0];
+  document.getElementById('pinLng').value=safeCenter[1];
+  const pcs=document.getElementById('pinColorSelect');
+  if(pcs){
+    const names=new Set((state[activeVillage].diseases||[]).map(d=>String(d.name||'').trim().toLowerCase()));
+    const availablePins=PIN_COLORS.filter(p=>names.has(String(p.indicator||'').trim().toLowerCase()));
+    pcs.innerHTML=availablePins.map(p=>`<option value="${p.key}">${escapeHtml(p.name)} — ${escapeHtml(p.indicator)}</option>`).join('');
+  }
+  document.getElementById('pinModal').style.display='flex';
+}
+
+function closePinModal(){document.getElementById('pinModal').style.display='none';}
+
+function addPin(){
+  const key=activeVillage;
+  if(!(state[key]?.diseases?.length)){alert('Belum ada indikator penyakit pada desa ini.');return;}
+  // Tidak dibatasi satu pin: pin boleh ditambah berulang untuk penyakit yang sama maupun berbeda.
+  openPinPasswordModal('add',key);
+}
+
+function savePinFromModal(){
+  const key=document.getElementById('pinVillage').value;
+  const lat=Number(document.getElementById('pinLat').value);
+  const lng=Number(document.getElementById('pinLng').value);
+  const modalColor=document.getElementById('pinColorSelect')?.value;
+  const selectedColor=PIN_COLORS.find(p=>p.key===modalColor);
+  const color=selectedColor ? (PIN_COLORS.find(p=>String(p.indicator||'').trim().toLowerCase()===String(selectedColor.indicator||'').trim().toLowerCase()) || selectedColor) : null;
+  if(!Number.isFinite(lat)||!Number.isFinite(lng)){alert('Koordinat tidak valid.');return;}
+  if(!color){alert('Indikator pin belum dipilih.');return;}
+  if(!findDiseaseRow(key,color.indicator)){alert('Indikator pin tersebut tidak tersedia di tabel desa ini.');return;}
+  // Validasi tetap wajib di dalam desa. Bila koordinat awal ternyata berada tepat
+  // di luar karena bentuk polygon resmi tidak beraturan, pindahkan otomatis ke titik aman desa.
+  let finalLat=lat, finalLng=lng;
+  if(!isPointInsideVillage(key,finalLat,finalLng)){
+    const safe=ensureVillagePinCenter(key);
+    if(safe && isPointInsideVillage(key,safe[0],safe[1])){
+      finalLat=Number(safe[0]);
+      finalLng=Number(safe[1]);
+    }else{
+      alert(`Pin tidak dapat ditancapkan karena titik berada di luar batas ${VILLAGES[key].name}.`);
+      return;
+    }
+  }
+  const pin={id:`pin_${key}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,lat:Number(finalLat.toFixed(6)),lng:Number(finalLng.toFixed(6)),indicator:color.indicator,colorKey:color.key,countApplied:false};
+  getVillagePins(key).push(pin);
+  state[key].pinColor=color.key;
+  applyPinImpact(key,pin);
+  markers[pin.id]=makePin(key,pin);
+  closePinModal();
+  refreshPwsAfterPinChange(key,`pin ${color.indicator} #${getVillagePins(key).length} ditancapkan di ${VILLAGES[key].name} • K +1, P +1 • tabel dan diagram diperbarui`);
+  if(map) map.setView([finalLat,finalLng],14);
+}
+
+function closePinRemovalModal(){
+  const modal=document.getElementById('pinRemoveModal'); if(modal) modal.style.display='none';
+  pendingPinRemoveId=null;
+}
+
+function openPinRemovalPicker(){
+  const key=activeVillage;
+  const pins=getVillagePins(key);
+  if(!pins.length){alert('Belum ada pin pada desa ini.');return;}
+  const list=document.getElementById('pinRemoveList');
+  if(!list) return;
+  list.innerHTML=pins.map((pin,index)=>{
+    const color=PIN_COLORS.find(p=>p.key===pin.colorKey) || PIN_COLORS[0];
+    return `<button class="pin-remove-choice" onclick="choosePinToRemove('${pin.id}')"><span class="color-dot" style="background:${color.hex}"></span><b>Pin #${index+1} — ${escapeHtml(pin.indicator)}</b><span class="small">${pin.lat.toFixed(5)}, ${pin.lng.toFixed(5)}</span></button>`;
+  }).join('');
+  document.getElementById('pinRemoveInfo').innerHTML=`Pilih pin yang akan dicabut dari <b>${escapeHtml(VILLAGES[key].name)}</b>.`;
+  document.getElementById('pinRemoveModal').style.display='flex';
+}
+
+function removePin(){
+  const key=activeVillage;
+  if(!getVillagePins(key).length){alert('Belum ada pin pada desa ini.');return;}
+  openPinPasswordModal('remove',key);
+}
+
+function choosePinToRemove(id){
+  const pin=getVillagePins(activeVillage).find(p=>p.id===id);
+  if(!pin) return;
+  pendingPinRemoveId=id;
+  const color=PIN_COLORS.find(p=>p.key===pin.colorKey) || PIN_COLORS[0];
+  document.getElementById('pinRemoveList').innerHTML=`<div class="pin-selected-box"><span class="color-dot" style="background:${color.hex}"></span><b>Pin ${escapeHtml(pin.indicator)}</b><br><span class="small">${pin.lat.toFixed(6)}, ${pin.lng.toFixed(6)}</span></div>`;
+  document.getElementById('pinRemoveInfo').innerHTML='Pilih alasan pencabutan pin:';
+}
+
+function confirmPinRemoval(outcome){
+  const key=activeVillage;
+  const pin=getVillagePins(key).find(p=>p.id===pendingPinRemoveId);
+  if(!pin) return closePinRemovalModal();
+  if(outcome!=='s' && outcome!=='m') return;
+
+  const row=findDiseaseRow(key,pin.indicator);
+  if(row){
+    reversePinImpact(key,pin);
+    if(outcome==='s') row.s=Math.max(0,(Number(row.s)||0)+1);
+    if(outcome==='m') row.m=Math.max(0,(Number(row.m)||0)+1);
+  } else {
+    // Pin tanpa baris indikator tetap dicabut agar tidak menjadi pin yatim.
+    pin.countApplied=false;
+  }
+
+  const idx=getVillagePins(key).findIndex(p=>p.id===pin.id);
+  if(idx>=0) getVillagePins(key).splice(idx,1);
+  if(markers[pin.id] && map) map.removeLayer(markers[pin.id]);
+  delete markers[pin.id];
+  state[key].pinColor=getVillagePins(key)[getVillagePins(key).length-1]?.colorKey || 'red';
+
+  const outcomeText=outcome==='s'?'sembuh (K -1, P -1, S +1)':'meninggal (K -1, P -1, M +1)';
+  closePinRemovalModal();
+  refreshPwsAfterPinChange(key,`pin ${pin.indicator} dicabut • ${outcomeText} • tabel dan diagram diperbarui`);
+}
+
+function applyMapLock(locked){
+  if(!map) return;
+  mapLocked = !!locked;
+  const methods = ["dragging","scrollWheelZoom","doubleClickZoom","boxZoom","keyboard","touchZoom"];
+  methods.forEach(name=>{
+    const handler=map[name];
+    if(!handler) return;
+    mapLocked ? handler.disable() : handler.enable();
+  });
+  const btn=document.getElementById("mapLockBtn");
+  const status=document.getElementById("mapLockStatus");
+  if(btn){btn.textContent=mapLocked ? "🔓 Buka Kunci Peta" : "🔒 Kunci Peta";btn.classList.toggle("active",mapLocked)}
+  if(status){status.classList.toggle("locked",mapLocked);status.innerHTML=mapLocked?"<span>●</span> Peta terkunci":"<span>●</span> Peta bebas digeser"}
+  localStorage.setItem("pws_map_locked",mapLocked?"1":"0");
+}
+
+function toggleMapLock(){
+  if(mapLocked){
+    const modal=document.getElementById("mapLockModal");
+    const input=document.getElementById("mapAdminPassword");
+    if(input) input.value="";
+    if(modal) modal.style.display="flex";
+    setTimeout(()=>input?.focus(),80);
+  }else{
+    applyMapLock(true);
+  }
+}
+
+function confirmMapUnlock(){
+  const input=document.getElementById("mapAdminPassword");
+  if(!input) return;
+  if(input.value===ADMIN_PASSWORD){closeMapLockModal();applyMapLock(false)}
+  else{alert("Password admin salah.");input.select()}
+}
+
+function closeMapLockModal(){
+  const modal=document.getElementById("mapLockModal");
+  if(modal) modal.style.display="none";
+}
+
+function restoreMapLockState(){
+  applyMapLock(localStorage.getItem("pws_map_locked")==="1");
+}
+
+function openDiseaseCardFromVillageClick(){
+  const card=document.getElementById("diseaseCard");
+  const text=document.getElementById("collapseText");
+  if(card) card.classList.remove("collapsed");
+  if(text) text.textContent="Minimize";
+  localStorage.setItem("pws_table_collapsed","0");
+  setTimeout(()=>document.getElementById("diseaseCard")?.scrollIntoView({behavior:"smooth",block:"start"}),120);
+}
+
+function setBase(kind){
+  if(!map) return;
+  if(kind==="satellite"){
+    if(map.hasLayer(baseStreet)) map.removeLayer(baseStreet);
+    baseSatellite.addTo(map);
+    activeBase="satellite";
+  }else{
+    if(map.hasLayer(baseSatellite)) map.removeLayer(baseSatellite);
+    baseStreet.addTo(map);
+    activeBase="street";
+  }
+}
+
+function renderPinPalette(){
+  const box=document.getElementById("pinPalette");
+  if(!box) return;
+  const selected=state[activeVillage].pinColor || "red";
+  const diseases=state[activeVillage]?.diseases || [];
+  const seen=new Set();
+  const activePins=diseases.map(d=>getPinForDisease(d.name)).filter(p=>{
+    if(!p || seen.has(p.indicator.toLowerCase())) return false;
+    seen.add(p.indicator.toLowerCase());
+    return true;
+  });
+  box.innerHTML=activePins.map(p=>`
+    <button class="pin-choice disease-pin ${selected===p.key?'selected':''}" onclick="setPinColor('${p.key}')">
+      <span class="pin-color-key"><span class="color-dot" style="background:${p.hex}"></span><b>${p.name}</b></span>
+      <span class="pin-disease-label">${escapeHtml(p.indicator)}</span>
+    </button>
+  `).join("");
+}
+
+function setPinColor(colorKey){
+  if(!PIN_COLORS.some(p=>p.key===colorKey)) return;
+  state[activeVillage].pinColor=colorKey;
+  saveState();
+  queuePwsCloudSave();
+  renderPinPalette();
+  updateSixVillageGrid();
+}
+
+function villageSvg(village, pin, pinColor){
+  const pts=village.polygon;
+  const xs=pts.map(p=>p[1]), ys=pts.map(p=>p[0]);
+  const minX=Math.min(...xs), maxX=Math.max(...xs);
+  const minY=Math.min(...ys), maxY=Math.max(...ys);
+  const pad=0.12;
+  const dx=(maxX-minX)||0.01, dy=(maxY-minY)||0.01;
+  const toX=lon=>24 + ((lon-minX)/dx)*152;
+  const toY=lat=>82 - ((lat-minY)/dy)*62;
+  const polygonPoints=pts.map(p=>`${toX(p[1]).toFixed(1)},${toY(p[0]).toFixed(1)}`).join(" ");
+  const cx=pin ? toX(pin.lng) : toX(village.center[1]);
+  const cy=pin ? toY(pin.lat) : toY(village.center[0]);
+  return `
+    <svg viewBox="0 0 200 100" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+      <rect x="0" y="0" width="200" height="100" fill="#d9e7ec"/>
+      <path d="M0,74 C28,62 40,88 68,76 C95,64 111,88 139,76 C160,67 176,84 200,72 L200,100 L0,100 Z"
+            fill="#cfe1c6" opacity=".85"/>
+      <polygon points="${polygonPoints}" fill="${village.color}" fill-opacity=".92"
+               stroke="${pinColor.hex}" stroke-width="2"/>
+      <circle cx="${cx}" cy="${cy}" r="3.8" fill="${pinColor.hex}" stroke="#fff" stroke-width="1.5"/>
+      ${pin ? `<text x="${cx}" y="${Math.max(12,cy-7)}" text-anchor="middle" font-size="17">📍</text>` : ""}
+    </svg>`;
+}
+
+function updateSixVillageGrid(){
+  const box=document.getElementById("villageSixGrid");
+  if(!box) return;
+  box.innerHTML=Object.entries(VILLAGES).map(([key,v])=>{
+    const data=state[key];
+    const pins=getVillagePins(key);
+    const pin=pins[0] || null;
+    const pinColor=PIN_COLORS.find(p=>p.key===(pin?.colorKey || data.pinColor || "red")) || PIN_COLORS[0];
+    const diseaseCount=data.diseases?.length || 0;
+    const special=data.diseases?.filter(d=>["ODGJ","Stunting"].includes(d.name)).length || 0;
+    return `
+      <div class="village-card ${key===activeVillage?'active':''}" onclick="selectVillage('${key}')">
+        <div class="village-mini-map">${villageSvg(v,pin,pinColor)}</div>
+        <div class="village-name">${v.name}</div>
+        <div class="village-stats">
+          ${diseaseCount} indikator • ${special} indikator utama<br>
+          ${pins.length ? `Pin terpasang: ${pins.length}` : "Belum ada pin"}<br>
+          ${pins.length ? `<span style="color:${pinColor.hex};font-weight:700">${escapeHtml(pins.map(x=>x.indicator).join(', '))}</span>` : ""}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function selectVillage(key){
+  if(!VILLAGES[key]) return;
+  activeVillage=key;
+
+  if(map && polygons[key]){
+    map.fitBounds(polygons[key].getBounds().pad(.18));
+    polygons[key].setStyle({weight:7,opacity:0.95,color:"#fff",dashArray:"10 8",fillOpacity:.30});
+    if(VILLAGES[key].innerBoundary) VILLAGES[key].innerBoundary.setStyle({weight:3,opacity:1,dashArray:"10 8",color:"#111827"});
+    Object.entries(polygons).forEach(([k,p])=>{
+      if(k!==key) {
+        p.setStyle({weight:6,opacity:0.85,dashArray:"10 8",color:"#ffffff",fillOpacity:.24});
+        if(VILLAGES[k].innerBoundary) VILLAGES[k].innerBoundary.setStyle({weight:2,opacity:0.95,dashArray:"10 8",color:"#263238"});
+      }
+    });
+  }
+
+  const diseaseCard=document.getElementById("diseaseCard");
+  if(diseaseCard) diseaseCard.classList.remove("collapsed");
+  const collapseText=document.getElementById("collapseText");
+  if(collapseText) collapseText.textContent="Minimize";
+  localStorage.setItem("pws_table_collapsed","0");
+
+  updateVillageUI();
+  renderDiseaseTable();
+  renderDiseaseChart();
+  setTimeout(()=>document.getElementById("diseaseCard")?.scrollIntoView({behavior:"smooth",block:"start"}),60);
+}
+
+function updateVillageUI(){
+  const v=VILLAGES[activeVillage];
+  const pins=getVillagePins(activeVillage);
+
+  document.getElementById("villageSelect").value=activeVillage;
+  document.getElementById("pinVillage").value=activeVillage;
+  document.getElementById("tableVillageName").textContent=v.name.toUpperCase();
+
+  document.getElementById("villageMeta").innerHTML=`
+    <div class="meta-box"><b>Desa</b><span>${v.name}</span></div>
+    <div class="meta-box"><b>Pin PWS</b><span>${pins.length} pin</span></div>
+    <div class="meta-box"><b>Status Data</b><span>${state[activeVillage].diseases.length} penyakit</span></div>
+  `;
+
+  document.querySelectorAll(".village-btn").forEach(b=>{
+    b.classList.toggle("active",b.dataset.key===activeVillage);
+  });
+  renderPinPalette();
+  updateSixVillageGrid();
+}
+
+
+function toggleDiseaseTable(){
+  const card=document.getElementById("diseaseCard");
+  const text=document.getElementById("collapseText");
+  if(!card) return;
+  card.classList.toggle("collapsed");
+  const collapsed=card.classList.contains("collapsed");
+  if(text) text.textContent=collapsed ? "Buka Tabel" : "Minimize";
+  localStorage.setItem("pws_table_collapsed", collapsed ? "1" : "0");
+  if(map) setTimeout(()=>map.invalidateSize(),120);
+}
+
+function toggleMapFull(){
+  const card=document.getElementById("mapCard");
+  const btn=document.getElementById("mapFullBtn");
+  if(!card) return;
+  card.classList.toggle("full-map");
+  const full=card.classList.contains("full-map");
+  if(btn) {
+    btn.textContent = full ? "Kembali" : "Peta Penuh";
+    btn.classList.toggle("active", full);
+  }
+  localStorage.setItem("pws_map_full", full ? "1" : "0");
+  setTimeout(()=>{
+    if(map){
+      map.invalidateSize();
+      if(full) fitAll();
+    }
+  },180);
+}
+
+function restoreMapState(){
+  const card=document.getElementById("mapCard");
+  const btn=document.getElementById("mapFullBtn");
+  const full=localStorage.getItem("pws_map_full")==="1";
+  if(card) card.classList.toggle("full-map", full);
+  if(btn) {
+    btn.textContent = full ? "Kembali" : "Peta Penuh";
+    btn.classList.toggle("active", full);
+  }
+}
+
+function restoreDiseaseTableState(){
+  const card=document.getElementById("diseaseCard");
+  const text=document.getElementById("collapseText");
+  const collapsed=localStorage.getItem("pws_table_collapsed")==="1";
+  if(card && collapsed) card.classList.add("collapsed");
+  if(text) text.textContent=collapsed ? "Buka Tabel" : "Minimize";
+}
+
+function buildVillageControls(){
+  const sel=document.getElementById("villageSelect");
+  sel.innerHTML="";
+  const box=document.getElementById("villageButtons");
+  box.innerHTML="";
+
+  Object.entries(VILLAGES).forEach(([key,v])=>{
+    const o=document.createElement("option");
+    o.value=key;o.textContent=v.name;
+    sel.appendChild(o);
+
+    const b=document.createElement("button");
+    b.className="village-btn";
+    b.dataset.key=key;
+    b.textContent=v.name;
+    b.onclick=()=>selectVillage(key);
+    box.appendChild(b);
+  });
+}
+
+function calcPantau(k,s,m){
+  const val=(Number(k)||0)-(Number(s)||0)-(Number(m)||0);
+  return val<0?0:val;
+}
+
+function getDiseaseKey(name){
+  const map={"TB Paru":"tb","Diabetes Melitus":"dm","Ibu Hamil":"ibuhamil","Bumil Resti":"bumil resti"};
+  return map[name] || String(name).toLowerCase().replace(/[^a-z0-9]+/g,'_');
+}
+
+function getPinForDisease(name){
+  const n=String(name||'').trim().toLowerCase();
+  return PIN_COLORS.find(p=>String(p.indicator||'').trim().toLowerCase()===n) || ensurePinColorForDisease(String(name||'PWS'));
+}
+
+function getDesaTotals(item){
+  const totals={k:0,p:0,s:0,m:0};
+  (item?.diseases||[]).forEach(d=>{
+    totals.k += Number(d.k)||0;
+    totals.p += Number(d.p)||0;
+    totals.s += Number(d.s)||0;
+    totals.m += Number(d.m)||0;
+  });
+  return totals;
+}
+
+function buildMasterTableHeader(){
+  const groupRow=document.getElementById("masterDiseaseGroupRow");
+  const statusRow=document.getElementById("masterStatusRow");
+  if(!groupRow||!statusRow) return;
+  groupRow.innerHTML='<th rowspan="2" class="master-village-head">Nama Desa</th>';
+  statusRow.innerHTML='';
+
+  const diseases=state[activeVillage]?.diseases || [];
+  diseases.forEach((d)=>{
+    const th=document.createElement('th');
+    const pin=getPinForDisease(d.name);
+    th.colSpan=4;
+    th.className='disease-group';
+    th.style.borderTopColor=pin.hex;
+    th.title=`Warna pin: ${pin.name} — ${d.name}`;
+    th.innerHTML=`<span class="pin-indicator-head"><span class="pin-indicator-dot" style="background:${pin.hex}"></span><span>${escapeHtml(d.name)}</span></span>`;
+    groupRow.appendChild(th);
+    [['K','k'],['P','p'],['S','s'],['M','m']].forEach(([label,cls])=>{
+      const sh=document.createElement('th');
+      sh.className=`status-th status-${cls}`;
+      sh.textContent=label;
+      statusRow.appendChild(sh);
+    });
+  });
+
+  const totalTh=document.createElement('th');
+  totalTh.colSpan=4; totalTh.className='disease-group total-group'; totalTh.title='Total Akumulasi Seluruh Penyakit'; totalTh.textContent='Total PWS';
+  groupRow.appendChild(totalTh);
+  [['K','total-status-k'],['P','total-status-p'],['S','total-status-s'],['M','total-status-m']].forEach(([label,cls])=>{
+    const sh=document.createElement('th'); sh.className=`status-th ${cls}`; sh.textContent=label; statusRow.appendChild(sh);
+  });
+  const aksi=document.createElement('th'); aksi.rowSpan=2; aksi.className='action-cell-master'; aksi.textContent='Aksi'; groupRow.appendChild(aksi);
+}
+
+function renderDiseaseTable(){
+  buildMasterTableHeader();
+  const body=document.getElementById('diseaseBody');
+  if(!body) return;
+  body.innerHTML='';
+
+  Object.entries(VILLAGES).forEach(([villageKey,village])=>{
+    const item=state[villageKey];
+    const totals=getDesaTotals(item);
+    const editing=item.diseases.some(d=>d.editing);
+    const tr=document.createElement('tr');
+    tr.className = villageKey===activeVillage ? 'master-active-row' : '';
+    let html=`<td class="village-cell">${escapeHtml(village.name)}</td>`;
+
+    // Table columns follow the Master PWS disease order.
+    const headerDiseases=state[activeVillage]?.diseases || [];
+    headerDiseases.forEach((headerDisease, i)=>{
+      const rowDisease=item.diseases[i] || makeDiseaseRow(headerDisease.name,[0,0,0]);
+      const p=Number(rowDisease.p)||0;
+      if(editing){
+        html += `
+          <td class="status-cell"><input class="master-input k-input" min="0" type="number" value="${Number(rowDisease.k)||0}" oninput="liveMasterInput('${villageKey}',${i},'k',this.value)"></td>
+          <td class="status-cell p-cell"><input class="master-input p-input" min="0" type="number" value="${Number(rowDisease.p)||0}" oninput="liveMasterInput('${villageKey}',${i},'p',this.value)"></td>
+          <td class="status-cell"><input class="master-input s-input" min="0" type="number" value="${Number(rowDisease.s)||0}" oninput="liveMasterInput('${villageKey}',${i},'s',this.value)"></td>
+          <td class="status-cell"><input class="master-input m-input" min="0" type="number" value="${Number(rowDisease.m)||0}" oninput="liveMasterInput('${villageKey}',${i},'m',this.value)"></td>`;
+      }else{
+        html += `
+          <td class="status-cell status-k">${Number(rowDisease.k)||0}</td>
+          <td class="status-cell p-cell">${p}</td>
+          <td class="status-cell status-s">${Number(rowDisease.s)||0}</td>
+          <td class="status-cell status-m">${Number(rowDisease.m)||0}</td>`;
+      }
+    });
+
+    html += `
+      <td id="tot-k-${villageKey}" class="status-cell total-cell-k">${totals.k}</td>
+      <td id="tot-p-${villageKey}" class="status-cell total-cell-p master-total-p">${totals.p}</td>
+      <td id="tot-s-${villageKey}" class="status-cell total-cell-s">${totals.s}</td>
+      <td id="tot-m-${villageKey}" class="status-cell total-cell-m">${totals.m}</td>
+      <td class="action-cell-master">${editing
+        ? `<button class="btn" onclick="saveVillageRow('${villageKey}')">✓ Simpan</button>
+           <button class="btn secondary" onclick="cancelVillageRowEdits('${villageKey}')">✕ Batal</button>`
+        : `<button class="btn secondary" onclick="promptPwsEdit('${villageKey}')">✎ Edit</button>`}</td>`;
+
+    tr.innerHTML=html;
+    body.appendChild(tr);
+  });
+  updateVillageUI();
+}
+
+let pwsEditVillageKey=null;
+
+function promptPwsEdit(villageKey){
+  if(!VILLAGES[villageKey]) return;
+  pwsEditVillageKey=villageKey;
+  activeVillage=villageKey;
+  const modal=document.getElementById('pwsEditModal');
+  if(!modal) return;
+  document.getElementById('pwsEditVillageLabel').textContent=VILLAGES[villageKey].name;
+  document.getElementById('pwsEditPassword').value='';
+  document.getElementById('pwsEditError').style.display='none';
+  updateVillageUI();
+  modal.style.display='flex';
+  setTimeout(()=>document.getElementById('pwsEditPassword')?.focus(),60);
+}
+
+function closePwsEditModal(){
+  const modal=document.getElementById('pwsEditModal');
+  if(modal) modal.style.display='none';
+  pwsEditVillageKey=null;
+}
+
+function confirmPwsEdit(){
+  const key=pwsEditVillageKey || activeVillage;
+  const val=document.getElementById('pwsEditPassword').value;
+  if(val===MASTER_VILLAGE_PASSWORDS[key]){
+    state[key].diseases.forEach(d=>{
+      d.editing=true;
+      d._backup={k:d.k,p:d.p,s:d.s,m:d.m};
+    });
+    saveState();
+    closePwsEditModal();
+    renderDiseaseTable();
+    setSaveState(`akses edit dibuka: ${VILLAGES[key].name}`);
+  }else{
+    document.getElementById('pwsEditError').style.display='block';
+  }
+}
+
+function liveMasterInput(villageKey,i,type,value){
+  const row=state[villageKey]?.diseases?.[i];
+  if(!row) return;
+  row[type]=Math.max(0,Number(value)||0);
+  const p=Number(row.p)||0;
+  const totals=getDesaTotals(state[villageKey]);
+  const ek=document.getElementById(`tot-k-${villageKey}`), ep=document.getElementById(`tot-p-${villageKey}`), es=document.getElementById(`tot-s-${villageKey}`), em=document.getElementById(`tot-m-${villageKey}`);
+  if(ek) ek.textContent=totals.k; if(ep) ep.textContent=totals.p; if(es) es.textContent=totals.s; if(em) em.textContent=totals.m;
+  if(villageKey===activeVillage) renderDiseaseChart();
+}
+
+function saveVillageRow(villageKey){
+  if(!state[villageKey]) return;
+  state[villageKey].diseases.forEach(d=>{d.editing=false;delete d._backup;d.saved=true;});
+  saveState();
+  queuePwsCloudSave();
+  renderDiseaseTable();
+  if(villageKey===activeVillage) renderDiseaseChart();
+  updateSixVillageGrid();
+  setSaveState(`tersimpan: ${VILLAGES[villageKey].name}`);
+}
+
+function cancelVillageRowEdits(villageKey){
+  if(!state[villageKey]) return;
+  state[villageKey].diseases.forEach(d=>{
+    if(d._backup){d.k=d._backup.k;d.p=d._backup.p;d.s=d._backup.s;d.m=d._backup.m;delete d._backup;}
+    d.editing=false;
+  });
+  renderDiseaseTable();
+  if(villageKey===activeVillage) renderDiseaseChart();
+  setSaveState(`perubahan dibatalkan: ${VILLAGES[villageKey].name}`);
+}
+
+function saveCurrentVillage(){
+  saveVillageRow(activeVillage);
+}
+
+function deleteDiseaseRow(i){
+  const row=state[activeVillage].diseases[i];
+  if(!row) return;
+  if(!confirm(`Cabut/hapus indikator ${row.name} dari tabel, rekap, dan diagram semua desa?`)) return;
+  const name=row.name.toLowerCase();
+  Object.keys(VILLAGES).forEach(key=>{
+    const keepPins=[];
+    getVillagePins(key).forEach(pin=>{
+      if(String(pin.indicator||'').toLowerCase()===name){
+        reversePinImpact(key,pin);
+        if(markers[pin.id] && map) map.removeLayer(markers[pin.id]);
+        delete markers[pin.id];
+      }else keepPins.push(pin);
+    });
+    state[key].pins=keepPins;
+    state[key].diseases=state[key].diseases.filter(d=>String(d.name||'').toLowerCase()!==name);
+  });
+  saveState();
+  queuePwsCloudSave();
+  rebuildDiseaseDefaultColorMap();
+  renderDiseaseTable();
+  renderDiseaseChart();
+  updateSixVillageGrid();
+  setSaveState(`indikator ${row.name} dihapus dari rekap dan diagram`);
+}
+
+const GENERATED_PIN_HEX = [
+  "#6a1b9a","#1565c0","#2e7d32","#ad1457","#ef6c00","#00695c",
+  "#283593","#c62828","#00838f","#7b1fa2","#558b2f","#4e342e",
+  "#0277bd","#4527a0","#9e9d24","#5d4037"
+];
+
+function getNextPinColorForDisease(){
+  const used = new Set(PIN_COLORS.map(p=>p.hex.toLowerCase()));
+  const generatedCount = PIN_COLORS.filter(p=>p.generated).length;
+  for(let i=0;i<GENERATED_PIN_HEX.length;i++){
+    const hex=GENERATED_PIN_HEX[(i+generatedCount)%GENERATED_PIN_HEX.length];
+    if(!used.has(hex.toLowerCase())) return hex;
+  }
+  const hue=(generatedCount*47)%360;
+  return `hsl(${hue},70%,40%)`;
+}
+
+function slugifyPinKey(name){
+  return "disease_" + String(name).toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"").slice(0,36);
+}
+
+function ensurePinColorForDisease(name){
+  const existing=PIN_COLORS.find(p=>p.indicator.toLowerCase()===name.toLowerCase());
+  if(existing) return existing;
+  const preset=PIN_COLOR_PRESETS.find(p=>p.indicator.toLowerCase()===String(name).toLowerCase());
+  if(preset){
+    PIN_COLORS.push({...preset});
+    return PIN_COLORS[PIN_COLORS.length-1];
+  }
+  let key=slugifyPinKey(name);
+  let n=2;
+  while(PIN_COLORS.some(p=>p.key===key)) key=slugifyPinKey(name)+"_"+(n++);
+  const pin={
+    key,
+    name:`${name}`,
+    hex:getNextPinColorForDisease(),
+    indicator:name,
+    generated:true
+  };
+  PIN_COLORS.push(pin);
+  return pin;
+}
+
+function rebuildDiseaseDefaultColorMap(){
+  // Ensure every existing disease has a corresponding pin color.
+  Object.values(state).forEach(v=>{
+    (v.diseases||[]).forEach(d=>ensurePinColorForDisease(d.name));
+  });
+}
+
+function addDiseaseForAllVillages(name, target=0){
+  const clean=(name||'').trim();
+  if(!clean) return false;
+  const pin=ensurePinColorForDisease(clean);
+  Object.keys(VILLAGES).forEach(key=>{
+    if(!state[key].diseases.some(d=>d.name.toLowerCase()===clean.toLowerCase())){
+      state[key].diseases.push(makeDiseaseRow(clean,[0,0,0]));
+    }
+  });
+  saveState();
+  queuePwsCloudSave();
+  renderPinPalette();
+  renderDiseaseTable();
+  updateSixVillageGrid();
+  return pin;
+}
+
+function addDisease(){
+  const name=prompt('Masukkan nama penyakit/indikator PWS baru:');
+  if(name===null) return;
+  const clean=name.trim();
+  if(clean.toLowerCase()==='ibu hamil'){ alert('Indikator Ibu Hamil sudah tidak digunakan. Gunakan Bumil Resti.'); return; }
+  if(!clean){ alert('Nama penyakit belum diisi.'); return; }
+  if(state[activeVillage].diseases.some(d=>d.name.toLowerCase()===clean.toLowerCase())){
+    alert('Penyakit/indikator tersebut sudah ada.'); return;
+  }
+  const pin=ensurePinColorForDisease(clean);
+  Object.keys(VILLAGES).forEach(key=>{
+    if(!state[key].diseases.some(d=>d.name.toLowerCase()===clean.toLowerCase())){
+      state[key].diseases.push(makeDiseaseRow(clean,[0,0,0]));
+    }
+  });
+  saveState();
+  queuePwsCloudSave();
+  renderPinPalette();
+  renderDiseaseTable();
+  renderDiseaseChart();
+  updateSixVillageGrid();
+  setSaveState(`indikator ditambahkan • pin ${pin.name} • kolom K/P/S/M, Total PWS dan diagram diperbarui`);
+}
+
+function removeDisease(){
+  const names=(state[activeVillage]?.diseases||[]).map(d=>d.name).filter(n=>String(n).toLowerCase()!=='ibu hamil');
+  if(!names.length){ alert('Belum ada penyakit/indikator yang dapat dihapus.'); return; }
+  const list=names.map((n,i)=>`${i+1}. ${n}`).join('\n');
+  const choice=prompt(`Pilih nomor penyakit/indikator yang ingin dihapus dari tabel, rekap, dan diagram semua desa.\n\n${list}`);
+  if(choice===null) return;
+  const idx=Number(choice)-1;
+  if(!Number.isInteger(idx) || idx<0 || idx>=names.length){ alert('Nomor penyakit/indikator tidak valid.'); return; }
+  const name=names[idx];
+  if(!confirm(`Hapus indikator ${name} dari seluruh tabel, Total PWS, dan diagram?`)) return;
+  const target=name.toLowerCase();
+  Object.keys(VILLAGES).forEach(key=>{
+    const remaining=[];
+    getVillagePins(key).forEach(pin=>{
+      if(String(pin.indicator||'').toLowerCase()===target){
+        reversePinImpact(key,pin);
+        if(markers[pin.id] && map) map.removeLayer(markers[pin.id]);
+        delete markers[pin.id];
+      }else remaining.push(pin);
+    });
+    state[key].pins=remaining;
+    state[key].diseases=state[key].diseases.filter(d=>String(d.name||'').toLowerCase()!==target);
+    state[key].pinColor=remaining[remaining.length-1]?.colorKey || 'red';
+  });
+  saveState();
+  queuePwsCloudSave();
+  drawAllPins();
+  renderPinPalette();
+  renderDiseaseTable();
+  renderDiseaseChart();
+  updateSixVillageGrid();
+  setSaveState(`indikator ${name} dicabut • pin, kolom K/P/S/M, Total PWS dan diagram diperbarui`);
+}
+
+function openResetModal(){
+  const modal=document.getElementById('resetDataModal');
+  const input=document.getElementById('resetAdminPassword');
+  if(!modal || !input) return;
+  input.value='';
+  modal.style.display='flex';
+  setTimeout(()=>input.focus(),60);
+}
+
+function closeResetModal(){
+  const modal=document.getElementById('resetDataModal');
+  if(modal) modal.style.display='none';
+}
+
+async function confirmResetAllData(){
+  const input=document.getElementById('resetAdminPassword');
+  if(!input) return;
+  if(input.value!==ADMIN_PASSWORD){
+    alert('Password salah. Reset semua data dibatalkan.');
+    input.value='';
+    input.focus();
+    return;
+  }
+
+  closeResetModal();
+  if(!confirm('Reset SEMUA data PWS pada 6 desa? Pin peta akan dihapus, seluruh nilai K/P/S/M dikosongkan, dan diagram akan ikut direset.')) return;
+
+  // Hentikan seluruh simpan cloud yang tertunda agar data lama tidak masuk lagi.
+  clearTimeout(pwsCloudSaveTimer);
+  pwsCloudSaveTimer=null;
+
+  // Aktifkan kunci reset TERLEBIH DAHULU supaya loader cloud tidak boleh memulihkan data lama.
+  try{ localStorage.setItem(PWS_RESET_FLAG,'1'); }catch(e){}
+
+  // Ganti seluruh state PWS dengan state benar-benar kosong.
+  state=forceEmptyPwsState();
+  activeVillage='berindat';
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  saveState();
+
+  // Hapus semua marker dari Leaflet.
+  Object.keys(markers).forEach(id=>{
+    try{
+      if(markers[id] && map && map.hasLayer(markers[id])) map.removeLayer(markers[id]);
+    }catch(e){}
+  });
+  markers={};
+
+  // Render ulang seluruh komponen dari state kosong.
+  rebuildDiseaseDefaultColorMap();
+  drawAllPins();
+  renderPinPalette();
+  renderDiseaseTable();
+  renderDiseaseChart();
+  renderWeeklyValidation();
+  updateVillageUI();
+  updateSixVillageGrid();
+  setSaveState('semua data PWS telah direset ke 0');
+
+  // Hapus file lama di folder cloud terlebih dahulu, lalu upload state kosong baru.
+  let cleaned=false, saved=false;
+  try{
+    if(supabaseClient){
+      cleaned=await clearPwsSupabaseFolder();
+      saved=await savePwsToSupabase({silent:false});
+    }
+  }catch(e){
+    console.warn('Reset PWS Supabase gagal:',e);
+  }
+
+  // Pastikan flag reset tetap aktif jika cloud gagal agar reload tidak mengembalikan data lama.
+  if(!saved){
+    try{ localStorage.setItem(PWS_RESET_FLAG,'1'); }catch(e){}
+  }
+
+  if(saved){
+    setSaveState('RESET BERHASIL • peta, tabel, diagram, dan Supabase kosong');
+    setPwsCloudStatus(cleaned ? 'reset tersimpan • folder cloud dibersihkan' : 'reset tersimpan • cloud kosong',true);
+    alert('Reset berhasil. Semua pin peta dihapus, seluruh K/P/S/M menjadi 0, diagram dikosongkan, dan data PWS di Supabase direset.');
+  }else{
+    setSaveState('RESET LOKAL BERHASIL • data PWS dikosongkan');
+    setPwsCloudStatus('reset lokal • cloud belum dapat diperbarui',false);
+    alert('Reset berhasil pada peta, tabel, dan diagram. Data cloud belum dapat diperbarui; reset tetap dikunci agar data lama tidak dipulihkan otomatis.');
+  }
+}
+
+function resetCurrentVillage(){
+  openResetModal();
+}
+
+function printPwsA4(){
+  const allDiseases=(state[activeVillage]?.diseases||[]).map(d=>({
+    name:String(d.name||''),
+    k:Number(d.k)||0,
+    p:Number(d.p)||0,
+    s:Number(d.s)||0,
+    m:Number(d.m)||0
+  }));
+  if(!allDiseases.length){
+    alert('Belum ada data penyakit PWS untuk dicetak.');
+    return;
+  }
+
+  // A4 landscape dibuat menjadi 3 potongan laporan dalam 1 lembar.
+  // Setiap potongan memuat maksimal 5 indikator agar seluruh kolom tetap terbaca.
+  const chunks=[];
+  for(let i=0;i<allDiseases.length;i+=5) chunks.push(allDiseases.slice(i,i+5));
+  while(chunks.length<3) chunks.push([]);
+  const printChunks=chunks.slice(0,3);
+
+  const weeklyTotals={k:0,p:0,s:0,m:0};
+  Object.values(VILLAGES).forEach(v=>{
+    const item=state[Object.keys(VILLAGES).find(k=>VILLAGES[k]===v)] || null;
+    if(!item) return;
+    (item.diseases||[]).forEach(r=>{
+      weeklyTotals.k += Number(r.k)||0;
+      weeklyTotals.p += Number(r.p)||0;
+      weeklyTotals.s += Number(r.s)||0;
+      weeklyTotals.m += Number(r.m)||0;
+    });
+  });
+
+  // Hitung minggu kalender ISO dan periode minggu Senin-Minggu.
+  const now=new Date();
+  const dateOnly=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const day=(dateOnly.getDay()+6)%7;
+  const weekStart=new Date(dateOnly); weekStart.setDate(dateOnly.getDate()-day);
+  const weekEnd=new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6);
+  const pad=n=>String(n).padStart(2,'0');
+  const fmt=d=>`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+  const firstThu=new Date(dateOnly.getFullYear(),0,4);
+  const diffDays=Math.floor((dateOnly-firstThu)/86400000);
+  const isoWeek=1+Math.floor((diffDays + ((firstThu.getDay()+6)%7))/7);
+  const period=`${fmt(weekStart)} – ${fmt(weekEnd)}`;
+
+  const w=window.open('','_blank','width=1400,height=950');
+  if(!w){
+    alert('Popup print diblokir browser. Izinkan popup untuk mencetak PWS.');
+    return;
+  }
+
+  const esc=escapeHtml;
+  const makeChunk=(chunk,pi)=>{
+    if(!chunk.length) return '';
+    let h='<tr><th rowspan="2" class="village">Nama Desa</th>';
+    chunk.forEach(d=>h+=`<th colspan="4" class="disease">${esc(d.name)}</th>`);
+    h+='<th colspan="4" class="total">Total PWS</th></tr>';
+    let sh='<tr>';
+    chunk.forEach(()=>sh+='<th>K</th><th>P</th><th>S</th><th>M</th>');
+    sh+='<th>K</th><th>P</th><th>S</th><th>M</th></tr>';
+    let b='';
+    Object.entries(VILLAGES).forEach(([key,v])=>{
+      const item=state[key]||{diseases:[]};
+      const rows=item.diseases||[];
+      const total=getDesaTotals(item);
+      b+=`<tr><td class="village">${esc(v.name)}</td>`;
+      chunk.forEach(d=>{
+        const r=rows.find(x=>String(x.name||'').toLowerCase()===d.name.toLowerCase())||{};
+        b+=`<td>${Number(r.k)||0}</td><td>${Number(r.p)||0}</td><td>${Number(r.s)||0}</td><td>${Number(r.m)||0}</td>`;
+      });
+      b+=`<td>${total.k}</td><td>${total.p}</td><td>${total.s}</td><td>${total.m}</td></tr>`;
+    });
+    return `<section class="print-chunk">
+      <div class="chunk-title">Bagian ${pi+1} / 3</div>
+      <table class="print-table"><thead>${h}${sh}</thead><tbody>${b}</tbody></table>
+    </section>`;
+  };
+
+  const chunksHtml=printChunks.map(makeChunk).join('');
+  const validation=`
+    <section class="validation-report">
+      <div class="validation-title">LAPORAN VALIDASI MINGGUAN</div>
+      <div class="validation-meta">Minggu ke-${isoWeek} • Periode ${period} • Rekapan seluruh desa dan seluruh indikator PWS</div>
+      <table class="validation-table">
+        <thead><tr><th>Rekapan</th><th>K</th><th>P</th><th>S</th><th>M</th></tr></thead>
+        <tbody>
+          <tr><td>Total Validasi Mingguan</td><td>${weeklyTotals.k}</td><td>${weeklyTotals.p}</td><td>${weeklyTotals.s}</td><td>${weeklyTotals.m}</td></tr>
+        </tbody>
+      </table>
+      <div class="validation-sign">Validasi pada: ${fmt(now)} • Pemeriksaan mencakup kesesuaian rekapan K/P/S/M pada 6 desa.</div>
+    </section>`;
+
+  w.document.open();
+  w.document.write(`<!doctype html><html><head><meta charset="UTF-8"><title>Print PWS</title><style>
+    @page{size:A4 landscape;margin:7mm}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:#fff;color:#000;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{width:100%;font-size:8px}
+    .print-sheet{width:100%;page-break-after:auto}
+    .print-header{text-align:center;margin:0 0 3mm;padding-bottom:2mm;border-bottom:1px solid #000}
+    .print-header h1{margin:0;font-size:14px;letter-spacing:.2px}
+    .print-header div{font-size:8px;margin-top:1mm}
+    .print-chunk{margin-bottom:3mm;break-inside:avoid;page-break-inside:avoid}
+    .chunk-title{font-size:8px;font-weight:700;text-transform:uppercase;margin:0 0 1mm}
+    .print-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:7.2px}
+    .print-table th,.print-table td{border:1px solid #000;padding:2px 1px;text-align:center;vertical-align:middle;line-height:1.05;height:5mm}
+    .print-table thead th{font-weight:700;background:#fff;color:#000}
+    .print-table .village{width:28mm;text-align:left;font-weight:700;white-space:nowrap}
+    .print-table .disease{font-size:7px;text-transform:uppercase}
+    .print-table .total{font-weight:800}
+    .validation-report{margin-top:3mm;border:1.2px solid #000;padding:2.5mm;break-inside:avoid;page-break-inside:avoid}
+    .validation-title{text-align:center;font-weight:800;font-size:10px;letter-spacing:.4px}
+    .validation-meta{text-align:center;font-size:7.5px;margin:1mm 0 2mm}
+    .validation-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:8px}
+    .validation-table th,.validation-table td{border:1px solid #000;padding:2mm 1mm;text-align:center}
+    .validation-table th:first-child,.validation-table td:first-child{width:48%;text-align:left;font-weight:700}
+    .validation-sign{margin-top:2mm;font-size:7.5px}
+    @media print{
+      .print-sheet{min-height:0}
+      .print-table,.validation-table{color:#000;background:#fff}
+      .print-table th,.print-table td,.validation-table th,.validation-table td{background:#fff!important;color:#000!important}
+    }
+  </style></head><body>
+    <main class="print-sheet">
+      <div class="print-header"><h1>PEMANTAUAN WILAYAH SETEMPAT (PWS)</h1><div>Kecamatan Singkep Pesisir • UPTD Puskesmas Lanjut</div></div>
+      ${chunksHtml}
+      <div class="print-legend"><b>K</b> = Kasus Baru &nbsp;&nbsp; <b>P</b> = Pemantauan &nbsp;&nbsp; <b>S</b> = Sembuh &nbsp;&nbsp; <b>M</b> = Meninggal</div>
+      ${validation}
+    </main>
+  </body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(),500);
+}
+
+function getWeeklyPeriodInfo(dateObj=new Date()){
+  const dateOnly=new Date(dateObj.getFullYear(),dateObj.getMonth(),dateObj.getDate());
+  const day=(dateOnly.getDay()+6)%7;
+  const weekStart=new Date(dateOnly); weekStart.setDate(dateOnly.getDate()-day);
+  const weekEnd=new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6);
+  const pad=n=>String(n).padStart(2,'0');
+  const fmt=d=>`${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+  const firstThu=new Date(dateOnly.getFullYear(),0,4);
+  const diffDays=Math.floor((dateOnly-firstThu)/86400000);
+  const isoWeek=1+Math.floor((diffDays + ((firstThu.getDay()+6)%7))/7);
+  return {weekStart,weekEnd,isoWeek,period:`${fmt(weekStart)} – ${fmt(weekEnd)}`,today:fmt(dateOnly)};
+}
+
+function renderWeeklyValidation(){
+  const body=document.getElementById('weeklyValidationBody');
+  const foot=document.getElementById('weeklyValidationFoot');
+  const meta=document.getElementById('weeklyValidationMeta');
+  const badge=document.getElementById('weeklyValidationWeek');
+  const title=document.getElementById('weeklyValidationTitle');
+  const note=document.getElementById('weeklyValidationNote');
+  if(!body || !foot) return;
+
+  const v=VILLAGES[activeVillage];
+  const rows=state[activeVillage]?.diseases || [];
+  const info=getWeeklyPeriodInfo();
+  const totals=rows.reduce((a,r)=>{
+    a.k+=Number(r.k)||0; a.p+=Number(r.p)||0; a.s+=Number(r.s)||0; a.m+=Number(r.m)||0; return a;
+  },{k:0,p:0,s:0,m:0});
+
+  if(title) title.textContent=`Laporan Validasi Mingguan — ${v?.name || ''}`;
+  if(meta) meta.textContent=`Rekapan K/P/S/M untuk ${v?.name || 'desa'} • Periode ${info.period}`;
+  if(badge) badge.textContent=`Minggu ke-${info.isoWeek}`;
+  body.innerHTML=rows.map(r=>`
+    <tr>
+      <td>${escapeHtml(r.name)}</td>
+      <td>${Number(r.k)||0}</td>
+      <td>${Number(r.p)||0}</td>
+      <td>${Number(r.s)||0}</td>
+      <td>${Number(r.m)||0}</td>
+    </tr>`).join('') || `<tr><td colspan="5">Belum ada data validasi.</td></tr>`;
+  foot.innerHTML=`<tr>
+    <td>TOTAL ${escapeHtml((v?.name || '').toUpperCase())}</td>
+    <td>${totals.k}</td><td>${totals.p}</td><td>${totals.s}</td><td>${totals.m}</td>
+  </tr>`;
+  if(note) note.textContent=`Laporan ini menampilkan 1 rekapan untuk minggu berjalan (Senin–Minggu). Data mengikuti K/P/S/M yang tersimpan untuk desa ini pada ${info.today}.`;
+}
+
+function renderDiseaseChart(){
+  const box=document.getElementById('diseaseChart');
+  if(!box) return;
+  const rows=state[activeVillage]?.diseases || [];
+  if(!rows.length){ box.innerHTML='<div class="chart-empty">Belum ada data penyakit/indikator PWS.</div>'; renderWeeklyValidation(); return; }
+
+  const data=rows.map(r=>({name:r.name,total:Number(r.k)||0,p:Number(r.p)||0,s:Number(r.s)||0,m:Number(r.m)||0}));
+  const hasAnyValue=data.some(d=>d.total>0 || d.p>0 || d.s>0 || d.m>0);
+  if(!hasAnyValue){
+    box.innerHTML='<div class="chart-empty">Diagram PWS sudah direset. Belum ada data untuk ditampilkan.</div>';
+    renderWeeklyValidation();
+    return;
+  }
+  const max=Math.max(1,...data.map(d=>d.total));
+  const width=Math.max(760,data.length*90);
+  const height=330,left=170,right=25,top=28,bottom=62;
+  const plotW=width-left-right,plotH=height-top-bottom,slot=plotW/data.length,barW=Math.min(34,slot*.42);
+
+  let svg=`<svg viewBox="0 0 ${width} ${height}" width="100%" height="${height}" role="img" aria-label="Diagram semua penyakit PWS">
+    <rect x="0" y="0" width="${width}" height="${height}" fill="#fbfdfb" rx="10"/>
+    <text x="${left}" y="18" font-size="15" font-weight="700" fill="#24342a">Diagram PWS — ${escapeHtml(VILLAGES[activeVillage].name)} • ${data.length} indikator</text>`;
+
+  for(let i=0;i<=5;i++){
+    const val=max*i/5; const y=top+plotH-(plotH*i/5);
+    svg+=`<line x1="${left}" x2="${width-right}" y1="${y}" y2="${y}" stroke="#dce6de" stroke-width="1"/>`;
+    svg+=`<text x="${left-10}" y="${y+4}" text-anchor="end" font-size="10" fill="#66746b">${Math.round(val)}</text>`;
+  }
+
+  data.forEach((d,i)=>{
+    const x=left+i*slot+(slot-barW)/2,h=d.total/max*plotH,y=top+plotH-h;
+    const pin=PIN_COLORS.find(p=>p.indicator.toLowerCase()===d.name.toLowerCase());
+    const fill=pin?.hex||'#7a8c7f';
+    const label=d.name.length>17?d.name.slice(0,16)+'…':d.name;
+    svg+=`<rect x="${x}" y="${y}" width="${barW}" height="${Math.max(1,h)}" rx="5" fill="${fill}" opacity=".9"><title>${escapeHtml(d.name)}: K ${d.total}, P ${d.p}, S ${d.s}, M ${d.m}</title></rect>`;
+    svg+=`<text x="${x+barW/2}" y="${Math.max(top+12,y-5)}" text-anchor="middle" font-size="10" fill="#34453a">${d.total}</text>`;
+    svg+=`<text x="${x+barW/2}" y="${top+plotH+16}" text-anchor="middle" font-size="10" fill="#56665b" transform="rotate(-35 ${x+barW/2} ${top+plotH+16})">${escapeHtml(label)}</text>`;
+  });
+  svg+=`<text x="${left}" y="${height-10}" font-size="10" fill="#66746b">Kasus (K) per indikator; P, S, M tersimpan di tabel.</text></svg>`;
+  box.innerHTML=svg;
+  renderWeeklyValidation();
+}
+
+function setSaveState(text){
+  document.getElementById("saveState").innerHTML =
+    ` • <span class="status-dot saved"></span>${text}`;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+document.getElementById("pinVillage")?.addEventListener("change",e=>{
+  const key=e.target.value;
+  document.getElementById("pinLat").value=VILLAGES[key].center[0];
+  document.getElementById("pinLng").value=VILLAGES[key].center[1];
+});
+
+buildVillageControls();
+rebuildDiseaseDefaultColorMap();
+migratePinImpactsOnce();
+initMap();
+restoreDiseaseTableState();
+restoreMapState();
+restoreMapLockState();
+updateSixVillageGrid();
+selectVillage("berindat");
+loadOfficialBIGBoundaries();
+
+async function activatePwsModule(){
+  const area=document.getElementById('pwsDisplayArea');
+  if(!area) return;
+  setPwsCloudStatus('memeriksa data cloud…');
+  try{
+    await loadPwsFromSupabase();
+  }catch(e){
+    console.warn('Aktivasi PWS Supabase:',e);
+  }
+  setTimeout(()=>{
+    try{
+      if(map){
+        map.invalidateSize(true);
+        fitAll();
+      }
+      updateVillageUI();
+      updateSixVillageGrid();
+    }catch(e){ console.warn('Aktivasi Dashboard PWS:', e); }
+  }, 80);
+}
+
+
+</script>
+
 </body>
 </html>
 <script>
