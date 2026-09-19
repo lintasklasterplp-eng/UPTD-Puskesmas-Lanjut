@@ -5883,6 +5883,7 @@ footer {
 
         window.addEventListener('DOMContentLoaded', (event) => {
             try { renderAmbulanceServiceState(); } catch (e) { console.warn('Status layanan Ambulance gagal dimuat:', e); }
+            void ambulanceInitServiceStateRealtime();
             initOBHPBMHP();
             initMonitoringUPKDK();
         });
@@ -6879,22 +6880,130 @@ body { width:auto; }
         }
 
 // ============================================================
-// STATUS BUKA/TUTUP PELAYANAN AMBULANCE
+// STATUS BUKA/TUTUP PELAYANAN AMBULANCE - SUPABASE REALTIME
 // ============================================================
 const AMBULANCE_SERVICE_STATE_KEY = 'ambulance_service_open';
+const AMBULANCE_SERVICE_STATE_TABLE = 'ambulance_service_state';
+const AMBULANCE_SERVICE_STATE_ID = 'ambulance';
+let ambServiceOpenCache = null;
+let ambServiceStateChannel = null;
+let ambServiceStateLoadingPromise = null;
 
 function validasiPasswordAdminAmbulance(pwd) {
     return pwd === 'admin';
 }
 
 function isAmbulanceServiceOpen() {
+    if (typeof ambServiceOpenCache === 'boolean') return ambServiceOpenCache;
     const raw = localStorage.getItem(AMBULANCE_SERVICE_STATE_KEY);
     return raw !== 'false';
 }
 
-function setAmbulanceServiceOpen(isOpen) {
-    localStorage.setItem(AMBULANCE_SERVICE_STATE_KEY, isOpen ? 'true' : 'false');
+function ambulanceSetServiceCache(isOpen) {
+    ambServiceOpenCache = !!isOpen;
+    try { localStorage.setItem(AMBULANCE_SERVICE_STATE_KEY, isOpen ? 'true' : 'false'); } catch (_) {}
     renderAmbulanceServiceState();
+}
+
+async function ambulanceLoadServiceState(options = {}) {
+    if (ambServiceStateLoadingPromise) return ambServiceStateLoadingPromise;
+
+    const silent = !!options.silent;
+    ambServiceStateLoadingPromise = (async () => {
+        try {
+            const { data, error } = await supabaseClient
+                .from(AMBULANCE_SERVICE_STATE_TABLE)
+                .select('service_key,is_open,updated_at')
+                .eq('service_key', AMBULANCE_SERVICE_STATE_ID)
+                .maybeSingle();
+
+            if (error) throw error;
+
+            if (data) {
+                ambulanceSetServiceCache(data.is_open !== false);
+                return data.is_open !== false;
+            }
+
+            // Migrasi aman dari status lokal yang mungkin sudah dipakai perangkat ini.
+            const initialOpen = (() => {
+                try { return localStorage.getItem(AMBULANCE_SERVICE_STATE_KEY) !== 'false'; }
+                catch (_) { return true; }
+            })();
+
+            const { data: inserted, error: insertError } = await supabaseClient
+                .from(AMBULANCE_SERVICE_STATE_TABLE)
+                .insert([{
+                    service_key: AMBULANCE_SERVICE_STATE_ID,
+                    is_open: initialOpen,
+                    updated_by: 'browser-init'
+                }])
+                .select('service_key,is_open,updated_at')
+                .single();
+
+            if (insertError) throw insertError;
+            ambulanceSetServiceCache(inserted.is_open !== false);
+            return inserted.is_open !== false;
+        } catch (error) {
+            console.warn('Status layanan Ambulance Supabase gagal dimuat. Menggunakan cache lokal:', error);
+            if (!silent && !ambServiceStateLoadingPromise) {
+                alert('Status layanan Ambulance dari Supabase gagal dimuat. Periksa koneksi dan tabel ambulance_service_state.');
+            }
+            const fallback = isAmbulanceServiceOpen();
+            renderAmbulanceServiceState();
+            return fallback;
+        } finally {
+            ambServiceStateLoadingPromise = null;
+        }
+    })();
+
+    return ambServiceStateLoadingPromise;
+}
+
+async function setAmbulanceServiceOpen(isOpen) {
+    const nextOpen = !!isOpen;
+    try {
+        const { data, error } = await supabaseClient
+            .from(AMBULANCE_SERVICE_STATE_TABLE)
+            .upsert([{
+                service_key: AMBULANCE_SERVICE_STATE_ID,
+                is_open: nextOpen,
+                updated_by: 'petugas'
+            }], { onConflict: 'service_key' })
+            .select('service_key,is_open,updated_at')
+            .single();
+
+        if (error) throw error;
+        ambulanceSetServiceCache(data.is_open !== false);
+        return data;
+    } catch (error) {
+        console.error('Gagal menyimpan status layanan Ambulance ke Supabase:', error);
+        alert('Status layanan Ambulance belum berubah di semua perangkat karena Supabase gagal disimpan.\n\n' + (error.message || error));
+        return null;
+    }
+}
+
+async function ambulanceInitServiceStateRealtime() {
+    await ambulanceLoadServiceState({ silent: true });
+    if (!supabaseClient) return;
+    if (ambServiceStateChannel) return;
+
+    ambServiceStateChannel = supabaseClient
+        .channel('ambulance-service-state-realtime')
+        .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: AMBULANCE_SERVICE_STATE_TABLE,
+            filter: `service_key=eq.${AMBULANCE_SERVICE_STATE_ID}`
+        }, payload => {
+            const row = payload?.new || payload?.record || null;
+            if (!row || row.service_key !== AMBULANCE_SERVICE_STATE_ID) return;
+            ambulanceSetServiceCache(row.is_open !== false);
+        })
+        .subscribe(status => {
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                console.warn('Realtime status layanan Ambulance:', status);
+            }
+        });
 }
 
 function renderAmbulanceServiceState() {
@@ -6921,7 +7030,10 @@ function renderAmbulanceServiceState() {
     }
 }
 
-function bukaAmbulanceDenganPassword() {
+async function bukaAmbulanceDenganPassword() {
+    // Selalu sinkronkan dulu dengan Supabase agar status perangkat lain langsung berlaku.
+    await ambulanceLoadServiceState({ silent: true });
+
     // Bila pelayanan sedang terbuka, akses dari Beranda langsung masuk tanpa password.
     if (isAmbulanceServiceOpen()) {
         selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan');
@@ -6929,7 +7041,7 @@ function bukaAmbulanceDenganPassword() {
         return;
     }
 
-    // Setelah pelayanan ditutup, akses berikutnya wajib menggunakan sandi admin.
+    // Setelah pelayanan ditutup di perangkat mana pun, akses berikutnya wajib menggunakan sandi admin.
     showPasswordPrompt(
         'Akses Ambulance & Darurat',
         'Masukkan Password',
@@ -6945,27 +7057,30 @@ function bukaAmbulanceDenganPassword() {
     );
 }
 
-function toggleAmbulanceService() {
+async function toggleAmbulanceService() {
+    await ambulanceLoadServiceState({ silent: true });
     const opening = !isAmbulanceServiceOpen();
 
-    // Tombol "Buka Layanan" pada form: buka layanan lalu langsung kembali ke Beranda.
+    // Tombol "Buka Layanan" pada form: buka layanan di Supabase lalu langsung kembali ke Beranda.
     if (opening) {
-        setAmbulanceServiceOpen(true);
+        const saved = await setAmbulanceServiceOpen(true);
+        if (!saved) return;
         resetToHome();
         return;
     }
 
-    // Tombol "Tutup Pelayanan": wajib sandi admin, lalu kembali ke Beranda dalam keadaan terkunci.
+    // Tombol "Tutup Pelayanan": wajib sandi admin, lalu ubah status global dan kembali ke Beranda.
     showPasswordPrompt(
         'Tutup Pelayanan Ambulance',
         'Masukkan Password',
-        (success, pwd) => {
+        async (success, pwd) => {
             if (!success) return;
             if (!validasiPasswordAdminAmbulance(pwd)) {
                 alert('Sandi admin salah. Pelayanan tetap terbuka.');
                 return;
             }
-            setAmbulanceServiceOpen(false);
+            const saved = await setAmbulanceServiceOpen(false);
+            if (!saved) return;
             resetToHome();
         }
     );
