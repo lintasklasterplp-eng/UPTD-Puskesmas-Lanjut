@@ -2446,8 +2446,8 @@ footer {
 .amb-history-panel{margin-top:12px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;overflow:hidden}
 .amb-history-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:linear-gradient(135deg,#f8fafc,#ecfeff);border-bottom:1px solid #e2e8f0}
 .amb-history-title{font-size:.85rem;font-weight:900;color:#0f172a}.amb-history-sub{font-size:.62rem;color:#64748b;margin-top:2px}
-.amb-history-list{display:grid;gap:8px;padding:10px;max-height:420px;overflow:auto}.amb-history-item{border:1px solid #e2e8f0;border-radius:10px;padding:10px;background:#fff}.amb-history-item.cancelled{border-left:4px solid #ef4444}.amb-history-item.completed{border-left:4px solid #10b981}
-.amb-history-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.amb-history-name{font-size:.74rem;font-weight:900;color:#0f172a}.amb-history-status{font-size:.58rem;font-weight:900;padding:3px 7px;border-radius:999px;background:#f1f5f9;color:#475569}.amb-history-status.cancelled{background:#fef2f2;color:#b91c1c}.amb-history-status.completed{background:#ecfdf5;color:#047857}
+.amb-history-list{display:grid;gap:8px;padding:10px;max-height:420px;overflow:auto}.amb-history-item{border:1px solid #e2e8f0;border-radius:10px;padding:10px;background:#fff}.amb-history-item.cancelled{border-left:4px solid #ef4444}.amb-history-item.completed{border-left:4px solid #10b981}.amb-history-item.deleted{border-left:4px solid #64748b}
+.amb-history-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.amb-history-name{font-size:.74rem;font-weight:900;color:#0f172a}.amb-history-status{font-size:.58rem;font-weight:900;padding:3px 7px;border-radius:999px;background:#f1f5f9;color:#475569}.amb-history-status.cancelled{background:#fef2f2;color:#b91c1c}.amb-history-status.completed{background:#ecfdf5;color:#047857}.amb-history-status.deleted{background:#f1f5f9;color:#475569}
 .amb-history-meta{margin-top:5px;font-size:.62rem;line-height:1.5;color:#64748b}.amb-history-token{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#0369a1;font-weight:900;word-break:break-all}.amb-history-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.amb-history-delete{border:0;border-radius:7px;padding:6px 9px;background:#fee2e2;color:#b91c1c;font-weight:900;font-size:.61rem;cursor:pointer}.amb-history-delete:hover{background:#fecaca}.amb-history-empty{padding:24px 12px;text-align:center;color:#64748b;font-size:.68rem}.amb-history-refresh{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:7px;padding:6px 9px;font-weight:800;font-size:.62rem;cursor:pointer}
 
 </style>
@@ -3665,7 +3665,7 @@ footer {
                                     <div class="amb-history-head">
                                         <div>
                                             <div class="amb-history-title">📚 Riwayat Pelayanan Ambulance & Darurat</div>
-                                            <div class="amb-history-sub">Riwayat permintaan yang sudah selesai atau dibatalkan. Penghapusan setiap riwayat memerlukan password admin.</div>
+                                            <div class="amb-history-sub">Semua riwayat pelayanan: selesai, dibatalkan, atau dihapus dari daftar aktif. Penghapusan permanen riwayat memerlukan password admin.</div>
                                         </div>
                                         <button type="button" class="amb-history-refresh" onclick="ambulanceMuatRiwayat()">🔄 Muat</button>
                                     </div>
@@ -8419,7 +8419,8 @@ function ambStatusLabel(status) {
         hampir_tiba: 'Petugas Hampir Tiba',
         tiba: 'Petugas Sudah Tiba',
         selesai: 'Permintaan Selesai',
-        dibatalkan: 'Permintaan Dibatalkan'
+        dibatalkan: 'Permintaan Dibatalkan',
+        dihapus: 'Permintaan Dihapus / Diarsipkan'
     };
     return labels[status] || status || '-';
 }
@@ -8701,12 +8702,12 @@ function ambulanceRenderRiwayat(list) {
     const box = document.getElementById('ambHistoryList');
     if (!box) return;
     if (!Array.isArray(list) || !list.length) {
-        box.innerHTML = '<div class="amb-history-empty">Belum ada riwayat pelayanan yang selesai atau dibatalkan.</div>';
+        box.innerHTML = '<div class="amb-history-empty">Belum ada Riwayat Pelayanan Ambulance & Darurat.</div>';
         return;
     }
     box.innerHTML = list.map(item => {
         const status = item.status || '';
-        const cls = status === 'dibatalkan' ? 'cancelled' : status === 'selesai' ? 'completed' : '';
+        const cls = status === 'dibatalkan' ? 'cancelled' : status === 'selesai' ? 'completed' : status === 'dihapus' ? 'deleted' : '';
         const idArg = JSON.stringify(item.id || '');
         const tokenArg = JSON.stringify(item.tracking_token || item.trackingToken || '');
         return `
@@ -8734,13 +8735,13 @@ async function ambulanceMuatRiwayat() {
     box.innerHTML = '<div class="amb-history-empty">Memuat riwayat dari Supabase…</div>';
     try {
         const { data, error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE)
-            .select('*').in('status', ['selesai', 'dibatalkan']).order('updated_at', { ascending: false }).limit(200);
+            .select('*').in('status', ['selesai', 'dibatalkan', 'dihapus']).order('updated_at', { ascending: false }).limit(200);
         if (error) throw error;
         (Array.isArray(data) ? data : []).forEach(ambulanceSimpanRiwayatLocal);
         ambulanceRenderRiwayat(data || []);
     } catch (error) {
         console.warn('Riwayat Supabase tidak dapat dimuat:', error);
-        const local = ambulanceBacaRiwayatLocal().filter(x => ['selesai','dibatalkan'].includes(x.status));
+        const local = ambulanceBacaRiwayatLocal().filter(x => ['selesai','dibatalkan','dihapus'].includes(x.status));
         ambulanceRenderRiwayat(local);
         if (!local.length) box.innerHTML = `<div class="amb-history-empty" style="color:#b91c1c">Riwayat Supabase gagal dimuat: ${ambEsc(error?.message || error)}</div>`;
     }
@@ -8766,7 +8767,7 @@ function ambulanceRenderPatient(request) {
         `Diperbarui ${ambFormatDate(request.updated_at || request.created_at)}.`;
     ambulanceSetCancelButton(request);
     ambulanceSimpanRiwayatLocal(request);
-    if (['selesai', 'dibatalkan'].includes(request.status)) {
+    if (['selesai', 'dibatalkan', 'dihapus'].includes(request.status)) {
         void ambulanceMuatRiwayat();
     }
 
@@ -9038,7 +9039,7 @@ function ambulanceUpdatePetugasActionButtons(request) {
 
     const canPause = status === 'dalam_perjalanan';
     const canResume = status === 'ditunda';
-    const canDelete = !['selesai','dibatalkan'].includes(status);
+    const canDelete = !['selesai','dibatalkan','dihapus'].includes(status);
 
     tundaBtn.disabled = !canPause;
     lanjutBtn.disabled = !canResume;
@@ -9050,7 +9051,7 @@ function ambulanceUpdatePetugasActionButtons(request) {
             : canResume
                 ? 'Permintaan sedang ditunda. Tekan Lanjutkan untuk meneruskan perjalanan dan GPS.'
                 : canDelete
-                    ? 'Permintaan terpilih. Hapus akan menghapus permintaan dan lokasi GPS terkait.'
+                    ? 'Permintaan terpilih. Hapus akan memasukkan data ke Riwayat Pelayanan Ambulance & Darurat.'
                     : 'Permintaan ini sudah masuk riwayat dan tidak lagi dapat diubah dari daftar aktif.';
     }
 }
@@ -9127,6 +9128,10 @@ async function ambulanceLanjutkanPermintaan() {
         ambSelectedRequest = data;
         document.getElementById('ambPetugasSelectedTitle').textContent = `${data.patient_name || '-'} — ${ambStatusLabel(data.status)}`;
         document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token || '-'} • ${ambFormatDate(data.updated_at)}`;
+        if (['selesai', 'dibatalkan'].includes(data.status)) {
+            ambulanceSimpanRiwayatLocal(data);
+            await ambulanceMuatRiwayat();
+        }
         await ambulanceMuatDaftarPetugas();
         ambulanceUpdatePetugasActionButtons(ambSelectedRequest);
 
@@ -9144,29 +9149,39 @@ async function ambulancePetugasHapusPermintaan() {
         alert('Pilih permintaan terlebih dahulu.');
         return;
     }
-    if (['selesai','dibatalkan'].includes(ambSelectedRequest.status)) {
-        alert('Permintaan ini sudah masuk riwayat. Gunakan tombol Hapus pada riwayat untuk menghapusnya dengan password admin.');
+    if (['selesai','dibatalkan','dihapus'].includes(ambSelectedRequest.status)) {
+        alert('Permintaan ini sudah berada di riwayat. Gunakan tombol Hapus pada riwayat untuk penghapusan permanen dengan password admin.');
         return;
     }
     const token = ambGetRequestTrackingToken(ambSelectedRequest);
     const nama = ambSelectedRequest.patient_name || '-';
-    if (!confirm(`Hapus permintaan ambulance ini?\n\nNama pasien: ${nama}\nNomor tracking: ${token || '-'}\n\nData permintaan aktif dan lokasi GPS terkait akan dihapus.`)) return;
+    if (!confirm(`Hapus permintaan ambulance ini?\n\nNama pasien: ${nama}\nNomor tracking: ${token || '-'}\n\nData tidak akan hilang. Permintaan akan dipindahkan ke Riwayat Pelayanan Ambulance & Darurat dengan status \"Dihapus / Diarsipkan\".`)) return;
 
     try {
         if (ambOfficerWatchId !== null) {
             navigator.geolocation.clearWatch(ambOfficerWatchId);
             ambOfficerWatchId = null;
         }
+        const now = new Date().toISOString();
+        const { data, error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE)
+            .update({ status: 'dihapus', updated_at: now })
+            .eq('id', ambSelectedRequest.id)
+            .eq('tracking_token', token)
+            .select('*').single();
+        if (error) throw error;
+        if (!data) throw new Error('Data permintaan tidak ditemukan.');
+
+        // GPS terakhir tidak lagi diperlukan untuk daftar aktif. Data pelayanan tetap tersimpan di
+        // ambulance_requests sehingga dapat ditampilkan pada Riwayat Pelayanan Ambulance & Darurat.
         if (token) {
             const { error: locError } = await supabaseClient.from(AMBULANCE_LOCATIONS_TABLE)
                 .delete().eq('tracking_token', token);
-            if (locError) throw locError;
+            if (locError) console.warn('Lokasi GPS arsip tidak terhapus:', locError);
         }
-        const { error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE)
-            .delete().eq('id', ambSelectedRequest.id).eq('tracking_token', token);
-        if (error) throw error;
 
-        ambulanceHapusRiwayatLocal(ambSelectedRequest.id, token);
+        ambulanceSimpanRiwayatLocal(data);
+        await ambulanceHapusRiwayatLegacyStorage(ambSelectedRequest.id, token);
+
         if (ambActiveTrackingToken === token) {
             ambActiveTrackingToken = '';
             localStorage.removeItem('ambulance_active_tracking_token');
@@ -9177,10 +9192,11 @@ async function ambulancePetugasHapusPermintaan() {
         document.getElementById('ambPetugasSelectedDetail').textContent = 'Pilih permintaan dari daftar.';
         ambulanceUpdatePetugasActionButtons(null);
         await ambulanceMuatDaftarPetugas();
-        alert('Permintaan berhasil dihapus.');
+        await ambulanceMuatRiwayat();
+        alert('Permintaan berhasil dihapus dari daftar aktif dan masuk ke Riwayat Pelayanan Ambulance & Darurat.');
     } catch (error) {
-        console.error('Hapus permintaan ambulance gagal:', error);
-        alert('Permintaan belum dapat dihapus: ' + (error?.message || error));
+        console.error('Arsip permintaan ambulance gagal:', error);
+        alert('Permintaan belum dapat dipindahkan ke riwayat: ' + (error?.message || error));
     }
 }
 
