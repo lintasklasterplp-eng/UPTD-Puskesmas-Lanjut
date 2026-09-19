@@ -3662,20 +3662,21 @@ footer {
                                             <div id="ambPetugasActionHint" style="margin-top:5px;font-size:.62rem;color:#64748b;">Pilih permintaan untuk mengaktifkan Tunda, Lanjutkan, dan Hapus.</div>
                                             <div id="ambulanceOfficerMap" class="amb-rt-map" style="height:260px;margin-top:8px"></div>
                                             <div class="amb-rt-note">Untuk mengirim GPS, browser harus mengizinkan lokasi dan halaman harus dibuka melalui HTTPS (atau lingkungan lokal yang aman).</div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div class="amb-history-panel" id="ambHistoryPanel">
-                                    <div class="amb-history-head">
-                                        <div>
-                                            <div class="amb-history-title">📚 Riwayat Pelayanan Ambulance & Darurat</div>
-                                            <div class="amb-history-sub">Semua riwayat pelayanan: selesai, dibatalkan, atau dihapus dari daftar aktif. Penghapusan permanen riwayat memerlukan password admin.</div>
+                                            <!-- Folder Riwayat hanya tampil di Mode Petugas -->
+                                            <div class="amb-history-panel" id="ambHistoryPanel" aria-label="Riwayat Pelayanan Ambulance & Darurat">
+                                                <div class="amb-history-head">
+                                                    <div>
+                                                        <div class="amb-history-title">📁 Riwayat Pelayanan Ambulance & Darurat</div>
+                                                        <div class="amb-history-sub">Riwayat selesai, dibatalkan, atau dihapus. Penghapusan permanen memerlukan password admin.</div>
+                                                    </div>
+                                                    <button type="button" class="amb-history-refresh" onclick="ambulanceMuatRiwayat()">🔄 Muat</button>
+                                                </div>
+                                                <div id="ambHistoryList" class="amb-history-list">
+                                                    <div class="amb-history-empty">Memuat riwayat…</div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button type="button" class="amb-history-refresh" onclick="ambulanceMuatRiwayat()">🔄 Muat</button>
-                                    </div>
-                                    <div id="ambHistoryList" class="amb-history-list">
-                                        <div class="amb-history-empty">Memuat riwayat…</div>
                                     </div>
                                 </div>
                             </div>
@@ -8547,6 +8548,7 @@ function ambulanceBukaModePetugas() {
             ambulanceInitMaps();
             void ambulanceEnsureRealtime();
             void ambulanceMuatDaftarPetugas();
+            void ambulanceMuatRiwayat();
         } else if (pwd !== '') {
             alert('Password salah.');
         }
