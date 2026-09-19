@@ -3079,11 +3079,11 @@ footer {
                                     
                                     <div class="gug-form-group gug-flex-row">
                                         <div style="flex: 1;">
-                                            <label>Tanggal (Real-Time Otomatis)</label>
-                                            <input type="date" id="tglKunjunganGUG" readonly>
+                                            <label>Tanggal Pemeriksaan (Manual)</label>
+                                            <input type="date" id="tglKunjunganGUG" required>
                                         </div>
                                         <div style="flex: 1;">
-                                            <label>Waktu (Real-Time Otomatis)</label>
+                                            <label>Waktu (Otomatis)</label>
                                             <input type="time" id="waktuKunjunganGUG" readonly>
                                         </div>
                                     </div>
@@ -5833,6 +5833,9 @@ footer {
         }
 
         let gugMidnightTimer = null;
+        // Tanggal riwayat yang sedang ditampilkan. Default hanya untuk tampilan tabel,
+        // bukan untuk mengisi otomatis tanggal pemeriksaan pasien.
+        let gugTanggalRiwayatTampilan = '';
 
         function formatTanggalGUG(date = new Date()) {
             const year = date.getFullYear();
@@ -5843,30 +5846,28 @@ footer {
 
         function setWaktuOtomatisGUG() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
 
             const tglEl = document.getElementById('tglKunjunganGUG');
             const waktuEl = document.getElementById('waktuKunjunganGUG');
 
-            if (tglEl) tglEl.value = `${year}-${month}-${day}`;
+            // Tanggal sengaja TIDAK diisi otomatis. Pengguna wajib memilih tanggal manual.
             if (waktuEl) waktuEl.value = `${hours}:${minutes}`;
         }
 
-        function filterRiwayatGUGHariIni(riwayat) {
-            const hariIni = formatTanggalGUG();
+        function filterRiwayatGUGHariIni(riwayat, tanggalFilter = '') {
+            const tanggal = tanggalFilter || gugTanggalRiwayatTampilan || formatTanggalGUG();
             return (Array.isArray(riwayat) ? riwayat : []).filter(item => {
                 if (!item || !item.tglWaktu) return false;
-                return String(item.tglWaktu).slice(0, 10) === hariIni;
+                return String(item.tglWaktu).slice(0, 10) === tanggal;
             });
         }
 
         function resetFormGUGHariBaru() {
             const form = document.getElementById('formSkriningGUG');
             if (form) form.reset();
+            gugTanggalRiwayatTampilan = formatTanggalGUG();
             setWaktuOtomatisGUG();
             cekAlamatGUG();
             renderDataGUG();
@@ -5969,6 +5970,12 @@ footer {
             const nama = document.getElementById('namaPasienGUG').value.trim();
             const umur = document.getElementById('umurPasienGUG').value.trim();
             const tglLahir = document.getElementById('tglLahirGUG').value || '';
+            const tgl = document.getElementById('tglKunjunganGUG').value;
+            if (!tgl) {
+                alert('Harap isi Tanggal Pemeriksaan secara manual terlebih dahulu.');
+                document.getElementById('tglKunjunganGUG')?.focus();
+                return;
+            }
             let alamat = document.getElementById('alamatPasienGUG').value;
             if (alamat === 'Lainnya') {
                 alamat = document.getElementById('alamatLainnyaGUG').value.trim();
@@ -5979,7 +5986,6 @@ footer {
                 return;
             }
 
-            const tgl = document.getElementById('tglKunjunganGUG').value;
             const waktu = document.getElementById('waktuKunjunganGUG').value;
             const tglWaktuStr = `${tgl} ${waktu}`;
 
@@ -6039,6 +6045,8 @@ footer {
             riwayat = riwayat.filter(item => item && item.id !== newData.id);
             riwayat.unshift(newData);
             simpanRiwayatGUGLocal(riwayat);
+            // Setelah menyimpan, tampilkan riwayat untuk tanggal yang baru saja dipilih.
+            gugTanggalRiwayatTampilan = tgl;
 
             // LANGSUNG tampilkan data terbaru ke tabel riwayat tanpa menunggu
             // proses upload Supabase selesai atau input pasien berikutnya.
@@ -6071,7 +6079,8 @@ footer {
             document.getElementById('formSkriningGUG').reset();
             setWaktuOtomatisGUG();
 
-            // Pastikan tampilan tetap menggunakan riwayat terbaru setelah reset form.
+            // Form berikutnya kembali kosong pada tanggal agar tanggal tetap diinput manual.
+            // Tabel tetap menampilkan tanggal yang baru saja disimpan.
             renderDataGUG(riwayat);
         }
 
@@ -6877,6 +6886,8 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                 muatUrlRujukan();
             } else if (categoryCode === 'skrining' && periodIdentifier === 'get_up_and_go') {
                 skriningGugArea.style.display = 'block';
+                // Set tanggal tampilan riwayat ke hari ini, tetapi tanggal pemeriksaan pasien tetap manual.
+                gugTanggalRiwayatTampilan = formatTanggalGUG();
                 setWaktuOtomatisGUG();
                 renderDataGUG();
             } else if (categoryCode === 'skrining') {
