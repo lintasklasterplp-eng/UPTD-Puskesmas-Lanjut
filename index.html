@@ -3660,6 +3660,7 @@ footer {
                                                 <button type="button" class="amb-rt-btn dark-danger" id="ambHapusPermintaanBtn" onclick="ambulancePetugasHapusPermintaan()" disabled>🗑 Hapus</button>
                                             </div>
                                             <div id="ambPetugasActionHint" style="margin-top:5px;font-size:.62rem;color:#64748b;">Pilih permintaan untuk mengaktifkan Tunda, Lanjutkan, dan Hapus.</div>
+                                            <div id="ambAutoTrackingHint" style="margin-top:6px;padding:7px 9px;border-radius:8px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:.62rem;font-weight:700;">🤖 Tracking otomatis: setelah diterima GPS aktif, &gt;50 m = Mulai Jemput, diam &gt;5 menit = Tunda, &gt;30 km/jam = Lanjutkan, 1 km = Hampir Tiba, 50 m = Tiba.</div>
                                             <div id="ambulanceOfficerMap" class="amb-rt-map" style="height:260px;margin-top:8px"></div>
                                             <div class="amb-rt-note">Untuk mengirim GPS, browser harus mengizinkan lokasi dan halaman harus dibuka melalui HTTPS (atau lingkungan lokal yang aman).</div>
 
@@ -8428,6 +8429,340 @@ let ambPatientLat = null;
 let ambPatientLng = null;
 let ambRealtimeRetryTimer = null;
 
+/* ===== TRACKING OTOMATIS AMBULANCE ===== */
+const AMB_AUTO_START_DISTANCE_M = 50;      // >50 m dari titik GPS awal petugas = Mulai Jemput + GPS
+const AMB_AUTO_STOP_TIMEOUT_MS = 5 * 60 * 1000;
+const AMB_AUTO_NEAR_DISTANCE_M = 1000;     // 1 km dari titik jemput = Hampir Tiba
+const AMB_AUTO_ARRIVAL_DISTANCE_M = 50;    // 50 m dari titik jemput = Tiba
+const AMB_AUTO_RESUME_SPEED_KMH = 30;      // >30 km/jam saat ditunda = Lanjutkan otomatis
+const AMB_AUTO_MOVING_SPEED_KMH = 3;       // ambang gerak normal
+const AMB_AUTO_MOVEMENT_EPSILON_M = 15;    // toleransi perubahan posisi GPS
+let ambAutoWatchState = {
+    token: '', requestId: '',
+    originLat: null, originLng: null,
+    lastLat: null, lastLng: null, lastFixAt: 0,
+    lastMovingAt: 0,
+    started: false,
+    nearNotified: false,
+    arrivedNotified: false,
+    autoPaused: false
+};
+let ambAutoTransitionBusy = false;
+
+function ambResetAutoWatchState(token = '', requestId = '') {
+    ambAutoWatchState = {
+        token: ambNormalizeTrackingToken(token) || '', requestId: requestId || '',
+        originLat: null, originLng: null,
+        lastLat: null, lastLng: null, lastFixAt: 0,
+        lastMovingAt: Date.now(), started: false,
+        nearNotified: false, arrivedNotified: false, autoPaused: false
+    };
+}
+
+function ambHaversineMeters(lat1, lng1, lat2, lng2) {
+    const a = Number(lat1), b = Number(lng1), c = Number(lat2), d = Number(lng2);
+    if (![a,b,c,d].every(Number.isFinite)) return Infinity;
+    const R = 6371000;
+    const p1 = a * Math.PI / 180, p2 = c * Math.PI / 180;
+    const dp = (c - a) * Math.PI / 180, dl = (d - b) * Math.PI / 180;
+    const h = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+function ambPositionSpeedKmh(position, prevLat, prevLng, prevTime) {
+    const nativeSpeed = Number(position?.coords?.speed);
+    if (Number.isFinite(nativeSpeed) && nativeSpeed >= 0) return nativeSpeed * 3.6;
+    if (!Number.isFinite(prevLat) || !Number.isFinite(prevLng) || !prevTime) return 0;
+    const now = Date.now();
+    const dt = (now - prevTime) / 1000;
+    if (dt <= 0) return 0;
+    return (ambHaversineMeters(prevLat, prevLng, position.coords.latitude, position.coords.longitude) / dt) * 3.6;
+}
+
+async function ambulanceLogTrackingEvent(eventType, payload = {}) {
+    try {
+        if (!supabaseClient) return;
+        const row = {
+            request_id: payload.request_id || null,
+            tracking_token: payload.tracking_token || ambActiveTrackingToken || '',
+            event_type: eventType,
+            event_label: payload.event_label || eventType,
+            latitude: Number.isFinite(Number(payload.latitude)) ? Number(payload.latitude) : null,
+            longitude: Number.isFinite(Number(payload.longitude)) ? Number(payload.longitude) : null,
+            speed_kmh: Number.isFinite(Number(payload.speed_kmh)) ? Number(payload.speed_kmh) : null,
+            distance_from_start_m: Number.isFinite(Number(payload.distance_from_start_m)) ? Number(payload.distance_from_start_m) : null,
+            distance_to_pickup_m: Number.isFinite(Number(payload.distance_to_pickup_m)) ? Number(payload.distance_to_pickup_m) : null,
+            note: payload.note || null,
+            created_at: new Date().toISOString()
+        };
+        const { error } = await supabaseClient.from('ambulance_tracking_events').insert(row);
+        if (error) console.warn('Log tracking event tidak tersimpan (tabel opsional):', error.message || error);
+    } catch (e) {
+        console.warn('Log tracking event gagal:', e);
+    }
+}
+
+async function ambulanceAutoUpdateStatus(status, extra = {}, eventType = status, eventLabel = '') {
+    if (!ambSelectedRequest?.id || ambAutoTransitionBusy) return null;
+    const currentToken = ambGetRequestTrackingToken(ambSelectedRequest);
+    if (!currentToken) return null;
+    ambAutoTransitionBusy = true;
+    try {
+        const now = new Date().toISOString();
+        const update = {
+            status,
+            updated_at: now,
+            officer_name: ambSelectedRequest.officer_name || localStorage.getItem('ambulance_petugas_nama') || null,
+            officer_phone: ambSelectedRequest.officer_phone || localStorage.getItem('ambulance_petugas_hp') || null
+        };
+        // Detail GPS/event disimpan pada tabel ambulance_tracking_events agar
+        // tracking tetap kompatibel dengan struktur ambulance_requests yang sudah ada.
+        const { data, error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE)
+            .update(update)
+            .eq('id', ambSelectedRequest.id)
+            .eq('tracking_token', currentToken)
+            .select('*').single();
+        if (error) throw error;
+        ambSelectedRequest = data;
+        await ambulanceLogTrackingEvent('lanjut_manual', { request_id: data.id, tracking_token: data.tracking_token, event_label: 'Tracking Lanjut', note: 'Petugas menekan tombol Lanjutkan.' });
+        document.getElementById('ambPetugasSelectedTitle').textContent = `${data.patient_name || '-'} — ${ambStatusLabel(data.status)}`;
+        document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token || '-'} • ${ambFormatDate(data.updated_at)}`;
+        await ambulanceMuatDaftarPetugas();
+        await ambulanceLogTrackingEvent(eventType, {
+            request_id: data.id,
+            tracking_token: currentToken,
+            event_label: eventLabel || ambStatusLabel(status),
+            latitude: extra.latitude,
+            longitude: extra.longitude,
+            speed_kmh: extra.speed_kmh,
+            distance_from_start_m: extra.distance_from_start_m,
+            distance_to_pickup_m: extra.distance_to_pickup_m,
+            note: extra.tracking_note || null
+        });
+        return data;
+    } catch (error) {
+        console.error('Auto status Ambulance gagal:', error);
+        ambUpdateRealtimeIndicator(`⚠ Status otomatis gagal: ${error?.message || error}`, 'warn');
+        return null;
+    } finally {
+        ambAutoTransitionBusy = false;
+    }
+}
+
+function ambulanceOpenWhatsAppTerima(request, preopenedWindow = null) {
+    if (!request?.requester_phone) return;
+    const token = ambGetRequestTrackingToken(request);
+    const onceKey = `ambulance_terima_wa_${token || request.id}`;
+    if (sessionStorage.getItem(onceKey) === '1') return;
+    const target = typeof formatNomorWhatsAppIndonesia === 'function'
+        ? formatNomorWhatsAppIndonesia(request.requester_phone)
+        : String(request.requester_phone).replace(/\D/g, '');
+    if (!target || target.length < 10) return;
+    sessionStorage.setItem(onceKey, '1');
+    const pesan = `✅ *TERIMA PERMINTAAN AMBULANCE*\n\n` +
+        `Petugas Ambulance telah menerima permintaan dan segera menuju lokasi.\n` +
+        `👤 Pasien/Keluarga: ${request.requester_name || request.patient_name || '-'}\n` +
+        `🔎 Nomor Tracking: ${token || '-'}\n` +
+        `🔗 Tracking: ${token ? ambTrackingUrl(token) : '-'}\n\n` +
+        `Status berikutnya akan diperbarui otomatis melalui tracking GPS.`;
+    const url = `https://api.whatsapp.com/send?phone=${target}&text=${encodeURIComponent(pesan)}`;
+    if (preopenedWindow && !preopenedWindow.closed) {
+        try {
+            preopenedWindow.location.href = url;
+            preopenedWindow.focus?.();
+            return;
+        } catch (_) {}
+    }
+    const win = window.open(url, '_blank');
+    if (!win) window.location.href = url;
+}
+
+async function ambulanceAutoHandlePosition(position, trackingToken, requestId) {
+    if (!position || !trackingToken) return;
+    const lat = Number(position.coords.latitude), lng = Number(position.coords.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const now = Date.now();
+
+    if (ambAutoWatchState.token !== trackingToken || ambAutoWatchState.requestId !== requestId) {
+        ambResetAutoWatchState(trackingToken, requestId);
+    }
+
+    if (!Number.isFinite(ambAutoWatchState.originLat)) {
+        ambAutoWatchState.originLat = lat;
+        ambAutoWatchState.originLng = lng;
+        ambAutoWatchState.lastLat = lat;
+        ambAutoWatchState.lastLng = lng;
+        ambAutoWatchState.lastFixAt = now;
+        ambAutoWatchState.lastMovingAt = now;
+        ambUpdateRealtimeIndicator(`● GPS awal petugas ${lat.toFixed(6)}, ${lng.toFixed(6)} — menunggu bergerak > 50 m`, 'ok');
+        return;
+    }
+
+    const prevLat = ambAutoWatchState.lastLat;
+    const prevLng = ambAutoWatchState.lastLng;
+    const prevTime = ambAutoWatchState.lastFixAt;
+    const deltaM = ambHaversineMeters(prevLat, prevLng, lat, lng);
+    const fromOriginM = ambHaversineMeters(ambAutoWatchState.originLat, ambAutoWatchState.originLng, lat, lng);
+    const pickupLat = Number(ambSelectedRequest?.pickup_lat);
+    const pickupLng = Number(ambSelectedRequest?.pickup_lng);
+    const toPickupM = ambHaversineMeters(pickupLat, pickupLng, lat, lng);
+    const speedKmh = ambPositionSpeedKmh(position, prevLat, prevLng, prevTime);
+    const moving = speedKmh >= AMB_AUTO_MOVING_SPEED_KMH || deltaM >= AMB_AUTO_MOVEMENT_EPSILON_M;
+    if (moving) ambAutoWatchState.lastMovingAt = now;
+
+    ambAutoWatchState.lastLat = lat;
+    ambAutoWatchState.lastLng = lng;
+    ambAutoWatchState.lastFixAt = now;
+
+    // Simpan posisi terakhir ke tabel realtime yang sudah digunakan aplikasi.
+    try {
+        const locationPayload = {
+            tracking_token: trackingToken,
+            latitude: lat,
+            longitude: lng,
+            accuracy: position.coords.accuracy ?? null,
+            heading: position.coords.heading ?? null,
+            speed: Number.isFinite(Number(position.coords.speed)) ? Number(position.coords.speed) : null,
+            updated_at: new Date().toISOString()
+        };
+        if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(requestId))) locationPayload.request_id = requestId;
+        let saved = false;
+        const { data: existingRows, error: findError } = await supabaseClient.from(AMBULANCE_LOCATIONS_TABLE)
+            .select('tracking_token').eq('tracking_token', trackingToken).order('updated_at', { ascending: false }).limit(1);
+        if (findError) throw findError;
+        if (Array.isArray(existingRows) && existingRows.length) {
+            const { error } = await supabaseClient.from(AMBULANCE_LOCATIONS_TABLE).update(locationPayload).eq('tracking_token', trackingToken);
+            if (error) throw error;
+            saved = true;
+        } else {
+            const { error } = await supabaseClient.from(AMBULANCE_LOCATIONS_TABLE).insert(locationPayload);
+            if (error) throw error;
+            saved = true;
+        }
+        if (saved) ambulanceRenderLocation(locationPayload);
+    } catch (e) {
+        console.error('GPS Ambulance gagal disimpan:', e);
+        ambUpdateRealtimeIndicator(`⚠ GPS gagal disimpan: ${e?.message || e}`, 'warn');
+    }
+
+    const currentStatus = ambSelectedRequest?.status || '';
+
+    // >50 m dari titik GPS awal petugas: otomatis menjadi Mulai Jemput + GPS.
+    if (!ambAutoWatchState.started && fromOriginM > AMB_AUTO_START_DISTANCE_M && ['diterima_petugas','menunggu_petugas'].includes(currentStatus)) {
+        const changed = await ambulanceAutoUpdateStatus('dalam_perjalanan', {
+            start_jemput_lat: lat,
+            start_jemput_lng: lng,
+            start_jemput_speed_kmh: speedKmh,
+            start_jemput_gps_at: new Date().toISOString(),
+            latitude: lat,
+            longitude: lng,
+            speed_kmh: speedKmh,
+            distance_from_start_m: fromOriginM,
+            distance_to_pickup_m: toPickupM,
+            tracking_note: `Mulai jemput otomatis setelah GPS berpindah ${Math.round(fromOriginM)} m dari titik awal petugas.`
+        }, 'mulai_jemput_gps', 'Mulai Jemput + GPS');
+        if (changed) {
+            ambAutoWatchState.started = true;
+            ambUpdateRealtimeIndicator(`🚑 Mulai Jemput + GPS otomatis (${Math.round(fromOriginM)} m dari titik awal)`, 'ok');
+        }
+    }
+
+    // >30 km/jam saat status ditunda = Lanjutkan otomatis.
+    if (ambSelectedRequest?.status === 'ditunda' && speedKmh > AMB_AUTO_RESUME_SPEED_KMH) {
+        const changed = await ambulanceAutoUpdateStatus('dalam_perjalanan', {
+            resumed_at: new Date().toISOString(),
+            latitude: lat,
+            longitude: lng,
+            speed_kmh: speedKmh,
+            distance_to_pickup_m: toPickupM,
+            tracking_note: `Tracking dilanjutkan otomatis karena GPS bergerak ${speedKmh.toFixed(1)} km/jam.`
+        }, 'auto_lanjutkan', 'Tracking Lanjut');
+        if (changed) {
+            ambAutoWatchState.autoPaused = false;
+            ambAutoWatchState.lastMovingAt = now;
+            ambUpdateRealtimeIndicator(`▶️ Tracking otomatis dilanjutkan (${speedKmh.toFixed(1)} km/jam)`, 'ok');
+        }
+    }
+
+    // GPS diam lebih dari 5 menit setelah perjalanan dimulai = Tunda otomatis.
+    if (ambSelectedRequest?.status === 'dalam_perjalanan' && ambAutoWatchState.started) {
+        if (!moving && now - ambAutoWatchState.lastMovingAt >= AMB_AUTO_STOP_TIMEOUT_MS) {
+            const changed = await ambulanceAutoUpdateStatus('ditunda', {
+                auto_paused_at: new Date().toISOString(),
+                latitude: lat,
+                longitude: lng,
+                speed_kmh: speedKmh,
+                distance_to_pickup_m: toPickupM,
+                tracking_note: 'Tracking ditunda otomatis karena GPS tidak bergerak lebih dari 5 menit.'
+            }, 'auto_tunda', 'Tracking Tunda Otomatis');
+            if (changed) {
+                ambAutoWatchState.autoPaused = true;
+                ambUpdateRealtimeIndicator('⏸️ Tracking otomatis tunda — GPS berhenti > 5 menit', 'warn');
+            }
+        }
+    }
+
+    // Urutan pengecekan tujuan: Tiba <=50 m lebih dahulu, lalu Hampir Tiba <=1 km.
+    if (Number.isFinite(toPickupM) && toPickupM <= AMB_AUTO_ARRIVAL_DISTANCE_M && !ambAutoWatchState.arrivedNotified && ['dalam_perjalanan','ditunda','hampir_tiba'].includes(ambSelectedRequest?.status || '')) {
+        const changed = await ambulanceAutoUpdateStatus('tiba', {
+            arrived_at: new Date().toISOString(),
+            latitude: lat,
+            longitude: lng,
+            speed_kmh: speedKmh,
+            distance_to_pickup_m: toPickupM,
+            tracking_note: `Petugas tiba otomatis. Jarak dari titik jemput ${Math.round(toPickupM)} m.`
+        }, 'tiba_gps', 'Tracking Tiba');
+        if (changed) {
+            ambAutoWatchState.arrivedNotified = true;
+            ambUpdateRealtimeIndicator('🏁 Tracking Tiba — GPS berada ≤ 50 meter dari lokasi jemput', 'ok');
+            if (ambOfficerWatchId !== null) {
+                navigator.geolocation.clearWatch(ambOfficerWatchId);
+                ambOfficerWatchId = null;
+            }
+        }
+    } else if (Number.isFinite(toPickupM) && toPickupM <= AMB_AUTO_NEAR_DISTANCE_M && !ambAutoWatchState.nearNotified && ['dalam_perjalanan','ditunda'].includes(ambSelectedRequest?.status || '')) {
+        const changed = await ambulanceAutoUpdateStatus('hampir_tiba', {
+            near_arrival_at: new Date().toISOString(),
+            latitude: lat,
+            longitude: lng,
+            speed_kmh: speedKmh,
+            distance_to_pickup_m: toPickupM,
+            tracking_note: `Hampir tiba otomatis. Sisa jarak ${Math.round(toPickupM)} meter.`
+        }, 'hampir_tiba_gps', 'Hampir Tiba');
+        if (changed) {
+            ambAutoWatchState.nearNotified = true;
+            ambUpdateRealtimeIndicator(`📍 Hampir Tiba — sisa ${Math.round(toPickupM)} m`, 'ok');
+        }
+    }
+
+    // Setelah tiba, GPS tetap boleh mengirim posisi terakhir tetapi status tidak bergerak lagi otomatis.
+    if (ambSelectedRequest?.status === 'tiba') ambUpdateRealtimeIndicator(`🏁 Tiba — ${Math.round(toPickupM)} m dari lokasi jemput`, 'ok');
+}
+
+async function ambulanceMulaiGPSOtomatis(request) {
+    const req = request || ambSelectedRequest;
+    if (!req?.id || !navigator.geolocation) return;
+    const token = ambGetRequestTrackingToken(req);
+    if (!token) return;
+    if (ambOfficerWatchId !== null) return;
+
+    ambSelectedRequest = req;
+    ambActiveTrackingToken = token;
+    localStorage.setItem('ambulance_active_tracking_token', token);
+    ambResetAutoWatchState(token, req.id);
+    await ambulanceEnsureRealtime();
+
+    ambOfficerWatchId = navigator.geolocation.watchPosition(
+        position => { void ambulanceAutoHandlePosition(position, token, req.id); },
+        error => {
+            console.error('GPS otomatis Ambulance:', error);
+            ambUpdateRealtimeIndicator(`⚠ GPS otomatis gagal: ${error?.message || 'izin lokasi ditolak'}`, 'warn');
+        },
+        { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+    );
+    ambUpdateRealtimeIndicator('● GPS otomatis aktif — menunggu kendaraan bergerak > 50 meter', 'ok');
+}
+
 function ambStatusLabel(status) {
     const labels = {
         menunggu_petugas: 'Menunggu Petugas',
@@ -8504,16 +8839,16 @@ function ambulanceInitMaps() {
     if (typeof L === 'undefined') return;
     if (!ambPatientMap && document.getElementById('ambulancePatientMap')) {
         ambPatientMap = L.map('ambulancePatientMap', { zoomControl: true }).setView([-6.2, 106.816666], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 20,
+            attribution: 'Tiles &copy; Esri'
         }).addTo(ambPatientMap);
     }
     if (!ambOfficerMap && document.getElementById('ambulanceOfficerMap')) {
         ambOfficerMap = L.map('ambulanceOfficerMap', { zoomControl: true }).setView([-6.2, 106.816666], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 20,
+            attribution: 'Tiles &copy; Esri'
         }).addTo(ambOfficerMap);
     }
 }
@@ -9104,10 +9439,12 @@ async function ambulanceTundaPermintaan() {
             ambOfficerWatchId = null;
         }
         ambSelectedRequest = data;
+        ambulanceUpdatePetugasActionButtons(data);
         document.getElementById('ambPetugasSelectedTitle').textContent = `${data.patient_name || '-'} — ${ambStatusLabel(data.status)}`;
         document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token || '-'} • ${ambFormatDate(data.updated_at)}`;
         ambulanceUpdatePetugasActionButtons(data);
         await ambulanceMuatDaftarPetugas();
+        await ambulanceLogTrackingEvent('tunda_manual', { request_id: data.id, tracking_token: data.tracking_token, event_label: 'Tracking Tunda', note: 'Petugas menekan tombol Tunda.' });
         alert('Permintaan ditunda. GPS petugas dihentikan sementara.');
     } catch (error) {
         console.error('Tunda permintaan gagal:', error);
@@ -9227,6 +9564,9 @@ async function ambulancePilihPermintaan(id) {
         document.getElementById('ambPetugasSelectedTitle').textContent = `${data.patient_name || '-'} — ${ambStatusLabel(data.status)}`;
         document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token || '-'} • ${data.condition_text || '-'} • ${ambFormatDate(data.created_at)}`;
         ambulanceUpdatePetugasActionButtons(data);
+        if (['diterima_petugas','dalam_perjalanan','ditunda','hampir_tiba'].includes(data.status)) {
+            void ambulanceMulaiGPSOtomatis(data);
+        }
         if (Number.isFinite(Number(data.pickup_lat)) && Number.isFinite(Number(data.pickup_lng)) && ambOfficerMap) {
             ambOfficerMap.setView([Number(data.pickup_lat), Number(data.pickup_lng)], 14);
         }
@@ -9237,20 +9577,27 @@ async function ambulancePilihPermintaan(id) {
 }
 
 async function ambulancePilihDanTerima(id) {
+    // Buka jendela kosong saat masih berada dalam user gesture agar browser
+    // tidak memblokir perpindahan ke WhatsApp setelah query Supabase selesai.
+    const waWindow = window.open('about:blank', '_blank');
     await ambulancePilihPermintaan(id);
-    await ambulancePetugasStatus('diterima_petugas');
+    await ambulancePetugasStatus('diterima_petugas', waWindow);
 }
 
-async function ambulancePetugasStatus(status) {
+async function ambulancePetugasStatus(status, preopenedWaWindow = null) {
+    const waWindow = status === 'diterima_petugas' ? (preopenedWaWindow || window.open('about:blank', '_blank')) : null;
     if (!ambSelectedRequest?.id) {
+        if (waWindow && !waWindow.closed) { try { waWindow.close(); } catch (_) {} }
+
         alert('Pilih permintaan terlebih dahulu.');
         return false;
     }
     const nama = localStorage.getItem('ambulance_petugas_nama') || '';
     const hp = localStorage.getItem('ambulance_petugas_hp') || '';
     try {
+        const now = new Date().toISOString();
         const { data, error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE)
-            .update({ status, officer_name: nama || ambSelectedRequest.officer_name || null, officer_phone: hp || ambSelectedRequest.officer_phone || null, updated_at: new Date().toISOString() })
+            .update({ status, officer_name: nama || ambSelectedRequest.officer_name || null, officer_phone: hp || ambSelectedRequest.officer_phone || null, updated_at: now })
             .eq('id', ambSelectedRequest.id)
             .select('*').single();
         if (error) throw error;
@@ -9258,6 +9605,13 @@ async function ambulancePetugasStatus(status) {
         document.getElementById('ambPetugasSelectedTitle').textContent = `${data.patient_name || '-'} — ${ambStatusLabel(data.status)}`;
         document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${data.tracking_token || '-'} • ${ambFormatDate(data.updated_at)}`;
         await ambulanceMuatDaftarPetugas();
+        await ambulanceLogTrackingEvent(status, { request_id: data.id, tracking_token: data.tracking_token, event_label: ambStatusLabel(status), note: 'Status diperbarui oleh petugas.' });
+
+        // Begitu diterima, GPS langsung aktif dan WhatsApp keluarga dibuka dengan pesan TERIMA.
+        if (status === 'diterima_petugas') {
+            ambulanceOpenWhatsAppTerima(data, waWindow);
+            await ambulanceMulaiGPSOtomatis(data);
+        }
         return true;
     } catch (error) {
         alert('Gagal mengubah status: ' + (error?.message || error));
@@ -9278,11 +9632,10 @@ async function ambulancePetugasMulaiJemput() {
     const requestId = ambSelectedRequest.id;
     const trackingToken = ambGetRequestTrackingToken(ambSelectedRequest);
     if (!trackingToken) {
-        alert('Permintaan ini tidak memiliki nomor tracking. Permintaan harus dibuat ulang agar tracking token terbentuk.');
+        alert('Permintaan ini tidak memiliki nomor tracking.');
         return;
     }
 
-    // Pastikan token yang akan dipakai GPS benar-benar milik permintaan yang dipilih.
     try {
         const { data: requestCheck, error: requestCheckError } = await supabaseClient
             .from(AMBULANCE_REQUESTS_TABLE)
@@ -9291,109 +9644,45 @@ async function ambulancePetugasMulaiJemput() {
             .eq('tracking_token', trackingToken)
             .maybeSingle();
         if (requestCheckError) throw requestCheckError;
-        if (!requestCheck) {
-            alert('Tracking token tidak cocok dengan permintaan ambulance yang dipilih.');
-            return;
+        if (!requestCheck) throw new Error('Tracking token tidak cocok dengan permintaan ambulance.');
+
+        ambActiveTrackingToken = trackingToken;
+        localStorage.setItem('ambulance_active_tracking_token', trackingToken);
+
+        // Tombol manual tetap tersedia sebagai pemaksa mulai perjalanan sekarang.
+        if (ambSelectedRequest.status !== 'dalam_perjalanan') {
+            const now = new Date().toISOString();
+            const { data, error } = await supabaseClient.from(AMBULANCE_REQUESTS_TABLE)
+                .update({ status: 'dalam_perjalanan', updated_at: now })
+                .eq('id', requestId).eq('tracking_token', trackingToken)
+                .select('*').single();
+            if (error) throw error;
+            ambSelectedRequest = data;
         }
+
+        if (ambOfficerWatchId !== null) navigator.geolocation.clearWatch(ambOfficerWatchId);
+        ambOfficerWatchId = null;
+        await ambulanceMulaiGPSOtomatis(ambSelectedRequest);
+        ambAutoWatchState.started = true;
+        await ambulanceLogTrackingEvent('mulai_jemput_manual', {
+            request_id: requestId, tracking_token: trackingToken,
+            event_label: 'Mulai Jemput + GPS (manual)',
+            note: 'Petugas menekan tombol Mulai Jemput + GPS.'
+        });
+        document.getElementById('ambPetugasSelectedTitle').textContent = `${ambSelectedRequest.patient_name || '-'} — ${ambStatusLabel(ambSelectedRequest.status)}`;
+        document.getElementById('ambPetugasSelectedDetail').textContent = `Tracking ${trackingToken} • GPS aktif otomatis`;
+        await ambulanceMuatDaftarPetugas();
     } catch (error) {
-        alert('Verifikasi tracking token gagal: ' + (error?.message || error));
-        return;
+        console.error('Mulai GPS Ambulance gagal:', error);
+        alert('GPS petugas belum dapat dimulai: ' + (error?.message || error));
     }
-
-    ambActiveTrackingToken = trackingToken;
-    localStorage.setItem('ambulance_active_tracking_token', trackingToken);
-
-    const statusOK = await ambulancePetugasStatus('dalam_perjalanan');
-    if (!statusOK) return;
-    await ambulanceEnsureRealtime();
-
-    if (ambOfficerWatchId !== null) navigator.geolocation.clearWatch(ambOfficerWatchId);
-    ambOfficerWatchId = navigator.geolocation.watchPosition(async position => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        try {
-            const locationPayload = {
-                // KUNCI HUBUNGAN TRACKING: wajib sama persis dengan
-                // ambulance_requests.tracking_token.
-                tracking_token: trackingToken,
-                latitude: lat,
-                longitude: lng,
-                accuracy: position.coords.accuracy ?? null,
-                heading: position.coords.heading ?? null,
-                speed: position.coords.speed ?? null,
-                updated_at: new Date().toISOString()
-            };
-
-            // request_id sengaja hanya dikirim jika berupa UUID valid, supaya
-            // tabel lama dengan tipe id berbeda tidak membuat GPS gagal.
-            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(requestId))) {
-                locationPayload.request_id = requestId;
-            }
-
-            // Simpan lokasi terakhir berdasarkan tracking_token tanpa
-            // bergantung pada UNIQUE/PRIMARY KEY di tracking_token.
-            // Ini penting karena sebagian instalasi Supabase lama belum
-            // memiliki constraint UNIQUE pada kolom tersebut.
-            let saveError = null;
-
-            const { data: existingRows, error: findError } = await supabaseClient
-                .from(AMBULANCE_LOCATIONS_TABLE)
-                .select('tracking_token')
-                .eq('tracking_token', trackingToken)
-                .order('updated_at', { ascending: false })
-                .limit(1);
-
-            if (findError) {
-                saveError = findError;
-            } else if (Array.isArray(existingRows) && existingRows.length > 0) {
-                // Baris sudah ada: update berdasarkan tracking_token.
-                // Tidak memakai upsert/onConflict sehingga constraint UNIQUE tidak diperlukan.
-                const { error: updateError } = await supabaseClient
-                    .from(AMBULANCE_LOCATIONS_TABLE)
-                    .update(locationPayload)
-                    .eq('tracking_token', trackingToken);
-                saveError = updateError || null;
-            } else {
-                // Belum ada baris untuk token ini: buat baris pertama.
-                const { error: insertError } = await supabaseClient
-                    .from(AMBULANCE_LOCATIONS_TABLE)
-                    .insert(locationPayload);
-                saveError = insertError || null;
-            }
-
-            if (saveError) throw saveError;
-
-            // Tampilkan koordinat yang baru saja berhasil disimpan.
-            ambulanceRenderLocation(locationPayload);
-            ambUpdateRealtimeIndicator(
-                `● GPS tersimpan ${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-                'ok'
-            );
-        } catch (error) {
-            console.error('GPS Ambulance gagal dikirim:', error);
-
-            // Tampilkan pesan Supabase sebenarnya agar mudah diperbaiki.
-            const detail = [
-                error?.message,
-                error?.code ? `kode ${error.code}` : '',
-                error?.hint ? `hint: ${error.hint}` : ''
-            ].filter(Boolean).join(' | ');
-
-            ambUpdateRealtimeIndicator(
-                `⚠ GPS gagal disimpan${detail ? ': ' + detail : ''}`,
-                'warn'
-            );
-        }
-    }, error => {
-        console.error(error);
-        alert('GPS petugas tidak dapat dikirim: ' + (error?.message || 'izin lokasi ditolak'));
-    }, { enableHighAccuracy:true, maximumAge:3000, timeout:10000 });
 }
 
 function ambulanceHentikanGPSPetugas() {
     if (ambOfficerWatchId !== null) {
         navigator.geolocation.clearWatch(ambOfficerWatchId);
         ambOfficerWatchId = null;
+        ambResetAutoWatchState(ambActiveTrackingToken, ambSelectedRequest?.id || '');
         alert('Pelacakan GPS petugas dihentikan.');
     }
 }
