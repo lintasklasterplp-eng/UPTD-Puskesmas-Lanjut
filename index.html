@@ -2587,7 +2587,12 @@ footer {
                         <button class="sub-nav-btn">Laporan Bulanan</button>
                         <div class="sub-dropdown-content" id="dropLaporanBulananH" style="max-height: 250px; overflow-y: auto;"></div>
                     </div>
-                    <a onclick="verifyAndSelectMenu('pptlokmin', 'all', 'Arsip', 'PPT Lokmin')">PPT Lokmin</a>
+                    <div class="sub-dropdown" tabindex="0">
+                        <button class="sub-nav-btn">PPT Lokmin</button>
+                        <div class="sub-dropdown-content">
+                            <a onclick="verifyAndSelectMenu('pptlokmin', 'all', 'Arsip', 'PPT Lokmin')">Arsip PPT Lokmin</a>
+                        </div>
+                    </div>
                     <a onclick="verifyAndOpenRKO()">Rencana Kebutuhan Obat</a>
                     <a onclick="selectMenu('jadwal', 'all', 'Jadwal Rapat', 'Kalender 1 Tahun (2026)')">Jadwal Rapat</a>
                     <a onclick="selectMenu('gallery', 'all', 'Gallery Dokumentasi', 'Semua Foto')">Dokumentasi</a>
@@ -4585,7 +4590,10 @@ footer {
                     const rkoArea = document.getElementById('rkoDisplayArea');
                     const rkoFrame = document.getElementById('rkoModuleFrame');
                     if (rkoArea) rkoArea.style.display = 'none';
-            if (pptLokminArea) pptLokminArea.style.display = 'none';
+                    const pptLokminArea = document.getElementById('pptLokminDisplayArea');
+                    if (pptLokminArea) pptLokminArea.style.display = 'none';
+                    const pptLokminViewerOverlay = document.getElementById('pptLokminViewerOverlay');
+                    if (pptLokminViewerOverlay) pptLokminViewerOverlay.classList.remove('active');
                     if (rkoFrame) { rkoFrame.src = 'about:blank'; rkoFrame.dataset.loaded = '0'; }
                     document.getElementById('activeUI').style.display = 'none';
                     document.getElementById('homeViewContainer').style.display = 'block';
@@ -6862,6 +6870,11 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             monitoringUpkdkArea.style.display = 'none';
             if (pmiArea) pmiArea.style.display = 'none';
             if (rkoArea) rkoArea.style.display = 'none';
+            // PPT Lokmin hanya boleh tampil pada menu Arsip -> PPT Lokmin.
+            // Selalu sembunyikan panelnya saat berpindah ke menu/form lain.
+            if (pptLokminArea) pptLokminArea.style.display = 'none';
+            const pptLokminViewerOverlay = document.getElementById('pptLokminViewerOverlay');
+            if (pptLokminViewerOverlay) pptLokminViewerOverlay.classList.remove('active');
 
             if (categoryCode === 'jadwal') {
                 calArea.style.display = 'block';
@@ -6996,6 +7009,10 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             }
             const rkoArea = document.getElementById('rkoDisplayArea');
             if (rkoArea) rkoArea.style.display = 'none';
+            const pptLokminArea = document.getElementById('pptLokminDisplayArea');
+            if (pptLokminArea) pptLokminArea.style.display = 'none';
+            const pptLokminViewerOverlay = document.getElementById('pptLokminViewerOverlay');
+            if (pptLokminViewerOverlay) pptLokminViewerOverlay.classList.remove('active');
             document.getElementById('activeUI').style.display = 'none';
             document.getElementById('homeViewContainer').style.display = 'block';
             document.getElementById('btnAmbulanceFixed').style.display = 'inline-flex';
