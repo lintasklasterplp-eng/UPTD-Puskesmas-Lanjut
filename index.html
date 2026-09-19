@@ -8575,7 +8575,7 @@ async function ambulanceEnsureRealtime() {
     channel.subscribe(status => {
         ambRealtimeStatus = status;
         if (status === 'SUBSCRIBED') {
-            ambUpdateRealtimeIndicator('● Realtime terhubung', 'ok');
+            ambUpdateRealtimeIndicator('● Realtime terhubung — siap menerima update GPS', 'ok');
             if (ambRealtimeRetryTimer) {
                 clearTimeout(ambRealtimeRetryTimer);
                 ambRealtimeRetryTimer = null;
@@ -8810,15 +8810,35 @@ async function ambulancePetugasMulaiJemput() {
                 locationPayload.request_id = requestId;
             }
 
-            const { data, error } = await supabaseClient
+            // Simpan lokasi terakhir. Tidak menggunakan .select().single()
+            // agar kegagalan SELECT/RETURNING tidak disalahartikan sebagai
+            // kegagalan menyimpan GPS.
+            const { error } = await supabaseClient
                 .from(AMBULANCE_LOCATIONS_TABLE)
-                .upsert(locationPayload, { onConflict: 'tracking_token' })
-                .select('*').single();
+                .upsert(locationPayload, { onConflict: 'tracking_token' });
+
             if (error) throw error;
-            ambulanceRenderLocation(data || locationPayload);
+
+            // Tampilkan koordinat yang baru saja berhasil disimpan.
+            ambulanceRenderLocation(locationPayload);
+            ambUpdateRealtimeIndicator(
+                `● GPS tersimpan ${lat.toFixed(6)}, ${lng.toFixed(6)}`,
+                'ok'
+            );
         } catch (error) {
             console.error('GPS Ambulance gagal dikirim:', error);
-            ambUpdateRealtimeIndicator('GPS belum tersimpan ke Supabase', 'warn');
+
+            // Tampilkan pesan Supabase sebenarnya agar mudah diperbaiki.
+            const detail = [
+                error?.message,
+                error?.code ? `kode ${error.code}` : '',
+                error?.hint ? `hint: ${error.hint}` : ''
+            ].filter(Boolean).join(' | ');
+
+            ambUpdateRealtimeIndicator(
+                `⚠ GPS gagal disimpan${detail ? ': ' + detail : ''}`,
+                'warn'
+            );
         }
     }, error => {
         console.error(error);
