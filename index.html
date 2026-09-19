@@ -1170,6 +1170,55 @@
         .darurat-container { max-width: 100%; width: 100%; margin: auto; text-align: center; background: #fff; padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
         .btn-darurat-main { background-color: #ef4444; color: white; padding: 12px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; width: 100%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-darurat-main:hover { background-color: #dc2626; }
+        .amb-service-control {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #fff7f7 0%, #fff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .amb-service-status {
+            font-size: .72rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+        .amb-service-status strong { color: #047857; }
+        .amb-service-toggle-btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: .72rem;
+            font-weight: 800;
+            color: #fff;
+            box-shadow: 0 2px 7px rgba(15,23,42,.10);
+        }
+        .amb-service-toggle-btn.open { background: #dc2626; }
+        .amb-service-toggle-btn.open:hover { background: #b91c1c; }
+        .amb-service-toggle-btn.locked { background: #047857; }
+        .amb-service-toggle-btn.locked:hover { background: #065f46; }
+        .btn-ambulance-fixed.amb-locked {
+            background-color: #64748b !important;
+            color: #fff !important;
+            border-color: #475569 !important;
+            animation: none !important;
+            box-shadow: 0 3px 9px rgba(15,23,42,.20);
+        }
+        .btn-ambulance-fixed.amb-locked:hover {
+            background-color: #475569 !important;
+            border-color: #334155 !important;
+        }
+        @media (max-width: 640px) {
+            .amb-service-control { align-items: stretch; }
+            .amb-service-toggle-btn { width: 100%; }
+        }
+
         
         .form-kontak { display: none; background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 12px; text-align: left; }
         .form-kontak label { font-size: 0.95rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; display: block; }
@@ -2641,7 +2690,7 @@ footer {
     </header>
 
     <div class="content-wrapper">
-        <button id="btnAmbulanceFixed" class="btn-ambulance-fixed" onclick="selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan')">
+        <button id="btnAmbulanceFixed" class="btn-ambulance-fixed" onclick="bukaAmbulanceDenganPassword()" aria-label="Akses layanan Ambulance & Darurat">
             🚨 Ambulance & Darurat
         </button>
 
@@ -2652,7 +2701,7 @@ footer {
                         <h2 id="activeTitle">Judul Menu</h2>
                         <p id="activeSubtitle">Periode</p>
                     </div>
-                    <button class="btn-close-card" onclick="resetToHome()">Tutup</button>
+                    <button class="btn-close-card" id="activeUICloseBtn" onclick="tutupMenuAktif()">Tutup</button>
                 </div>
                 
                 <div class="card-body">
@@ -3527,6 +3576,12 @@ footer {
 
                     <div id="ambulanceDisplayArea" style="display: none; justify-content: center; align-items: center; width: 100%;">
                         <div class="darurat-container">
+                            <div class="amb-service-control" id="ambServiceControl">
+                                <div class="amb-service-status" id="ambServiceStatus">Status layanan: <strong>TERBUKA</strong></div>
+                                <button type="button" class="amb-service-toggle-btn open" id="ambServiceToggleBtn" onclick="toggleAmbulanceService()">
+                                    🔒 Tutup Pelayanan
+                                </button>
+                            </div>
                             <h3 style="color: #ef4444; margin-bottom: 12px; font-size: 1.1rem;">Pelayanan Ambulance & Gawat Darurat</h3>
                             <div class="kontak-info-box">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -5827,6 +5882,7 @@ footer {
         }
 
         window.addEventListener('DOMContentLoaded', (event) => {
+            try { renderAmbulanceServiceState(); } catch (e) { console.warn('Status layanan Ambulance gagal dimuat:', e); }
             initOBHPBMHP();
             initMonitoringUPKDK();
         });
@@ -6822,6 +6878,119 @@ body { width:auto; }
             }
         }
 
+// ============================================================
+// STATUS BUKA/TUTUP PELAYANAN AMBULANCE
+// ============================================================
+const AMBULANCE_SERVICE_STATE_KEY = 'ambulance_service_open';
+
+function validasiPasswordAdminAmbulance(pwd) {
+    return pwd === 'admin';
+}
+
+function isAmbulanceServiceOpen() {
+    const raw = localStorage.getItem(AMBULANCE_SERVICE_STATE_KEY);
+    return raw !== 'false';
+}
+
+function setAmbulanceServiceOpen(isOpen) {
+    localStorage.setItem(AMBULANCE_SERVICE_STATE_KEY, isOpen ? 'true' : 'false');
+    renderAmbulanceServiceState();
+}
+
+function renderAmbulanceServiceState() {
+    const isOpen = isAmbulanceServiceOpen();
+    const btn = document.getElementById('btnAmbulanceFixed');
+    if (btn) {
+        btn.classList.toggle('amb-locked', !isOpen);
+        btn.innerHTML = isOpen ? '🚨 Ambulance & Darurat' : '🛠️ Ambulance Perbaikan';
+        btn.setAttribute('aria-label', isOpen ? 'Akses layanan Ambulance & Darurat' : 'Ambulance Perbaikan - akses dengan password');
+        btn.title = isOpen ? 'Buka layanan Ambulance & Darurat' : 'Ambulance Perbaikan. Masukkan Password untuk membuka layanan.';
+    }
+
+    const status = document.getElementById('ambServiceStatus');
+    const toggle = document.getElementById('ambServiceToggleBtn');
+    if (status) {
+        status.innerHTML = isOpen
+            ? 'Status layanan: <strong>TERBUKA</strong>'
+            : 'Status layanan: <strong style="color:#475569;">TERKUNCI / TIDAK TERSEDIA</strong>';
+    }
+    if (toggle) {
+        toggle.className = 'amb-service-toggle-btn ' + (isOpen ? 'open' : 'locked');
+        toggle.innerHTML = isOpen ? '🔒 Tutup Pelayanan' : '🔓 Buka Pelayanan';
+        toggle.title = isOpen ? 'Tutup pelayanan, kembali ke Beranda dan ubah navigasi menjadi Ambulance Perbaikan' : 'Buka pelayanan dan kembali ke Beranda';
+    }
+}
+
+function bukaAmbulanceDenganPassword() {
+    // Bila pelayanan sedang terbuka, akses dari Beranda langsung masuk tanpa password.
+    if (isAmbulanceServiceOpen()) {
+        selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan');
+        renderAmbulanceServiceState();
+        return;
+    }
+
+    // Setelah pelayanan ditutup, akses berikutnya wajib menggunakan sandi admin.
+    showPasswordPrompt(
+        'Akses Ambulance & Darurat',
+        'Masukkan Password',
+        (success, pwd) => {
+            if (!success) return;
+            if (validasiPasswordAdminAmbulance(pwd)) {
+                selectMenu('ambulance', 'all', 'Pelayanan Ambulance & Gawat Darurat', 'Form Pelayanan');
+                renderAmbulanceServiceState();
+            } else if (pwd !== '') {
+                alert('Sandi admin salah. Ambulance tetap terkunci.');
+            }
+        }
+    );
+}
+
+function toggleAmbulanceService() {
+    const opening = !isAmbulanceServiceOpen();
+
+    // Tombol "Buka Layanan" pada form: buka layanan lalu langsung kembali ke Beranda.
+    if (opening) {
+        setAmbulanceServiceOpen(true);
+        resetToHome();
+        return;
+    }
+
+    // Tombol "Tutup Pelayanan": wajib sandi admin, lalu kembali ke Beranda dalam keadaan terkunci.
+    showPasswordPrompt(
+        'Tutup Pelayanan Ambulance',
+        'Masukkan Password',
+        (success, pwd) => {
+            if (!success) return;
+            if (!validasiPasswordAdminAmbulance(pwd)) {
+                alert('Sandi admin salah. Pelayanan tetap terbuka.');
+                return;
+            }
+            setAmbulanceServiceOpen(false);
+            resetToHome();
+        }
+    );
+}
+
+function tutupMenuAktif() {
+    const isAmbulance = String(currentMenuId || '').startsWith('ambulance-');
+    if (!isAmbulance) {
+        resetToHome();
+        return;
+    }
+    showPasswordPrompt(
+        'Tutup Modul Ambulance',
+        'Masukkan password admin untuk kembali ke Beranda:',
+        (success, pwd) => {
+            if (!success) return;
+            if (validasiPasswordAdminAmbulance(pwd)) {
+                resetToHome();
+            } else if (pwd !== '') {
+                alert('Password admin salah. Modul Ambulance tetap terbuka.');
+            }
+        }
+    );
+}
+
 function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             document.getElementById('topNavBar').classList.remove('show-mobile');
             document.getElementById('hamburgerBtn')?.classList.remove('active');
@@ -6966,6 +7135,7 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
                 muatUrlSkrining();
             } else if (categoryCode === 'ambulance') {
                 ambulanceArea.style.display = 'flex';
+                renderAmbulanceServiceState();
                 muatDataPetugasAmbulance();
             } else if (categoryCode === 'pws') {
                 pwsArea.style.display = 'flex';
@@ -7019,6 +7189,7 @@ function selectMenu(categoryCode, periodIdentifier, mainTitle, subTitle) {
             document.getElementById('homeViewContainer').style.display = 'block';
             document.getElementById('btnAmbulanceFixed').style.display = 'inline-flex';
             currentMenuId = "";
+            renderAmbulanceServiceState();
             updateSystemStats();
         }
 
