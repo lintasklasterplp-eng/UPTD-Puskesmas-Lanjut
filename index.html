@@ -2938,11 +2938,9 @@ footer {
 #pwsModuleIntegrated .master-table-body .total-cell-p{color:#713f12;background:#facc15;font-weight:900}
 #pwsModuleIntegrated .master-table-body .total-cell-s{color:#15803d;background:#eff6ff;font-weight:800}
 #pwsModuleIntegrated .master-table-body .total-cell-m{color:#1f2937;background:#eff6ff;font-weight:800}
-#pwsModuleIntegrated .master-table-body .action-cell-master{min-width:88px;border-left:1px solid #e1e6e2;background:#fff}
 #pwsModuleIntegrated .master-input{width:38px;border:1px solid #cbd5e1;border-radius:5px;padding:3px 2px;text-align:center;font-size:11px;font-weight:700;background:#fff}
 #pwsModuleIntegrated .master-input.k-input{color:#dc2626}#pwsModuleIntegrated .master-input.p-input{color:#ca8a04}#pwsModuleIntegrated .master-input.s-input{color:#16a34a}#pwsModuleIntegrated .master-input.m-input{color:#4b5563}
 #pwsModuleIntegrated .pin-remove-list{display:grid;gap:8px;max-height:260px;overflow:auto}#pwsModuleIntegrated .pin-remove-choice{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;text-align:left;border:1px solid #d5dfd7;background:#f8fbf8;border-radius:9px;padding:9px 10px}#pwsModuleIntegrated .pin-remove-choice .small{grid-column:2}#pwsModuleIntegrated .pin-remove-choice:hover{background:#eef5ef}#pwsModuleIntegrated .pin-selected-box{border:1px solid #d5dfd7;background:#f7faf7;border-radius:9px;padding:10px}
-#pwsModuleIntegrated .master-table-body .action-cell-master button{padding:5px 8px;border-radius:6px;font-size:11px}
 #pwsModuleIntegrated .master-total-p{animation:masterPulse 1.2s infinite ease-in-out}
 @keyframes masterPulse{0%,100%{opacity:1}50%{opacity:.55}}
 @media(max-width:700px){#pwsModuleIntegrated .pws-master-head{align-items:flex-start}#pwsModuleIntegrated .master-legend{gap:8px}#pwsModuleIntegrated .master-pws-table .master-village-head{min-width:125px}#pwsModuleIntegrated .master-pws-table .disease-group{min-width:132px}}
@@ -4301,7 +4299,7 @@ footer {
           <button class="btn secondary" onclick="openResetModal()">Reset Semua Data</button>
         </div>
         <div class="footer-note">
-          Struktur mengikuti Master PWS. Kolom K/P/S/M dapat diedit melalui tombol <b>Edit</b>. Pin kasus otomatis menambah K dan P; pencabutan otomatis mengurangi K/P serta menambah S atau M.
+          Struktur mengikuti Master PWS. Kolom K/P/S/M ditampilkan tanpa kolom Aksi/Edit. Pin kasus otomatis menambah K dan P; pencabutan otomatis mengurangi K/P serta menambah S atau M.
         </div>
 
         <div style="margin-top:18px">
@@ -12868,7 +12866,6 @@ function buildMasterTableHeader(){
   [['K','total-status-k'],['P','total-status-p'],['S','total-status-s'],['M','total-status-m']].forEach(([label,cls])=>{
     const sh=document.createElement('th'); sh.className=`status-th ${cls}`; sh.textContent=label; statusRow.appendChild(sh);
   });
-  const aksi=document.createElement('th'); aksi.rowSpan=2; aksi.className='action-cell-master'; aksi.textContent='Aksi'; groupRow.appendChild(aksi);
 }
 
 function renderDiseaseTable(){
@@ -12909,11 +12906,7 @@ function renderDiseaseTable(){
       <td id="tot-k-${villageKey}" class="status-cell total-cell-k">${totals.k}</td>
       <td id="tot-p-${villageKey}" class="status-cell total-cell-p master-total-p">${totals.p}</td>
       <td id="tot-s-${villageKey}" class="status-cell total-cell-s">${totals.s}</td>
-      <td id="tot-m-${villageKey}" class="status-cell total-cell-m">${totals.m}</td>
-      <td class="action-cell-master">${editing
-        ? `<button class="btn" onclick="saveVillageRow('${villageKey}')">✓ Simpan</button>
-           <button class="btn secondary" onclick="cancelVillageRowEdits('${villageKey}')">✕ Batal</button>`
-        : `<button class="btn secondary" onclick="promptPwsEdit('${villageKey}')">✎ Edit</button>`}</td>`;
+      <td id="tot-m-${villageKey}" class="status-cell total-cell-m">${totals.m}</td>`;
 
     tr.innerHTML=html;
     body.appendChild(tr);
