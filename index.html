@@ -9311,18 +9311,38 @@ async function ambulancePetugasMulaiJemput() {
                 locationPayload.request_id = requestId;
             }
 
-            // Simpan lokasi terakhir berdasarkan tracking_token.
-            // Karena tracking_token dibuat UNIQUE di Supabase, setiap update
-            // akan menimpa posisi ambulance yang sama, bukan membuat token baru.
-            // Tidak menggunakan .select().single() agar kegagalan SELECT/RETURNING
-            // tidak disalahartikan sebagai kegagalan penyimpanan GPS.
-            // agar kegagalan SELECT/RETURNING tidak disalahartikan sebagai
-            // kegagalan menyimpan GPS.
-            const { error } = await supabaseClient
-                .from(AMBULANCE_LOCATIONS_TABLE)
-                .upsert(locationPayload, { onConflict: 'tracking_token' });
+            // Simpan lokasi terakhir berdasarkan tracking_token tanpa
+            // bergantung pada UNIQUE/PRIMARY KEY di tracking_token.
+            // Ini penting karena sebagian instalasi Supabase lama belum
+            // memiliki constraint UNIQUE pada kolom tersebut.
+            let saveError = null;
 
-            if (error) throw error;
+            const { data: existingRows, error: findError } = await supabaseClient
+                .from(AMBULANCE_LOCATIONS_TABLE)
+                .select('tracking_token')
+                .eq('tracking_token', trackingToken)
+                .order('updated_at', { ascending: false })
+                .limit(1);
+
+            if (findError) {
+                saveError = findError;
+            } else if (Array.isArray(existingRows) && existingRows.length > 0) {
+                // Baris sudah ada: update berdasarkan tracking_token.
+                // Tidak memakai upsert/onConflict sehingga constraint UNIQUE tidak diperlukan.
+                const { error: updateError } = await supabaseClient
+                    .from(AMBULANCE_LOCATIONS_TABLE)
+                    .update(locationPayload)
+                    .eq('tracking_token', trackingToken);
+                saveError = updateError || null;
+            } else {
+                // Belum ada baris untuk token ini: buat baris pertama.
+                const { error: insertError } = await supabaseClient
+                    .from(AMBULANCE_LOCATIONS_TABLE)
+                    .insert(locationPayload);
+                saveError = insertError || null;
+            }
+
+            if (saveError) throw saveError;
 
             // Tampilkan koordinat yang baru saja berhasil disimpan.
             ambulanceRenderLocation(locationPayload);
