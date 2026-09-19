@@ -2951,6 +2951,36 @@ footer {
 #pwsModuleIntegrated .print-pws-btn{background:#2563eb!important;color:#fff!important;}
 
 </style>
+<style id="password-settings-css">
+#passwordSettingsModal{display:none;position:fixed;inset:0;z-index:2450;padding:14px;background:rgba(15,23,42,.58);backdrop-filter:blur(7px);align-items:center;justify-content:center}
+#passwordSettingsModal.show{display:flex}
+.password-settings-panel{width:min(980px,100%);max-height:min(88vh,900px);overflow:hidden;background:#fff;border:1px solid #cbd5e1;border-radius:18px;box-shadow:0 24px 80px rgba(15,23,42,.24);display:flex;flex-direction:column}
+.password-settings-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;background:linear-gradient(135deg,#183a63,#2b6ea6);color:#fff}
+.password-settings-head h3{margin:0;font-size:1rem;font-weight:800}.password-settings-head p{margin:4px 0 0;font-size:.68rem;color:rgba(255,255,255,.82)}
+.password-settings-close{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:1rem;font-weight:800}.password-settings-close:hover{background:rgba(255,255,255,.22)}
+.password-settings-toolbar{padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.password-settings-search{flex:1;min-width:220px;max-width:460px;border:1px solid #cbd5e1;border-radius:9px;padding:9px 11px;font-size:.75rem;outline:none;background:#fff}.password-settings-search:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.10)}
+.password-settings-note{font-size:.66rem;color:#64748b;line-height:1.45}.password-settings-list{overflow:auto;padding:12px 14px 16px;background:#f8fafc}
+.password-setting-row{display:grid;grid-template-columns:minmax(220px,1.15fr) minmax(180px,.9fr) auto;gap:10px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 11px;margin-bottom:8px;box-shadow:0 2px 7px rgba(15,23,42,.04)}.password-setting-row:last-child{margin-bottom:0}
+.password-setting-title{font-size:.76rem;font-weight:800;color:#0f172a}.password-setting-meta{margin-top:3px;font-size:.61rem;color:#64748b}.password-setting-input-wrap{position:relative;display:flex;align-items:center}
+.password-setting-input{width:100%;padding:8px 38px 8px 10px;border:1px solid #cbd5e1;border-radius:8px;font-size:.72rem;background:#fff;color:#0f172a;outline:none}.password-setting-input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.password-toggle-btn{position:absolute;right:4px;border:0;background:transparent;color:#64748b;cursor:pointer;width:30px;height:30px;border-radius:7px}.password-toggle-btn:hover{background:#f1f5f9;color:#0f172a}
+.password-setting-actions{display:flex;gap:6px;align-items:center;justify-content:flex-end}.password-setting-save,.password-setting-reset-default{border-radius:8px;padding:8px 10px;font-size:.66rem;font-weight:800;cursor:pointer;white-space:nowrap}.password-setting-save{background:#2563eb;color:#fff;border:0}.password-setting-save:hover{background:#1d4ed8}.password-setting-reset-default{background:#f1f5f9;color:#334155;border:1px solid #cbd5e1}.password-setting-reset-default:hover{background:#e2e8f0}
+.password-settings-status{min-height:16px;font-size:.66rem;font-weight:700}.password-settings-status.ok{color:#047857}.password-settings-status.err{color:#b91c1c}
+@media(max-width:720px){#passwordSettingsModal{padding:7px;align-items:flex-end}.password-settings-panel{max-height:93vh;border-radius:16px 16px 10px 10px}.password-setting-row{grid-template-columns:1fr}.password-setting-actions{justify-content:stretch}.password-setting-save,.password-setting-reset-default{flex:1}.password-settings-toolbar{align-items:stretch;flex-direction:column}.password-settings-search{max-width:none}}
+.password-settings-toolbar-side{display:flex;flex-direction:column;align-items:flex-end;gap:5px;min-width:min(100%,390px)}
+.password-settings-cloud-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.password-settings-cloud-btn{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:8px;padding:7px 10px;font-size:.66rem;font-weight:800;cursor:pointer}
+.password-settings-cloud-btn:hover{background:#f1f5f9}
+.password-settings-cloud-btn.primary{background:#047857;color:#fff;border-color:#047857}
+.password-settings-cloud-btn.primary:hover{background:#065f46}
+.password-settings-cloud-status{font-size:.64rem;font-weight:800;text-align:right}
+.password-settings-cloud-status.info{color:#64748b}.password-settings-cloud-status.ok{color:#047857}.password-settings-cloud-status.warn{color:#b45309}.password-settings-cloud-status.err{color:#b91c1c}
+.password-setting-group{margin:8px 2px 6px;padding:6px 8px;border-left:3px solid #047857;color:#047857;font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.3px}
+.password-setting-reference{background:#fbfdff}
+@media(max-width:720px){.password-settings-toolbar-side{align-items:stretch;min-width:0}.password-settings-cloud-actions{justify-content:stretch}.password-settings-cloud-btn{flex:1}.password-settings-cloud-status{text-align:left}}
+</style>
+
 </head>
 <body>
 
@@ -3132,7 +3162,7 @@ footer {
             <div class="nav-item" tabindex="0">
                 <button class="nav-btn-h">Pengaturan</button>
                 <div class="dropdown-content-h">
-                    <a onclick="bukaPengaturanPassword()">Ganti Password</a>
+                    <a onclick="openPasswordSettings()">Pengaturan Password</a>
                     <a onclick="authLogout()">Keluar dari Aplikasi</a>
                     <a onclick="checkPasswordAndOpenInfo()">Informasi Sistem</a>
                 </div>
@@ -4569,7 +4599,7 @@ footer {
                 <div class="info-item"><span class="info-label">Supabase Storage</span><span class="info-value" id="statSupabaseStorage"><span class="badge-active">Memeriksa...</span></span></div>
                 <div class="info-item" style="align-items:flex-start;">
                     <span class="info-label">Bucket Supabase</span>
-                    <span class="info-value" id="statSupabaseBuckets" style="max-width:70%; text-align:right; line-height:1.5;">PPT-LOKMIN, APP-NOTIFIKASI, INVENTARIS, KIR, OBHPBMHP, PMI, PWS, Ambulance, RUJUKAN INTERNAL</span>
+                    <span class="info-value" id="statSupabaseBuckets" style="max-width:70%; text-align:right; line-height:1.5;">PENGATURAN, PPT-LOKMIN, APP-NOTIFIKASI, INVENTARIS, KIR, OBHPBMHP, PMI, PWS, Ambulance, RUJUKAN INTERNAL</span>
                 </div>
                 <div class="info-item"><span class="info-label">Status Sistem</span><span class="badge-active">Aktif (Local Storage)</span></div>
                 <div class="info-item"><span class="info-label">Backup Otomatis</span><span class="badge-active">Aktif</span></div>
@@ -4577,7 +4607,31 @@ footer {
         </div>
     </div>
 
-    <div id="passwordModal">
+    
+<!-- ================= PUSAT PENGATURAN PASSWORD ================= -->
+<div id="passwordSettingsModal" aria-hidden="true">
+  <div class="password-settings-panel" role="dialog" aria-modal="true" aria-labelledby="passwordSettingsTitle">
+    <div class="password-settings-head">
+      <div><h3 id="passwordSettingsTitle"><i class="fa-solid fa-shield-halved"></i> Pengaturan Password</h3><p>Kelola password semua modul, form, PWS, dan otorisasi admin dari satu tempat.</p></div>
+      <button class="password-settings-close" type="button" onclick="closePasswordSettings()" aria-label="Tutup">×</button>
+    </div>
+    <div class="password-settings-toolbar">
+      <input id="passwordSettingsSearch" class="password-settings-search" type="search" placeholder="Cari form / modul / password..." oninput="renderPasswordSettings()">
+      <div class="password-settings-toolbar-side">
+        <div class="password-settings-note">Semua perubahan disimpan di perangkat ini dan dapat disinkronkan lintas perangkat melalui Supabase.</div>
+        <div class="password-settings-cloud-actions">
+          <button type="button" class="password-settings-cloud-btn" onclick="refreshPasswordSettingsFromCloud()"><i class="fa-solid fa-cloud-arrow-down"></i> Muat</button>
+          <button type="button" class="password-settings-cloud-btn primary" onclick="savePasswordSettingsToSupabase()"><i class="fa-solid fa-cloud-arrow-up"></i> Simpan</button>
+        </div>
+        <div id="passwordSettingsCloudStatus" class="password-settings-cloud-status info">☁ Belum disinkronkan</div>
+        <div id="passwordSettingsStatus" class="password-settings-status"></div>
+      </div>
+    </div>
+    <div id="passwordSettingsList" class="password-settings-list"></div>
+  </div>
+</div>
+
+<div id="passwordModal">
         <div class="password-modal-box">
             <div class="password-modal-header" id="passModalTitle">Autentikasi Password</div>
             <div class="password-modal-body">
@@ -4656,6 +4710,11 @@ footer {
 
          // Bucket khusus Arsip PPT Lokmin. Semua berkas disimpan langsung di root bucket.
          const PPT_LOKMIN_STORAGE_BUCKET = "PPT-LOKMIN";
+
+        // Pusat pengaturan password lintas perangkat.
+        // Bucket harus dibuat di Supabase Storage dengan nama PENGATURAN.
+        const PASSWORD_SETTINGS_STORAGE_BUCKET = "PENGATURAN";
+        const PASSWORD_SETTINGS_STORAGE_PATH = "keamanan/password-settings.json";
 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -4938,7 +4997,7 @@ footer {
                 (success, pwd) => {
                     if (!success || pwd === '') return;
 
-                    if (pwd === systemPassword || pwd === 'admin') {
+                    if (pwd === systemPassword || pwd === ADMIN_PASSWORD) {
                         modal.classList.add('show');
                         modal.setAttribute('aria-hidden','false');
                         const btn = document.getElementById('appNotificationBtn');
@@ -4999,7 +5058,7 @@ footer {
         }
 
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') appNotificationClose();
+            if (event.key === 'Escape') { appNotificationClose(); closePasswordSettings(); }
         });
         document.addEventListener('click', function(event) {
             const modal = document.getElementById('appNotificationModal');
@@ -5021,8 +5080,8 @@ footer {
 
         let passwordCallback = null;
         // Password akses utama dan password khusus setiap modul.
-        const APP_LOGIN_PASSWORD = 'lintasklaster';
-        const MODULE_PASSWORDS = {
+        let APP_LOGIN_PASSWORD = localStorage.getItem('app_login_password') || 'lintasklaster';
+        const DEFAULT_MODULE_PASSWORDS = {
             kir: 'hilmi',
             obhp_bmhp: 'rendy',
             pmi: 'syifa',
@@ -5031,7 +5090,14 @@ footer {
             pptlokmin: 'rendy',
             rko: 'ulfa'
         };
+        let MODULE_PASSWORDS = (() => {
+            try {
+                const saved=JSON.parse(localStorage.getItem('app_module_passwords') || '{}');
+                return {...DEFAULT_MODULE_PASSWORDS, ...(saved && typeof saved==='object' ? saved : {})};
+            } catch(e){ return {...DEFAULT_MODULE_PASSWORDS}; }
+        })();
         let systemPassword = localStorage.getItem('app_system_password') || APP_LOGIN_PASSWORD;
+        let ADMIN_PASSWORD = localStorage.getItem('app_admin_password') || 'admin';
 
         function getModulePassword(categoryCode, periodIdentifier) {
             if (categoryCode === 'inventaris' && periodIdentifier === 'kir') return MODULE_PASSWORDS.kir;
@@ -5072,7 +5138,7 @@ footer {
         function checkPasswordAndOpenInfo() {
             showPasswordPrompt("Informasi Sistem", "Masukkan password untuk melihat Informasi Sistem:", (success, pwd) => {
                 if(success) {
-                    if(pwd === systemPassword || pwd === 'admin') openInfoModal();
+                    if(pwd === systemPassword || pwd === ADMIN_PASSWORD) openInfoModal();
                     else if(pwd !== "") alert("Password yang Anda masukkan salah!");
                 }
             });
@@ -5156,25 +5222,393 @@ footer {
             });
         }
 
-        function bukaPengaturanPassword() {
-            showPasswordPrompt("Ganti Password", "Masukkan password sistem saat ini:", (success, pwd) => {
-                if(success) {
-                    if (pwd === systemPassword || pwd === 'admin') {
-                        const passwordBaru = prompt("Masukkan password baru:");
-                        if (passwordBaru && passwordBaru.trim() !== "") {
-                            systemPassword = passwordBaru;
-                            localStorage.setItem('app_system_password', systemPassword);
-                            alert("Berhasil! Password sistem telah diubah.");
-                        } else if(passwordBaru !== null) {
-                            alert("Gagal. Password baru tidak boleh kosong.");
-                        }
-                    } else if(pwd !== "") {
-                        alert("Akses ditolak! Password lama yang Anda masukkan salah.");
-                    }
-                }
-            });
+        const PASSWORD_SETTINGS = [
+            {id:'login', label:'Login Aplikasi Utama', meta:'Password layar masuk aplikasi', type:'login', group:'Keamanan Utama'},
+            {id:'system', label:'Password Sistem / Otorisasi Umum', meta:'Informasi Sistem, notifikasi, reset GUG, dan otorisasi umum', type:'system', group:'Keamanan Utama'},
+            {id:'admin', label:'Password Admin', meta:'Kunci peta PWS, reset PWS, Ambulance, SBAR, dan penghapusan admin', type:'admin', group:'Keamanan Utama'},
+
+            {id:'kir', label:'Inventaris — KIR', meta:'Akses form Kartu Inventaris Ruangan', type:'module', key:'kir', group:'Inventaris'},
+            {id:'obhp_bmhp', label:'Inventaris — OBHP/BMHP', meta:'Akses kartu stok OBHP/BMHP', type:'module', key:'obhp_bmhp', group:'Inventaris'},
+
+            {id:'pmi', label:'Monitoring — Pemantauan Mutu Internal (PMI)', meta:'Akses form PMI', type:'module', key:'pmi', group:'Monitoring'},
+            {id:'upkdk', label:'Monitoring — Monitoring UPKDK', meta:'Akses form monitoring UPKDK', type:'module', key:'upkdk', group:'Monitoring'},
+            {id:'ikp', label:'Monitoring — Keselamatan Pasien (IKP)', meta:'Akses modul keselamatan pasien', type:'module', key:'ikp', group:'Monitoring'},
+
+            {id:'pptlokmin', label:'Arsip — PPT Lokmin', meta:'Akses arsip dan berkas PPT Lokmin', type:'module', key:'pptlokmin', group:'Arsip'},
+            {id:'rko', label:'Arsip — Rencana Kebutuhan Obat', meta:'Akses modul RKO', type:'module', key:'rko', group:'Arsip'},
+
+            {id:'gug', label:'Skrining Get Up & Go — Reset/Riwayat', meta:'Menggunakan Password Sistem', type:'systemRef', group:'Skrining'},
+            {id:'sbar_reset', label:'Rujukan Internal / SBAR — Reset Nomor', meta:'Menggunakan Password Admin', type:'adminRef', group:'Rujukan'},
+            {id:'sbar_pdf', label:'Rujukan Internal / SBAR — Hapus Rekaman PDF', meta:'Menggunakan Password Admin', type:'adminRef', group:'Rujukan'},
+
+            {id:'ambulance_access', label:'Ambulance & Darurat — Akses / Mode Petugas', meta:'Menggunakan Password Admin', type:'adminRef', group:'Ambulance'},
+            {id:'ambulance_edit', label:'Ambulance — Edit Data Petugas', meta:'Menggunakan Password Admin atau Sistem', type:'sharedRef', shared:'Password Admin / Sistem', group:'Ambulance'},
+            {id:'ambulance_history', label:'Ambulance — Hapus Riwayat', meta:'Menggunakan Password Admin / Sistem', type:'sharedRef', shared:'Password Admin / Sistem', group:'Ambulance'},
+
+            {id:'pws_admin', label:'Dashboard PWS — Kunci Peta & Reset Semua Data', meta:'Menggunakan Password Admin', type:'adminRef', group:'Dashboard PWS'},
+            {id:'pws_pin', label:'Dashboard PWS — Tancap/Cabut Pin Desa', meta:'Menggunakan password masing-masing desa', type:'pwsPinRef', group:'Dashboard PWS'},
+            {id:'info_notif', label:'Informasi Sistem & Pusat Notifikasi', meta:'Menggunakan Password Sistem/Admin', type:'sharedRef', shared:'Password Sistem / Admin', group:'Sistem'},
+
+            ...Object.entries({berindat:'Berindat',persing:'Persing',sedamai:'Sedamai',lanjut:'Lanjut',kote:'Kote',pelakak:'Pelakak'}).map(([key,name])=>({id:'pws_'+key,label:`PWS — Desa ${name}`,meta:'Password edit/otorisasi data dan pin desa',type:'village',key,group:'Dashboard PWS'}))
+        ];
+
+        let passwordSettingsCloudLoaded = false;
+        let passwordSettingsCloudLoading = null;
+        let passwordSettingsCloudSaveTimer = null;
+
+        function passwordSettingsSetCloudStatus(message, type='info') {
+            const el=document.getElementById('passwordSettingsCloudStatus');
+            if(!el) return;
+            el.textContent=message||'';
+            el.className='password-settings-cloud-status '+(type||'info');
         }
 
+        function getPasswordSettingsPayload(){
+            return {
+                version: 2,
+                updatedAt: new Date().toISOString(),
+                settings: {
+                    login: String(APP_LOGIN_PASSWORD||''),
+                    system: String(systemPassword||''),
+                    admin: String(ADMIN_PASSWORD||''),
+                    modules: {...MODULE_PASSWORDS},
+                    villages: {...MASTER_VILLAGE_PASSWORDS}
+                }
+            };
+        }
+
+        function applyPasswordSettingsPayload(payload){
+            const cfg=payload && payload.settings && typeof payload.settings==='object' ? payload.settings : null;
+            if(!cfg) throw new Error('Format konfigurasi password Supabase tidak valid.');
+
+            if(typeof cfg.login==='string' && cfg.login.length>=4){
+                APP_LOGIN_PASSWORD=cfg.login;
+                localStorage.setItem('app_login_password',cfg.login);
+            }
+            if(typeof cfg.system==='string' && cfg.system.length>=4){
+                systemPassword=cfg.system;
+                localStorage.setItem('app_system_password',cfg.system);
+            } else if(!systemPassword){
+                systemPassword=APP_LOGIN_PASSWORD;
+            }
+            if(typeof cfg.admin==='string' && cfg.admin.length>=4){
+                ADMIN_PASSWORD=cfg.admin;
+                localStorage.setItem('app_admin_password',cfg.admin);
+                try{ SBAR_PDF_DELETE_PASSWORD=ADMIN_PASSWORD; }catch(e){}
+            }
+
+            if(cfg.modules && typeof cfg.modules==='object'){
+                MODULE_PASSWORDS={...DEFAULT_MODULE_PASSWORDS,...MODULE_PASSWORDS};
+                Object.keys(DEFAULT_MODULE_PASSWORDS).forEach(key=>{
+                    if(typeof cfg.modules[key]==='string' && cfg.modules[key].length>=4) MODULE_PASSWORDS[key]=cfg.modules[key];
+                });
+                localStorage.setItem('app_module_passwords',JSON.stringify(MODULE_PASSWORDS));
+            }
+
+            if(cfg.villages && typeof cfg.villages==='object' && typeof MASTER_VILLAGE_PASSWORDS==='object'){
+                MASTER_VILLAGE_PASSWORDS={...DEFAULT_MASTER_VILLAGE_PASSWORDS,...MASTER_VILLAGE_PASSWORDS};
+                Object.keys(DEFAULT_MASTER_VILLAGE_PASSWORDS).forEach(key=>{
+                    if(typeof cfg.villages[key]==='string' && cfg.villages[key].length>=4) MASTER_VILLAGE_PASSWORDS[key]=cfg.villages[key];
+                });
+                localStorage.setItem('pws_village_passwords',JSON.stringify(MASTER_VILLAGE_PASSWORDS));
+            }
+        }
+
+        function getDefaultPasswordSettingsPayload(){
+            return {
+                version: 2,
+                module: 'PASSWORD_SETTINGS',
+                updatedAt: new Date().toISOString(),
+                settings: {
+                    login: String(APP_LOGIN_PASSWORD || 'lintasklaster'),
+                    system: String(systemPassword || APP_LOGIN_PASSWORD || 'lintasklaster'),
+                    admin: String(ADMIN_PASSWORD || 'admin'),
+                    modules: {...DEFAULT_MODULE_PASSWORDS, ...MODULE_PASSWORDS},
+                    villages: {...DEFAULT_MASTER_VILLAGE_PASSWORDS, ...MASTER_VILLAGE_PASSWORDS}
+                }
+            };
+        }
+
+        async function uploadPasswordSettingsBlob(payload){
+            const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+            const result = await supabaseClient.storage
+                .from(PASSWORD_SETTINGS_STORAGE_BUCKET)
+                .upload(PASSWORD_SETTINGS_STORAGE_PATH, blob, {
+                    upsert:true,
+                    cacheControl:'0',
+                    contentType:'application/json'
+                });
+            if(result.error) throw result.error;
+            return true;
+        }
+
+        async function savePasswordSettingsRest(payload){
+            const endpoint=`${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(PASSWORD_SETTINGS_STORAGE_BUCKET)}/${PASSWORD_SETTINGS_STORAGE_PATH}`;
+            const response=await fetch(endpoint,{
+                method:'POST',
+                headers:{
+                    'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,
+                    'apikey':SUPABASE_ANON_KEY,
+                    'Content-Type':'application/json',
+                    'x-upsert':'true',
+                    'Cache-Control':'no-cache'
+                },
+                body:JSON.stringify(payload)
+            });
+            if(!response.ok){
+                let detail='';
+                try{detail=await response.text();}catch(_){}
+                const e=new Error(detail||`HTTP ${response.status}`);
+                e.statusCode=response.status;
+                throw e;
+            }
+            return true;
+        }
+
+        async function initializePasswordSettingsInSupabase(){
+            const payload=getDefaultPasswordSettingsPayload();
+            try{
+                await uploadPasswordSettingsBlob(payload);
+                return true;
+            }catch(sdkErr){
+                try{
+                    await savePasswordSettingsRest(payload);
+                    return true;
+                }catch(restErr){
+                    restErr.storageError=sdkErr;
+                    throw restErr;
+                }
+            }
+        }
+
+        async function loadPasswordSettingsFromSupabase(options={}){
+            const silent=options.silent===true;
+            passwordSettingsSetCloudStatus('☁ Menghubungkan ke bucket PENGATURAN...','info');
+            try{
+                let blob=null;
+                let firstError=null;
+
+                // Jalur utama melalui SDK Storage.
+                try{
+                    const result=await supabaseClient.storage
+                        .from(PASSWORD_SETTINGS_STORAGE_BUCKET)
+                        .download(PASSWORD_SETTINGS_STORAGE_PATH);
+                    blob=result.data || null;
+                    firstError=result.error || null;
+                }catch(e){
+                    firstError=e;
+                }
+
+                // Fallback REST langsung.
+                if(!blob){
+                    const endpoint=`${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(PASSWORD_SETTINGS_STORAGE_BUCKET)}/${PASSWORD_SETTINGS_STORAGE_PATH}?t=${Date.now()}`;
+                    const response=await fetch(endpoint,{
+                        method:'GET',
+                        headers:{'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'apikey':SUPABASE_ANON_KEY,'Cache-Control':'no-cache'}
+                    });
+                    if(!response.ok){
+                        let detail='';
+                        try{detail=await response.text();}catch(_){}
+                        const e=new Error(detail||`HTTP ${response.status}`);
+                        e.statusCode=response.status;
+                        if(firstError) e.storageError=firstError;
+                        throw e;
+                    }
+                    blob=await response.blob();
+                }
+
+                const text=await blob.text();
+                const payload=JSON.parse(text);
+                applyPasswordSettingsPayload(payload);
+                passwordSettingsCloudLoaded=true;
+                const when=payload.updatedAt?new Date(payload.updatedAt):null;
+                const whenText=when && !Number.isNaN(when.getTime()) ? ` • ${when.toLocaleString('id-ID')}` : '';
+                passwordSettingsSetCloudStatus(`☁ Terhubung ke PENGATURAN • Tersinkron${whenText}`,'ok');
+                if(!silent) renderPasswordSettings();
+                return true;
+            }catch(err){
+                const raw=String(err?.message||err||'');
+                const notFound=/404|not found|object not found|no such file/i.test(raw);
+                if(notFound){
+                    try{
+                        passwordSettingsSetCloudStatus('☁ File konfigurasi belum ada • membuat konfigurasi awal...','info');
+                        await initializePasswordSettingsInSupabase();
+                        const ok=await loadPasswordSettingsFromSupabase({silent:true});
+                        if(!silent) renderPasswordSettings();
+                        if(ok && !silent) setPasswordSettingsStatus('✓ File password-settings.json berhasil dibuat di bucket PENGATURAN.','ok');
+                        return ok;
+                    }catch(initErr){
+                        passwordSettingsCloudSetError(initErr);
+                        if(!silent) alert('Bucket PENGATURAN terdeteksi, tetapi file konfigurasi belum bisa dibuat.\n\n'+passwordSettingsExplainError(initErr));
+                        return false;
+                    }
+                }
+                passwordSettingsCloudSetError(err);
+                if(!silent) alert('Pengaturan cloud gagal dimuat. Konfigurasi perangkat tetap digunakan.\n\n'+passwordSettingsExplainError(err));
+                return false;
+            }
+        }
+
+        function passwordSettingsExplainError(err){
+            const msg=String(err?.message||err||'Kesalahan tidak diketahui.');
+            if(/bucket.*not found|not found|does not exist/i.test(msg)) return `Bucket ${PASSWORD_SETTINGS_STORAGE_BUCKET} belum ditemukan.`;
+            if(/row-level security|permission|not authorized|forbidden|403/i.test(msg)) return 'Policy Storage Supabase belum mengizinkan akses aplikasi ke bucket PENGATURAN.';
+            if(/401|unauthorized/i.test(msg)) return 'Akses Supabase ditolak (401).';
+            if(/Failed to fetch|NetworkError|fetch/i.test(msg)) return 'Koneksi internet/Supabase bermasalah.';
+            return msg;
+        }
+
+        function passwordSettingsCloudSetError(err){
+            passwordSettingsSetCloudStatus('⚠ Gagal sinkron Supabase • '+passwordSettingsExplainError(err),'err');
+        }
+
+        async function savePasswordSettingsToSupabase(options={}){
+            const silent=options.silent===true;
+            try{
+                const payload=getPasswordSettingsPayload();
+                let saved=false;
+                let firstError=null;
+
+                try{
+                    await uploadPasswordSettingsBlob(payload);
+                    saved=true;
+                }catch(e){ firstError=e; }
+
+                if(!saved){
+                    try{
+                        await savePasswordSettingsRest(payload);
+                        saved=true;
+                    }catch(e){
+                        e.storageError=firstError;
+                        throw e;
+                    }
+                }
+
+                passwordSettingsCloudLoaded=true;
+                passwordSettingsSetCloudStatus(`☁ Tersimpan ke bucket PENGATURAN • ${new Date(payload.updatedAt).toLocaleString('id-ID')}`,'ok');
+                if(!silent) setPasswordSettingsStatus('✓ Pengaturan berhasil disimpan ke bucket PENGATURAN.','ok');
+                return true;
+            }catch(err){
+                passwordSettingsCloudSetError(err);
+                if(!silent) setPasswordSettingsStatus('⚠ Tersimpan lokal, tetapi gagal ke bucket PENGATURAN: '+passwordSettingsExplainError(err),'err');
+                return false;
+            }
+        }
+
+        function queuePasswordSettingsCloudSave(){
+            clearTimeout(passwordSettingsCloudSaveTimer);
+            passwordSettingsCloudSaveTimer=setTimeout(()=>savePasswordSettingsToSupabase({silent:true}),450);
+        }
+
+        async function ensurePasswordSettingsCloudLoaded(){
+            if(passwordSettingsCloudLoaded) return true;
+            if(passwordSettingsCloudLoading) return passwordSettingsCloudLoading;
+            passwordSettingsCloudLoading=loadPasswordSettingsFromSupabase({silent:true})
+                .finally(()=>{passwordSettingsCloudLoading=null;});
+            return passwordSettingsCloudLoading;
+        }
+
+        async function refreshPasswordSettingsFromCloud(){
+            passwordSettingsCloudLoaded=false;
+            await loadPasswordSettingsFromSupabase({silent:false});
+        }
+
+        function getPasswordSettingValue(item){
+            if(item.type==='login') return APP_LOGIN_PASSWORD;
+            if(item.type==='system') return systemPassword;
+            if(item.type==='admin') return ADMIN_PASSWORD;
+            if(item.type==='module') return MODULE_PASSWORDS[item.key] || '';
+            if(item.type==='village') return MASTER_VILLAGE_PASSWORDS[item.key] || '';
+            return '';
+        }
+        function setPasswordSettingValue(item,value){
+            const v=String(value||'').trim();
+            if(v.length<4) throw new Error('Password minimal 4 karakter.');
+            if(item.type==='login'){APP_LOGIN_PASSWORD=v;localStorage.setItem('app_login_password',v);}
+            else if(item.type==='system'){systemPassword=v;localStorage.setItem('app_system_password',v);}
+            else if(item.type==='admin'){ADMIN_PASSWORD=v;try{SBAR_PDF_DELETE_PASSWORD=v;}catch(e){}localStorage.setItem('app_admin_password',v);}
+            else if(item.type==='module'){MODULE_PASSWORDS[item.key]=v;localStorage.setItem('app_module_passwords',JSON.stringify(MODULE_PASSWORDS));}
+            else if(item.type==='village'){MASTER_VILLAGE_PASSWORDS[item.key]=v;localStorage.setItem('pws_village_passwords',JSON.stringify(MASTER_VILLAGE_PASSWORDS));}
+            else throw new Error('Pengaturan ini menggunakan password bersama dan diubah pada sumber utamanya.');
+        }
+        function setPasswordSettingsStatus(message,type='ok'){const el=document.getElementById('passwordSettingsStatus');if(!el)return;el.textContent=message||'';el.className='password-settings-status'+(type?' '+type:'');}
+        function passwordSettingMatches(item,query){if(!query)return true;const q=query.toLowerCase();return `${item.label} ${item.meta} ${item.group||''}`.toLowerCase().includes(q);}
+        function togglePasswordSettingVisibility(id){const input=document.getElementById(`passwordSettingInput_${id}`),btn=document.getElementById(`passwordSettingToggle_${id}`);if(!input)return;const show=input.type==='password';input.type=show?'text':'password';if(btn)btn.innerHTML=show?'<i class="fa-solid fa-eye-slash"></i>':'<i class="fa-solid fa-eye"></i>';}
+        function findPasswordSetting(id){return PASSWORD_SETTINGS.find(item=>item.id===id)||null;}
+        function passwordSettingSharedText(item){
+            if(item.type==='systemRef') return '🔐 Mengikuti <b>Password Sistem</b>.';
+            if(item.type==='adminRef') return '🔐 Mengikuti <b>Password Admin</b>.';
+            if(item.type==='sharedRef') return `🔐 Mengikuti <b>${escapeHtml(item.shared||'Password bersama')}</b>.`;
+            if(item.type==='pwsPinRef') return '📍 Tancap/cabut pin memakai password pada baris masing-masing desa PWS.';
+            return '';
+        }
+        function renderPasswordSettings(){
+            const list=document.getElementById('passwordSettingsList'),search=document.getElementById('passwordSettingsSearch');if(!list)return;
+            const q=String(search?.value||'').trim();const rows=PASSWORD_SETTINGS.filter(item=>passwordSettingMatches(item,q));
+            if(!rows.length){list.innerHTML='<div style="padding:34px 16px;text-align:center;color:#64748b;font-size:.78rem">Tidak ada form/password yang cocok.</div>';return;}
+            let lastGroup='';
+            const out=[];
+            rows.forEach(item=>{
+                if(item.group!==lastGroup){
+                    lastGroup=item.group;
+                    out.push(`<div class="password-setting-group">${escapeHtml(lastGroup||'Lainnya')}</div>`);
+                }
+                if(['systemRef','adminRef','sharedRef','pwsPinRef'].includes(item.type)){
+                    out.push(`<div class="password-setting-row password-setting-reference" data-password-setting="${item.id}"><div><div class="password-setting-title">${escapeHtml(item.label)}</div><div class="password-setting-meta">${escapeHtml(item.meta)}</div></div><div class="password-setting-note" style="padding:8px 10px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px">${passwordSettingSharedText(item)}</div><div class="password-setting-actions"><span style="font-size:.64rem;color:#64748b;font-weight:700">${item.type==='pwsPinRef'?'Ubah pada password desa PWS yang sesuai.':'Ubah pada password sumber di daftar.'}</span></div></div>`);
+                    return;
+                }
+                const value=escapeHtml(getPasswordSettingValue(item));
+                out.push(`<div class="password-setting-row" data-password-setting="${item.id}"><div><div class="password-setting-title">${escapeHtml(item.label)}</div><div class="password-setting-meta">${escapeHtml(item.meta)}</div></div><div class="password-setting-input-wrap"><input id="passwordSettingInput_${item.id}" class="password-setting-input" type="password" value="${value}" autocomplete="new-password"><button id="passwordSettingToggle_${item.id}" class="password-toggle-btn" type="button" onclick="togglePasswordSettingVisibility('${item.id}')" aria-label="Tampilkan password"><i class="fa-solid fa-eye"></i></button></div><div class="password-setting-actions"><button class="password-setting-save" type="button" onclick="savePasswordSetting('${item.id}')"><i class="fa-solid fa-floppy-disk"></i> Simpan</button><button class="password-setting-reset-default" type="button" onclick="resetPasswordSettingDefault('${item.id}')"><i class="fa-solid fa-rotate-left"></i> Default</button></div></div>`);
+            });
+            list.innerHTML=out.join('');
+        }
+        async function savePasswordSetting(id){
+            const item=findPasswordSetting(id),input=document.getElementById(`passwordSettingInput_${id}`);if(!item||!input)return;
+            try{
+                setPasswordSettingValue(item,input.value);
+                setPasswordSettingsStatus(`✓ ${item.label} diperbarui di perangkat. Menyimpan ke Supabase...`,'ok');
+                renderPasswordSettings();
+                await savePasswordSettingsToSupabase();
+            }catch(err){setPasswordSettingsStatus(err.message||'Password tidak dapat disimpan.','err');}
+        }
+        function getPasswordSettingDefault(item){
+            if(item.type==='login')return 'lintasklaster';
+            if(item.type==='system')return 'lintasklaster';
+            if(item.type==='admin')return 'admin';
+            if(item.type==='module')return DEFAULT_MODULE_PASSWORDS[item.key]||'';
+            if(item.type==='village')return DEFAULT_MASTER_VILLAGE_PASSWORDS[item.key]||'';
+            return '';
+        }
+        async function resetPasswordSettingDefault(id){
+            const item=findPasswordSetting(id);if(!item)return;if(!confirm(`Kembalikan password "${item.label}" ke nilai default?`))return;
+            try{
+                setPasswordSettingValue(item,getPasswordSettingDefault(item));
+                setPasswordSettingsStatus(`↺ ${item.label} dikembalikan ke default. Menyimpan ke Supabase...`,'ok');
+                renderPasswordSettings();
+                await savePasswordSettingsToSupabase();
+            }catch(err){setPasswordSettingsStatus(err.message||'Gagal mengembalikan default.','err');}
+        }
+        async function openPasswordSettings(){
+            // Muat konfigurasi cloud lebih dahulu agar perangkat baru dapat langsung
+            // memakai password sistem/admin terbaru sebelum prompt autentikasi ditampilkan.
+            passwordSettingsSetCloudStatus('☁ Memeriksa konfigurasi password terbaru...','info');
+            await ensurePasswordSettingsCloudLoaded();
+
+            showPasswordPrompt('Akses Pengaturan Password','Masukkan Password',async (success,pwd)=>{
+                if(!success)return;
+                if(pwd===systemPassword||pwd===ADMIN_PASSWORD){
+                    const modal=document.getElementById('passwordSettingsModal');if(!modal)return;modal.classList.add('show');modal.setAttribute('aria-hidden','false');
+                    const search=document.getElementById('passwordSettingsSearch');if(search)search.value='';
+                    setPasswordSettingsStatus('Memuat konfigurasi dari Supabase...','ok');
+                    closeMobileMenu();
+                    await refreshPasswordSettingsFromCloud();
+                    renderPasswordSettings();
+                }else if(pwd!=='')alert('Akses ditolak! Password sistem/admin salah.');
+            });
+        }
+        function closePasswordSettings(){const modal=document.getElementById('passwordSettingsModal');if(modal){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}}
+        function bukaPengaturanPassword(){openPasswordSettings();}
+        document.addEventListener('click',function(e){const modal=document.getElementById('passwordSettingsModal');if(modal&&e.target===modal)closePasswordSettings();});
         /* ---------------- SCRIPT API PROVINSI & KABUPATEN (KIR) ---------------- */
         const urlProvinsiKIR = 'https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json';
         fetch(urlProvinsiKIR)
@@ -6733,7 +7167,7 @@ footer {
                 async (success, pwd) => {
                     if (!success) return;
 
-                    if (pwd === systemPassword || pwd === 'admin') {
+                    if (pwd === systemPassword || pwd === ADMIN_PASSWORD) {
                         if (!confirm("Yakin ingin menghapus seluruh data riwayat Get Up & Go dan mengosongkan diagram?")) {
                             return;
                         }
@@ -6796,7 +7230,7 @@ footer {
         function simpanUrlSkrining() {
             showPasswordPrompt("Otorisasi Penyimpanan", "Masukkan password untuk menyimpan tautan skrining:", (success, pwd) => {
                 if (success) {
-                    if (pwd === "admin" || pwd === systemPassword) {
+                    if (pwd === ADMIN_PASSWORD || pwd === systemPassword) {
                         const urlInput = document.getElementById('inputUrlSkrining').value;
                         localStorage.setItem('url_skrining_' + currentMenuId, urlInput);
                         alert("Tautan skrining berhasil disimpan!");
@@ -7363,7 +7797,7 @@ let ambServiceStateChannel = null;
 let ambServiceStateLoadingPromise = null;
 
 function validasiPasswordAdminAmbulance(pwd) {
-    return pwd === 'admin';
+    return pwd === ADMIN_PASSWORD;
 }
 
 function isAmbulanceServiceOpen() {
@@ -8297,7 +8731,7 @@ const { data, error } = await supabaseClient.storage
                 'Masukkan password admin untuk mereset nomor surat ke nomor awal.',
                 (success, pwd) => {
                     if (!success) return;
-                    if (pwd !== 'admin') {
+                    if (pwd !== ADMIN_PASSWORD) {
                         alert('Password admin salah. Reset dibatalkan.');
                         return;
                     }
@@ -8351,7 +8785,7 @@ const { data, error } = await supabaseClient.storage
                 .slice(0, 80) || 'tanpa-nama';
         }
 
-        const SBAR_PDF_DELETE_PASSWORD = 'admin';
+        let SBAR_PDF_DELETE_PASSWORD = ADMIN_PASSWORD;
         let sbarPdfObjectUrls = [];
         let sbarPdfMigrationPromise = null;
 
@@ -9779,7 +10213,7 @@ async function ambulanceHapusRiwayatLegacyStorage(id, token) {
 async function ambulanceHapusSatuRiwayat(id, token) {
     showPasswordPrompt('Hapus Riwayat Ambulance', 'Masukkan password admin untuk menghapus riwayat ini:', async (success, pwd) => {
         if (!success) return;
-        if (!(pwd === systemPassword || pwd === 'admin')) {
+        if (!(pwd === systemPassword || pwd === ADMIN_PASSWORD)) {
             alert('Password admin salah. Data tidak dihapus.');
             return;
         }
@@ -11345,7 +11779,8 @@ window.addEventListener('load', () => {
         hideRegisterVerifyBox();
         showAuthLogin('Akun berhasil dikonfirmasi admin. Username dan password sudah disimpan di localStorage perangkat ini.','success');
     };
-    window.authLogin = function () {
+    window.authLogin = async function () {
+        try { await ensurePasswordSettingsCloudLoaded(); } catch (e) {}
         const password = document.getElementById('authPassword')?.value || '';
         const expectedPassword = APP_LOGIN_PASSWORD;
 
@@ -11661,10 +12096,16 @@ for(const __v of Object.keys(MASTER_PWS_SEEDS)){
   MASTER_PWS_SEEDS[__v]["bumil resti"] = MASTER_PWS_SEEDS[__v]["bumil resti"] || [0,0,0];
 }
 
-const MASTER_VILLAGE_PASSWORDS = {
+const DEFAULT_MASTER_VILLAGE_PASSWORDS = {
   berindat:'berindat123', persing:'persing123', sedamai:'sedamai123',
   lanjut:'lanjut123', kote:'kote123', pelakak:'pelakak123'
 };
+let MASTER_VILLAGE_PASSWORDS = (() => {
+  try {
+    const saved=JSON.parse(localStorage.getItem('pws_village_passwords') || '{}');
+    return {...DEFAULT_MASTER_VILLAGE_PASSWORDS, ...(saved && typeof saved==='object' ? saved : {})};
+  } catch(e){ return {...DEFAULT_MASTER_VILLAGE_PASSWORDS}; }
+})();
 
 const DEFAULT_DISEASES = MASTER_DISEASES.slice();
 
@@ -11674,7 +12115,6 @@ let polygons = {};
 let markers = {};
 let state = loadState();
 let baseStreet, baseSatellite, activeBase;
-const ADMIN_PASSWORD = "admin";
 let mapLocked = false;
 
 function makeDiseaseRow(name, seed=[0,0,0], explicitP=null){
