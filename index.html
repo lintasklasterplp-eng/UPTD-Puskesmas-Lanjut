@@ -2432,6 +2432,12 @@ footer {
 .amb-rt-map{width:100%;height:360px;border-radius:10px;overflow:hidden;border:1px solid #cbd5e1;background:#e5e7eb}
 .amb-rt-info{display:grid;gap:7px}.amb-rt-row{display:flex;justify-content:space-between;gap:10px;padding:7px 9px;border-radius:8px;background:#f8fafc;font-size:.7rem}.amb-rt-row b{color:#0f172a}.amb-rt-row span{color:#475569;text-align:right}
 .amb-rt-token{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.74rem;font-weight:800;color:#0369a1;word-break:break-all}
+.amb-tracking-card{margin-bottom:8px;padding:11px;border:2px solid #0ea5e9;border-radius:12px;background:linear-gradient(135deg,#eff6ff,#ecfeff);box-shadow:0 4px 12px rgba(14,165,233,.10)}
+.amb-tracking-label{font-size:.62rem;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.06em}
+.amb-tracking-number{display:block;margin-top:4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:1rem;font-weight:900;letter-spacing:.05em;color:#0369a1;word-break:break-all}
+.amb-tracking-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.amb-tracking-copy{border:0;border-radius:7px;padding:6px 9px;background:#0369a1;color:#fff;font-size:.64rem;font-weight:800;cursor:pointer}
+.amb-tracking-copy:hover{background:#075985}
 .amb-rt-list{display:grid;gap:7px;max-height:300px;overflow:auto}.amb-rt-request{border:1px solid #e2e8f0;border-radius:10px;padding:9px;background:#fff}.amb-rt-request.active{border-color:#10b981;box-shadow:0 0 0 2px rgba(16,185,129,.08)}
 .amb-rt-request-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.amb-rt-request-name{font-size:.78rem;font-weight:800;color:#0f172a}.amb-rt-badge{padding:3px 7px;border-radius:999px;font-size:.58rem;font-weight:800;background:#ecfdf5;color:#047857}.amb-rt-request-meta{margin-top:4px;font-size:.64rem;color:#64748b;line-height:1.45}.amb-rt-request-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
 .amb-rt-note{font-size:.63rem;color:#64748b;margin-top:7px;line-height:1.45}
@@ -3594,7 +3600,14 @@ footer {
                                     <div class="amb-rt-grid">
                                         <div id="ambulancePatientMap" class="amb-rt-map"></div>
                                         <div class="amb-rt-info">
-                                            <div class="amb-rt-row"><b>No. Tracking</b><span class="amb-rt-token" id="ambPatientToken">-</span></div>
+                                            <div class="amb-tracking-card">
+                                                <div class="amb-tracking-label">Nomor Tracking Ambulance</div>
+                                                <span class="amb-tracking-number" id="ambPatientToken">-</span>
+                                                <div class="amb-tracking-actions">
+                                                    <button type="button" class="amb-tracking-copy" id="ambCopyTokenBtn" onclick="ambulanceSalinNomorTracking()" disabled>📋 Salin Nomor</button>
+                                                </div>
+                                            </div>
+                                            <div class="amb-rt-row"><b>Pasien/Keluarga</b><span id="ambPatientName">-</span></div>
                                             <div class="amb-rt-row"><b>Pasien/Keluarga</b><span id="ambPatientName">-</span></div>
                                             <div class="amb-rt-row"><b>Status</b><span id="ambPatientStatusValue">-</span></div>
                                             <div class="amb-rt-row"><b>Petugas</b><span id="ambOfficerName">-</span></div>
@@ -8411,6 +8424,25 @@ function ambTrackingUrl(token) {
     return url.toString();
 }
 
+function ambulanceTampilkanNomorTracking(token) {
+    const normalized = ambNormalizeTrackingToken(token);
+    const el = document.getElementById('ambPatientToken');
+    const copyBtn = document.getElementById('ambCopyTokenBtn');
+    if (el) el.textContent = normalized || '-';
+    if (copyBtn) copyBtn.disabled = !normalized;
+}
+
+async function ambulanceSalinNomorTracking() {
+    const token = ambActiveTrackingToken || ambNormalizeTrackingToken(document.getElementById('ambPatientToken')?.textContent);
+    if (!token || token === '-') return;
+    try {
+        await navigator.clipboard.writeText(token);
+        alert('Nomor tracking berhasil disalin:\n\n' + token);
+    } catch (_) {
+        window.prompt('Salin nomor tracking berikut:', token);
+    }
+}
+
 function ambUpdateRealtimeIndicator(message, type='info') {
     const el = document.getElementById('ambRealtimeState');
     if (!el) return;
@@ -8476,7 +8508,7 @@ function ambulanceRenderPatient(request) {
     if (!request) return;
     ambActiveTrackingToken = ambGetRequestTrackingToken(request) || '';
     if (ambActiveTrackingToken) localStorage.setItem('ambulance_active_tracking_token', ambActiveTrackingToken);
-    document.getElementById('ambPatientToken').textContent = ambActiveTrackingToken || '-';
+    ambulanceTampilkanNomorTracking(ambActiveTrackingToken);
     document.getElementById('ambPatientName').textContent = request.patient_name || '-';
     document.getElementById('ambPatientStatusValue').textContent = ambStatusLabel(request.status);
     document.getElementById('ambOfficerName').textContent = request.officer_name || 'Belum ditetapkan';
@@ -8969,6 +9001,7 @@ async function kirimPermintaanAmbulance() {
         });
         ambSelectedRequest = realtimeRequest;
         ambActiveTrackingToken = token;
+        ambulanceTampilkanNomorTracking(token);
         ambulanceRenderPatient(realtimeRequest);
         ambSetTab('pasien');
         await ambulanceEnsureRealtime();
