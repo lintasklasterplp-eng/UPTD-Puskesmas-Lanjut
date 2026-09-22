@@ -12242,6 +12242,9 @@ function saveState(){
 let pwsCloudReady = false;
 let pwsCloudBusy = false;
 let pwsCloudSaveTimer = null;
+let pwsCloudSyncTimer = null;
+let pwsCloudLocalDirty = false;
+let pwsCloudLastSavedAt = null;
 
 function setPwsCloudStatus(text, ok=null){
   const el=document.getElementById("pwsCloudStatus");
@@ -12318,6 +12321,8 @@ async function loadPwsFromSupabase(){
       await clearPwsSupabaseFolder();
       const savedEmpty=await savePwsToSupabase({silent:true});
       pwsCloudReady=!!savedEmpty;
+      pwsCloudLocalDirty=false;
+      pwsCloudLastSavedAt=savedEmpty ? new Date().toISOString() : null;
       setPwsCloudStatus(savedEmpty ? "reset tersimpan • cloud kosong" : "reset lokal • cloud lama tidak dipulihkan",!!savedEmpty);
       drawAllPins();
       renderPinPalette();
@@ -12351,6 +12356,8 @@ async function loadPwsFromSupabase(){
     updateVillageUI();
     updateSixVillageGrid();
     pwsCloudReady=true;
+    pwsCloudLocalDirty=false;
+    pwsCloudLastSavedAt=payload.saved_at || null;
     setPwsCloudStatus(`tersambung • ${new Date(payload.saved_at||Date.now()).toLocaleString('id-ID')}`,true);
     return true;
   }catch(err){
@@ -12383,7 +12390,8 @@ async function savePwsToSupabase(options={}){
   }
   try{
     setPwsCloudStatus("menyimpan…");
-    const blob=new Blob([JSON.stringify(buildPwsCloudPayload(),null,2)],{type:"application/json"});
+    const payload=buildPwsCloudPayload();
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
     const {error}=await supabaseClient.storage
       .from(PWS_STORAGE_BUCKET)
       .upload(PWS_STORAGE_PATH,blob,{
@@ -12391,6 +12399,8 @@ async function savePwsToSupabase(options={}){
       });
     if(error) throw error;
     pwsCloudReady=true;
+    pwsCloudLocalDirty=false;
+    pwsCloudLastSavedAt=payload.saved_at || null;
     setPwsCloudStatus("tersimpan",true);
     return true;
   }catch(err){
@@ -12403,8 +12413,66 @@ async function savePwsToSupabase(options={}){
 
 function queuePwsCloudSave(){
   if(pwsStateHasData()) localStorage.removeItem(PWS_RESET_FLAG);
+  pwsCloudLocalDirty=true;
   clearTimeout(pwsCloudSaveTimer);
   pwsCloudSaveTimer=setTimeout(()=>{ void savePwsToSupabase({silent:true}); },350);
+}
+
+async function syncPwsFromCloudSilently(){
+  if(pwsCloudBusy || pwsCloudLocalDirty || !supabaseClient || isPwsResetActive()) return false;
+  pwsCloudBusy=true;
+  try{
+    const endpoint=`${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(PWS_STORAGE_BUCKET)}/${PWS_STORAGE_PATH}?t=${Date.now()}`;
+    const response=await fetch(endpoint,{
+      method:"GET",
+      headers:{
+        Authorization:`Bearer ${SUPABASE_ANON_KEY}`,
+        apikey:SUPABASE_ANON_KEY,
+        "Cache-Control":"no-cache, no-store, max-age=0"
+      },
+      cache:"no-store"
+    });
+    if(!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+    const payload=JSON.parse(await response.text());
+    if(!payload || payload.schema!=="pws-supabase-v1" || !payload.data) return false;
+    const incomingSavedAt=payload.saved_at || null;
+    if(incomingSavedAt && pwsCloudLastSavedAt && incomingSavedAt===pwsCloudLastSavedAt) return true;
+    if(!restorePwsFromCloudPayload(payload)) return false;
+    saveState();
+    pwsCloudLastSavedAt=incomingSavedAt;
+    pwsCloudReady=true;
+    drawAllPins();
+    renderPinPalette();
+    renderDiseaseTable();
+    renderDiseaseChart();
+    updateVillageUI();
+    updateSixVillageGrid();
+    setPwsCloudStatus(`sinkron • ${new Date(incomingSavedAt||Date.now()).toLocaleString('id-ID')}`,true);
+    return true;
+  }catch(err){
+    const msg=String(err?.message||err||'');
+    if(!/not found|404|does not exist|no such/i.test(msg)){
+      console.warn('Sinkronisasi PWS cloud gagal:',err);
+    }
+    return false;
+  }finally{
+    pwsCloudBusy=false;
+  }
+}
+
+function startPwsCloudSync(){
+  clearInterval(pwsCloudSyncTimer);
+  pwsCloudSyncTimer=setInterval(()=>{
+    if(pwsCloudLocalDirty) void savePwsToSupabase({silent:true});
+    else void syncPwsFromCloudSilently();
+  },5000);
+  if(pwsCloudLocalDirty) void savePwsToSupabase({silent:true});
+  else void syncPwsFromCloudSilently();
+}
+
+function stopPwsCloudSync(){
+  clearInterval(pwsCloudSyncTimer);
+  pwsCloudSyncTimer=null;
 }
 
 async function clearPwsSupabaseFolder(){
@@ -12823,6 +12891,8 @@ function makePin(key,pin){
     pin.lat=Number(p.lat.toFixed(6));
     pin.lng=Number(p.lng.toFixed(6));
     saveState();
+    pwsCloudLocalDirty=true;
+    queuePwsCloudSave();
     if(activeVillage===key){updateVillageUI();updateSixVillageGrid();}
   });
   return m;
@@ -13940,6 +14010,7 @@ async function activatePwsModule(){
       }
       updateVillageUI();
       updateSixVillageGrid();
+      startPwsCloudSync();
     }catch(e){ console.warn('Aktivasi Dashboard PWS:', e); }
   }, 80);
 }
