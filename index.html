@@ -4400,8 +4400,9 @@ footer {
       <label>Indikator / warna pin</label>
       <select id="pinColorSelect"></select>
     </div>
+    <div id="pinBatchStatus" class="small" style="margin:2px 0 8px;padding:8px 10px;border:1px dashed #b7c9bd;border-radius:8px;background:#f7fbf8;color:#486153"></div>
     <div class="modal-actions">
-      <button class="btn secondary" onclick="closePinModal()">Batal</button>
+      <button class="btn secondary" onclick="closePinModal()">Selesai</button>
       <button class="btn" onclick="savePinFromModal()">Pasang Pin</button>
     </div>
   </div>
@@ -12930,6 +12931,10 @@ function makePin(key,pin){
 let pendingPinAuthAction=null;
 let pendingPinAuthVillage=null;
 let pendingPinRemoveId=null;
+// Otorisasi batch hanya berlaku selama form pin desa yang sama masih terbuka.
+// Ini memungkinkan banyak pin ditancapkan berturut-turut tanpa menimpa pin lama.
+let pwsPinBatchAuthorized=false;
+let pwsPinBatchVillage=null;
 
 function openPinPasswordModal(action,villageKey){
   pendingPinAuthAction=action;
@@ -12960,9 +12965,46 @@ function confirmPinAuth(){
     return;
   }
   const action=pendingPinAuthAction;
+  const villageKey=key;
   closePinAuthModal();
-  if(action==='add') openPinModal();
+  if(action==='add'){
+    // Satu otorisasi dapat digunakan untuk beberapa pin pada desa yang sama.
+    pwsPinBatchAuthorized=true;
+    pwsPinBatchVillage=villageKey;
+    activeVillage=villageKey;
+    openPinModal();
+  }
   if(action==='remove') openPinRemovalPicker();
+}
+
+function getNextPinSuggestedPoint(key){
+  const base=ensureVillagePinCenter(key);
+  const pins=getVillagePins(key);
+  if(!base || !Number.isFinite(base[0]) || !Number.isFinite(base[1])) return base;
+  // Geser titik default setiap penancapan agar pin baru tidak bertumpuk tepat di titik lama.
+  const step=0.00065;
+  const candidates=[];
+  if(!pins.length) candidates.push([base[0],base[1]]);
+  for(let ring=1;ring<=6;ring++){
+    for(let i=0;i<8;i++){
+      const angle=(Math.PI*2*i)/8;
+      candidates.push([base[0]+Math.sin(angle)*step*ring,base[1]+Math.cos(angle)*step*ring]);
+    }
+  }
+  const occupied=new Set(pins.map(p=>`${Number(p.lat).toFixed(6)},${Number(p.lng).toFixed(6)}`));
+  for(const [lat,lng] of candidates){
+    const keyPoint=`${Number(lat).toFixed(6)},${Number(lng).toFixed(6)}`;
+    if(!occupied.has(keyPoint) && isPointInsideVillage(key,lat,lng)) return [Number(lat.toFixed(6)),Number(lng.toFixed(6))];
+  }
+  return [Number(base[0].toFixed(6)),Number(base[1].toFixed(6))];
+}
+
+function updatePinBatchStatus(){
+  const el=document.getElementById('pinBatchStatus');
+  if(!el) return;
+  const key=pwsPinBatchVillage || activeVillage;
+  const count=getVillagePins(key).length;
+  el.innerHTML=`<b>${count} pin</b> sudah terpasang di ${escapeHtml(VILLAGES[key]?.name || '')}. Anda dapat menancapkan pin berikutnya tanpa menutup form.`;
 }
 
 function openPinModal(){
@@ -12973,19 +13015,27 @@ function openPinModal(){
   });
   select.value=activeVillage;
   select.disabled=true;
-  const safeCenter=ensureVillagePinCenter(activeVillage);
-  document.getElementById('pinLat').value=safeCenter[0];
-  document.getElementById('pinLng').value=safeCenter[1];
+  const suggested=getNextPinSuggestedPoint(activeVillage);
+  document.getElementById('pinLat').value=suggested[0];
+  document.getElementById('pinLng').value=suggested[1];
   const pcs=document.getElementById('pinColorSelect');
   if(pcs){
     const names=new Set((state[activeVillage].diseases||[]).map(d=>String(d.name||'').trim().toLowerCase()));
     const availablePins=PIN_COLORS.filter(p=>names.has(String(p.indicator||'').trim().toLowerCase()));
     pcs.innerHTML=availablePins.map(p=>`<option value="${p.key}">${escapeHtml(p.name)} — ${escapeHtml(p.indicator)}</option>`).join('');
+    const selected=state[activeVillage].pinColor || availablePins[0]?.key;
+    if(selected && availablePins.some(p=>p.key===selected)) pcs.value=selected;
   }
+  updatePinBatchStatus();
   document.getElementById('pinModal').style.display='flex';
 }
 
-function closePinModal(){document.getElementById('pinModal').style.display='none';}
+function closePinModal(){
+  const modal=document.getElementById('pinModal');
+  if(modal) modal.style.display='none';
+  pwsPinBatchAuthorized=false;
+  pwsPinBatchVillage=null;
+}
 
 async function addPin(){
   const key=activeVillage;
@@ -12994,6 +13044,11 @@ async function addPin(){
   // tidak bekerja menggunakan pin lokal yang sudah kedaluwarsa.
   await preparePwsPinActionFromCloud();
   if(!(state[key]?.diseases?.length)){alert('Belum ada indikator penyakit pada desa ini.');return;}
+  // Bila form batch masih terbuka untuk desa yang sama, langsung lanjutkan pin berikutnya.
+  if(pwsPinBatchAuthorized && pwsPinBatchVillage===key){
+    openPinModal();
+    return;
+  }
   // Tidak dibatasi satu pin: pin boleh ditambah berulang untuk penyakit yang sama maupun berbeda.
   openPinPasswordModal('add',key);
 }
@@ -13026,8 +13081,14 @@ async function savePinFromModal(){
   state[key].pinColor=color.key;
   applyPinImpact(key,pin);
   markers[pin.id]=makePin(key,pin);
-  closePinModal();
   await commitPwsPinAction(key,`pin ${color.indicator} #${getVillagePins(key).length} ditancapkan di ${VILLAGES[key].name} • K +1, P +1 • tabel dan diagram diperbarui`);
+  // Form tetap terbuka agar pin kedua, ketiga, dan seterusnya dapat dipasang langsung.
+  if(pwsPinBatchAuthorized && pwsPinBatchVillage===key){
+    const next=getNextPinSuggestedPoint(key);
+    document.getElementById('pinLat').value=next[0];
+    document.getElementById('pinLng').value=next[1];
+    updatePinBatchStatus();
+  }
   if(map) map.setView([finalLat,finalLng],14);
 }
 
@@ -13191,18 +13252,23 @@ function setPinColor(colorKey){
   updateSixVillageGrid();
 }
 
-function villageSvg(village, pin, pinColor){
+function villageSvg(village, pins, pinColor){
   const pts=village.polygon;
   const xs=pts.map(p=>p[1]), ys=pts.map(p=>p[0]);
   const minX=Math.min(...xs), maxX=Math.max(...xs);
   const minY=Math.min(...ys), maxY=Math.max(...ys);
-  const pad=0.12;
   const dx=(maxX-minX)||0.01, dy=(maxY-minY)||0.01;
   const toX=lon=>24 + ((lon-minX)/dx)*152;
   const toY=lat=>82 - ((lat-minY)/dy)*62;
   const polygonPoints=pts.map(p=>`${toX(p[1]).toFixed(1)},${toY(p[0]).toFixed(1)}`).join(" ");
-  const cx=pin ? toX(pin.lng) : toX(village.center[1]);
-  const cy=pin ? toY(pin.lat) : toY(village.center[0]);
+  const allPins=Array.isArray(pins) ? pins : [];
+  const fallbackX=toX(village.center[1]), fallbackY=toY(village.center[0]);
+  const pinMarkup=allPins.slice(0,40).map((pin,index)=>{
+    const c=PIN_COLORS.find(p=>p.key===pin.colorKey) || PIN_COLORS.find(p=>String(p.indicator||'').toLowerCase()===String(pin.indicator||'').toLowerCase()) || pinColor || PIN_COLORS[0];
+    const cx=toX(Number(pin.lng)||village.center[1]);
+    const cy=toY(Number(pin.lat)||village.center[0]);
+    return `<g><circle cx="${cx}" cy="${cy}" r="${index<6?3.6:2.7}" fill="${c.hex}" stroke="#fff" stroke-width="1.3"><title>Pin #${index+1} — ${escapeHtml(pin.indicator||c.indicator)}</title></circle></g>`;
+  }).join('');
   return `
     <svg viewBox="0 0 200 100" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
       <rect x="0" y="0" width="200" height="100" fill="#d9e7ec"/>
@@ -13210,8 +13276,7 @@ function villageSvg(village, pin, pinColor){
             fill="#cfe1c6" opacity=".85"/>
       <polygon points="${polygonPoints}" fill="${village.color}" fill-opacity=".92"
                stroke="${pinColor.hex}" stroke-width="2"/>
-      <circle cx="${cx}" cy="${cy}" r="3.8" fill="${pinColor.hex}" stroke="#fff" stroke-width="1.5"/>
-      ${pin ? `<text x="${cx}" y="${Math.max(12,cy-7)}" text-anchor="middle" font-size="17">📍</text>` : ""}
+      ${pinMarkup || `<circle cx="${fallbackX}" cy="${fallbackY}" r="3.8" fill="${pinColor.hex}" stroke="#fff" stroke-width="1.5"/>`}
     </svg>`;
 }
 
@@ -13227,7 +13292,7 @@ function updateSixVillageGrid(){
     const special=data.diseases?.filter(d=>["ODGJ","Stunting"].includes(d.name)).length || 0;
     return `
       <div class="village-card ${key===activeVillage?'active':''}" onclick="selectVillage('${key}')">
-        <div class="village-mini-map">${villageSvg(v,pin,pinColor)}</div>
+        <div class="village-mini-map">${villageSvg(v,pins,pinColor)}</div>
         <div class="village-name">${v.name}</div>
         <div class="village-stats">
           ${diseaseCount} indikator • ${special} indikator utama<br>
@@ -13240,6 +13305,12 @@ function updateSixVillageGrid(){
 
 function selectVillage(key){
   if(!VILLAGES[key]) return;
+  if(pwsPinBatchVillage && pwsPinBatchVillage!==key){
+    pwsPinBatchAuthorized=false;
+    pwsPinBatchVillage=null;
+    const pm=document.getElementById('pinModal');
+    if(pm) pm.style.display='none';
+  }
   activeVillage=key;
 
   if(map && polygons[key]){
