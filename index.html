@@ -12332,20 +12332,30 @@ async function loadPwsFromSupabase(){
       updateSixVillageGrid();
       return !!savedEmpty;
     }
-    const {data:blob,error}=await supabaseClient.storage
-      .from(PWS_STORAGE_BUCKET)
-      .download(PWS_STORAGE_PATH);
-    if(error){
-      const msg=String(error.message||error.error||error);
+    // Gunakan endpoint object Supabase langsung dengan cache-busting agar
+    // tancap/cabut pin selalu membaca file cloud terbaru lintas perangkat.
+    const endpoint=`${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(PWS_STORAGE_BUCKET)}/${PWS_STORAGE_PATH}?t=${Date.now()}`;
+    const response=await fetch(endpoint,{
+      method:"GET",
+      headers:{
+        Authorization:`Bearer ${SUPABASE_ANON_KEY}`,
+        apikey:SUPABASE_ANON_KEY,
+        "Cache-Control":"no-cache, no-store, max-age=0"
+      },
+      cache:"no-store"
+    });
+    if(!response.ok){
+      const body=await response.text();
+      const msg=`HTTP ${response.status}: ${body}`;
       // File belum ada: gunakan data lokal tanpa menimpa cloud.
-      if(/not found|404|does not exist|no such/i.test(msg)){
+      if(response.status===404 || /not found|does not exist|no such/i.test(msg)){
         pwsCloudReady=true;
         setPwsCloudStatus("belum ada file cloud; siap disimpan",null);
         return false;
       }
-      throw error;
+      throw new Error(msg);
     }
-    const text=await blob.text();
+    const text=await response.text();
     const payload=JSON.parse(text);
     if(!restorePwsFromCloudPayload(payload)) throw new Error("Format pws-data.json tidak valid");
     saveState();
@@ -12540,15 +12550,34 @@ function reversePinImpact(key,pin){
   return true;
 }
 
-function refreshPwsAfterPinChange(key,message){
+async function commitPwsPinAction(key,message){
+  // Untuk aksi tancap/cabut, Supabase menjadi sumber data utama lintas perangkat.
+  // Simpan state lokal sebagai cache hanya setelah perubahan berhasil dibentuk.
   saveState();
-  queuePwsCloudSave();
+  const saved=await savePwsToSupabase({silent:false});
+  if(!saved){
+    // Tandai dirty agar mekanisme sinkronisasi berkala tetap mencoba mengirim ulang.
+    pwsCloudLocalDirty=true;
+    queuePwsCloudSave();
+  }
   activeVillage=key;
   renderDiseaseTable();
   renderDiseaseChart();
   updateVillageUI();
   updateSixVillageGrid();
-  if(message) setSaveState(message);
+  if(message){
+    setSaveState(saved ? message+' • tersimpan di Supabase' : message+' • menunggu sinkronisasi Supabase');
+  }
+  return saved;
+}
+
+async function preparePwsPinActionFromCloud(){
+  if(!supabaseClient) return false;
+  // Batalkan timer simpan lama agar tidak menimpa payload cloud terbaru.
+  clearTimeout(pwsCloudSaveTimer);
+  pwsCloudSaveTimer=null;
+  // Ambil data cloud terbaru tanpa cache sebelum tancap/cabut.
+  return await loadPwsFromSupabase();
 }
 
 function migratePinImpactsOnce(){
@@ -12958,14 +12987,18 @@ function openPinModal(){
 
 function closePinModal(){document.getElementById('pinModal').style.display='none';}
 
-function addPin(){
+async function addPin(){
   const key=activeVillage;
+  if(!(state[key]?.diseases?.length)){alert('Belum ada indikator penyakit pada desa ini.');return;}
+  // Sebelum tancap pin, ambil state terbaru dari Supabase agar perangkat ini
+  // tidak bekerja menggunakan pin lokal yang sudah kedaluwarsa.
+  await preparePwsPinActionFromCloud();
   if(!(state[key]?.diseases?.length)){alert('Belum ada indikator penyakit pada desa ini.');return;}
   // Tidak dibatasi satu pin: pin boleh ditambah berulang untuk penyakit yang sama maupun berbeda.
   openPinPasswordModal('add',key);
 }
 
-function savePinFromModal(){
+async function savePinFromModal(){
   const key=document.getElementById('pinVillage').value;
   const lat=Number(document.getElementById('pinLat').value);
   const lng=Number(document.getElementById('pinLng').value);
@@ -12994,7 +13027,7 @@ function savePinFromModal(){
   applyPinImpact(key,pin);
   markers[pin.id]=makePin(key,pin);
   closePinModal();
-  refreshPwsAfterPinChange(key,`pin ${color.indicator} #${getVillagePins(key).length} ditancapkan di ${VILLAGES[key].name} • K +1, P +1 • tabel dan diagram diperbarui`);
+  await commitPwsPinAction(key,`pin ${color.indicator} #${getVillagePins(key).length} ditancapkan di ${VILLAGES[key].name} • K +1, P +1 • tabel dan diagram diperbarui`);
   if(map) map.setView([finalLat,finalLng],14);
 }
 
@@ -13017,8 +13050,11 @@ function openPinRemovalPicker(){
   document.getElementById('pinRemoveModal').style.display='flex';
 }
 
-function removePin(){
+async function removePin(){
   const key=activeVillage;
+  // Ambil state cloud terbaru dahulu, sehingga daftar pin yang dipilih untuk dicabut
+  // selalu sama dengan data pada perangkat lain.
+  await preparePwsPinActionFromCloud();
   if(!getVillagePins(key).length){alert('Belum ada pin pada desa ini.');return;}
   openPinPasswordModal('remove',key);
 }
@@ -13032,7 +13068,7 @@ function choosePinToRemove(id){
   document.getElementById('pinRemoveInfo').innerHTML='Pilih alasan pencabutan pin:';
 }
 
-function confirmPinRemoval(outcome){
+async function confirmPinRemoval(outcome){
   const key=activeVillage;
   const pin=getVillagePins(key).find(p=>p.id===pendingPinRemoveId);
   if(!pin) return closePinRemovalModal();
@@ -13056,7 +13092,9 @@ function confirmPinRemoval(outcome){
 
   const outcomeText=outcome==='s'?'sembuh (K -1, P -1, S +1)':'meninggal (K -1, P -1, M +1)';
   closePinRemovalModal();
-  refreshPwsAfterPinChange(key,`pin ${pin.indicator} dicabut • ${outcomeText} • tabel dan diagram diperbarui`);
+  // Cabut pin langsung dikomit ke Supabase agar perangkat lain segera memiliki state yang sama.
+  await commitPwsPinAction(key,`pin ${pin.indicator} dicabut • ${outcomeText} • tabel dan diagram diperbarui`);
+  if(map) map.setView([pin.lat,pin.lng],14);
 }
 
 function applyMapLock(locked){
