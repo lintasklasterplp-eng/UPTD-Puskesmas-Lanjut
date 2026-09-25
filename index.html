@@ -12249,6 +12249,8 @@ let pwsCloudSaveTimer = null;
 let pwsCloudSyncTimer = null;
 let pwsCloudLocalDirty = false;
 let pwsCloudLastSavedAt = null;
+let pwsPinActionBusy = false;
+let legacyPwsPinsFromMain = {};
 
 function setPwsCloudStatus(text, ok=null){
   const el=document.getElementById("pwsCloudStatus");
@@ -12262,11 +12264,8 @@ function buildPwsCloudPayload(){
   Object.keys(VILLAGES).forEach(key=>{
     const item=state[key] || {};
     clean[key]={
-      pins:(Array.isArray(item.pins)?item.pins:[]).map(pin=>({
-        id:pin.id, lat:Number(pin.lat), lng:Number(pin.lng),
-        indicator:String(pin.indicator||""), colorKey:String(pin.colorKey||"red"),
-        countApplied:pin.countApplied!==false
-      })),
+      // PIN TIDAK lagi disimpan di pws-data.json.
+      // Pin setiap desa memiliki file Storage sendiri: dashboard-pws/pins/<desa>.json
       pinColor:String(item.pinColor||"red"),
       diseases:(Array.isArray(item.diseases)?item.diseases:[]).map(d=>({
         name:String(d.name||""), k:Number(d.k)||0, p:Number(d.p)||0,
@@ -12286,20 +12285,24 @@ function restorePwsFromCloudPayload(payload){
   if(!payload || payload.schema!=="pws-supabase-v1" || !payload.data) return false;
   const incoming=payload.data;
   const defaults=getDefaultState();
+  legacyPwsPinsFromMain={};
   Object.keys(VILLAGES).forEach(key=>{
     if(!incoming[key]) return;
     const src=incoming[key];
     const diseases=Array.isArray(src.diseases) ? src.diseases : [];
+
+    // Dukungan migrasi satu kali untuk pws-data.json versi lama
+    // yang masih menyimpan pin gabungan seluruh desa.
+    const legacyPins=Array.isArray(src.pins)
+      ? src.pins.map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
+      : [];
+    if(legacyPins.length) legacyPwsPinsFromMain[key]=legacyPins;
+
     defaults[key]={
       ...defaults[key],
+      // Pin sengaja dikosongkan di sini. Akan dipulihkan dari file pin desa.
+      pins:[],
       pinColor: PIN_COLORS.some(p=>p.key===src.pinColor) ? src.pinColor : "red",
-      pins: Array.isArray(src.pins) ? src.pins.map((pin,idx)=>({
-        id:pin.id || `pin_${key}_cloud_${idx}`,
-        lat:Number(pin.lat), lng:Number(pin.lng),
-        indicator:String(pin.indicator||""),
-        colorKey:PIN_COLORS.some(p=>p.key===pin.colorKey)?pin.colorKey:(PIN_COLORS.find(p=>p.indicator.toLowerCase()===String(pin.indicator||"").toLowerCase())?.key||"red"),
-        countApplied:pin.countApplied!==false
-      })).filter(pin=>Number.isFinite(pin.lat)&&Number.isFinite(pin.lng)&&pin.indicator && !['ibu hamil'].includes(String(pin.indicator).toLowerCase())) : [],
       diseases:normalizeDiseaseRows(diseases,key)
     };
   });
@@ -12395,14 +12398,25 @@ async function restorePwsVillagePinsFromSupabase(){
   let anyFound=false;
   const keys=Object.keys(VILLAGES);
   const results=await Promise.all(keys.map(key=>loadPwsVillagePinsFromSupabase(key)));
-  results.forEach((result,i)=>{
+  for(let i=0;i<keys.length;i++){
     const key=keys[i];
+    const result=results[i];
     if(result.found){
       state[key].pins=result.pins;
       state[key].pin=null;
       anyFound=true;
+      continue;
     }
-  });
+    // Migrasi pin dari pws-data.json lama hanya bila file pin desa belum ada.
+    const legacy=legacyPwsPinsFromMain[key];
+    if(Array.isArray(legacy) && legacy.length){
+      state[key].pins=legacy;
+      state[key].pin=null;
+      anyFound=true;
+      // Jangan menunggu penyimpanan ini untuk merender UI; migrasi jalan di background.
+      void savePwsVillagePinsToSupabase(key,{silent:true});
+    }
+  }
   return anyFound;
 }
 
@@ -12531,6 +12545,7 @@ async function savePwsToSupabase(options={}){
 }
 
 function queuePwsCloudSave(){
+  if(pwsPinActionBusy) return;
   if(pwsStateHasData()) localStorage.removeItem(PWS_RESET_FLAG);
   pwsCloudLocalDirty=true;
   clearTimeout(pwsCloudSaveTimer);
@@ -12538,7 +12553,7 @@ function queuePwsCloudSave(){
 }
 
 async function syncPwsFromCloudSilently(){
-  if(pwsCloudBusy || pwsCloudLocalDirty || !supabaseClient || isPwsResetActive()) return false;
+  if(pwsCloudBusy || pwsPinActionBusy || pwsCloudLocalDirty || !supabaseClient || isPwsResetActive()) return false;
   pwsCloudBusy=true;
   try{
     const endpoint=`${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(PWS_STORAGE_BUCKET)}/${PWS_STORAGE_PATH}?t=${Date.now()}`;
@@ -12583,6 +12598,7 @@ async function syncPwsFromCloudSilently(){
 function startPwsCloudSync(){
   clearInterval(pwsCloudSyncTimer);
   pwsCloudSyncTimer=setInterval(()=>{
+    if(pwsPinActionBusy) return;
     if(pwsCloudLocalDirty) void savePwsToSupabase({silent:true});
     else void syncPwsFromCloudSilently();
   },5000);
@@ -12657,41 +12673,56 @@ function reversePinImpact(key,pin){
 }
 
 async function commitPwsPinAction(key,message){
-  // Untuk aksi tancap/cabut, Supabase menjadi sumber data utama lintas perangkat.
-  // Simpan state lokal sebagai cache hanya setelah perubahan berhasil dibentuk.
-  saveState();
-  const saved=await savePwsToSupabase({silent:false});
-  const pinSaved=await savePwsVillagePinsToSupabase(key,{silent:false});
-  if(!saved){
-    // Tandai dirty agar mekanisme sinkronisasi berkala tetap mencoba mengirim ulang.
-    pwsCloudLocalDirty=true;
-    queuePwsCloudSave();
+  pwsPinActionBusy=true;
+  try{
+    saveState();
+    // Simpan file pin DESA ini terlebih dahulu.
+    const pinSaved=await savePwsVillagePinsToSupabase(key,{silent:false});
+    // Data tabel/diagram tetap disimpan di pws-data.json, tetapi file itu tidak lagi
+    // memiliki array pins sehingga tidak mungkin menghapus pin desa lain.
+    const saved=await savePwsToSupabase({silent:false});
+
+    if(!saved || !pinSaved){
+      pwsCloudLocalDirty=true;
+      queuePwsCloudSave();
+    }
+    activeVillage=key;
+    renderDiseaseTable();
+    renderDiseaseChart();
+    updateVillageUI();
+    updateSixVillageGrid();
+    if(message){
+      setSaveState(saved && pinSaved
+        ? message+' • tersimpan di Supabase'
+        : message+' • pin tersimpan lokal dan menunggu sinkronisasi Supabase');
+    }
+    return !!(saved && pinSaved);
+  }finally{
+    pwsPinActionBusy=false;
   }
-  // File pin per desa merupakan jalur persistensi utama pin.
-  if(!pinSaved){
-    pwsCloudLocalDirty=true;
-    queuePwsCloudSave();
-  }
-  activeVillage=key;
-  renderDiseaseTable();
-  renderDiseaseChart();
-  updateVillageUI();
-  updateSixVillageGrid();
-  if(message){
-    setSaveState(saved && pinSaved
-      ? message+' • tersimpan di Supabase'
-      : message+' • pin tersimpan lokal dan menunggu sinkronisasi Supabase');
-  }
-  return !!(saved && pinSaved);
 }
 
-async function preparePwsPinActionFromCloud(){
-  if(!supabaseClient) return false;
-  // Batalkan timer simpan lama agar tidak menimpa payload cloud terbaru.
+async function refreshPwsVillagePinsForEdit(key){
+  if(!supabaseClient || !VILLAGES[key]) return false;
+  const result=await loadPwsVillagePinsFromSupabase(key);
+  if(result.found){
+    state[key].pins=result.pins;
+    state[key].pin=null;
+    saveState();
+    drawAllPins();
+    updateVillageUI();
+    updateSixVillageGrid();
+    return true;
+  }
+  return false;
+}
+
+async function preparePwsPinActionFromCloud(key){
+  // JANGAN memuat ulang pws-data.json seluruh 6 desa hanya untuk tancap pin.
+  // Cukup ambil file pin desa yang sedang diedit sehingga pin desa lain tidak pernah tertimpa.
   clearTimeout(pwsCloudSaveTimer);
   pwsCloudSaveTimer=null;
-  // Ambil data cloud terbaru tanpa cache sebelum tancap/cabut.
-  return await loadPwsFromSupabase();
+  return await refreshPwsVillagePinsForEdit(key);
 }
 
 function migratePinImpactsOnce(){
@@ -13006,7 +13037,6 @@ function makePin(key,pin){
     || PIN_COLORS[0];
   pin.colorKey=color.key;
   pin.indicator=color.indicator;
-  saveState();
   const villagePins=getVillagePins(key);
   const index=Math.max(0,villagePins.findIndex(p=>p.id===pin.id))+1;
   const icon=L.divIcon({
@@ -13024,20 +13054,29 @@ function makePin(key,pin){
   const m=L.marker([pin.lat,pin.lng],{draggable:true,icon})
     .addTo(map)
     .bindPopup(`<b>${escapeHtml(VILLAGES[key].name)}</b><br>Pin #${index}<br>Indikator: <b>${escapeHtml(color.indicator)}</b><br><span class="small">Pin hanya boleh berada di dalam batas ${escapeHtml(VILLAGES[key].name)}.</span>`);
-  m.on("dragend",()=>{
+  m.on("dragend",async()=>{
+    if(pwsPinActionBusy) return;
     const p=m.getLatLng();
     if(!isPointInsideVillage(key,p.lat,p.lng)){
       m.setLatLng([pin.lat,pin.lng]);
       alert(`Pin tidak dapat dipindahkan ke luar ${VILLAGES[key].name}.`);
       return;
     }
-    pin.lat=Number(p.lat.toFixed(6));
-    pin.lng=Number(p.lng.toFixed(6));
-    saveState();
-    pwsCloudLocalDirty=true;
-    queuePwsCloudSave();
-    void savePwsVillagePinsToSupabase(key,{silent:true});
-    if(activeVillage===key){updateVillageUI();updateSixVillageGrid();}
+    pwsPinActionBusy=true;
+    try{
+      pin.lat=Number(p.lat.toFixed(6));
+      pin.lng=Number(p.lng.toFixed(6));
+      saveState();
+      const pinSaved=await savePwsVillagePinsToSupabase(key,{silent:false});
+      const saved=await savePwsToSupabase({silent:false});
+      if(!saved || !pinSaved){
+        pwsCloudLocalDirty=true;
+        queuePwsCloudSave();
+      }
+      if(activeVillage===key){updateVillageUI();updateSixVillageGrid();}
+    }finally{
+      pwsPinActionBusy=false;
+    }
   });
   return m;
 }
@@ -13156,7 +13195,7 @@ async function addPin(){
   if(!(state[key]?.diseases?.length)){alert('Belum ada indikator penyakit pada desa ini.');return;}
   // Sebelum tancap pin, ambil state terbaru dari Supabase agar perangkat ini
   // tidak bekerja menggunakan pin lokal yang sudah kedaluwarsa.
-  await preparePwsPinActionFromCloud();
+  await preparePwsPinActionFromCloud(key);
   if(!(state[key]?.diseases?.length)){alert('Belum ada indikator penyakit pada desa ini.');return;}
   // Bila form batch masih terbuka untuk desa yang sama, langsung lanjutkan pin berikutnya.
   if(pwsPinBatchAuthorized && pwsPinBatchVillage===key){
@@ -13168,7 +13207,11 @@ async function addPin(){
 }
 
 async function savePinFromModal(){
+  if(pwsPinActionBusy) return;
   const key=document.getElementById('pinVillage').value;
+  // Dropdown desa di modal dapat diubah langsung; selalu ambil state pin DESA yang dipilih
+  // tepat sebelum menambahkan pin baru. Ini mencegah pin desa lain tertimpa.
+  await refreshPwsVillagePinsForEdit(key);
   const lat=Number(document.getElementById('pinLat').value);
   const lng=Number(document.getElementById('pinLng').value);
   const modalColor=document.getElementById('pinColorSelect')?.value;
@@ -13190,6 +13233,7 @@ async function savePinFromModal(){
       return;
     }
   }
+  activeVillage=key;
   const pin={id:`pin_${key}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,lat:Number(finalLat.toFixed(6)),lng:Number(finalLng.toFixed(6)),indicator:color.indicator,colorKey:color.key,countApplied:false};
   getVillagePins(key).push(pin);
   state[key].pinColor=color.key;
