@@ -12264,9 +12264,11 @@ function buildPwsCloudPayload(){
   Object.keys(VILLAGES).forEach(key=>{
     const item=state[key] || {};
     clean[key]={
-      // PIN TIDAK lagi disimpan di pws-data.json.
-      // Pin setiap desa memiliki file Storage sendiri: dashboard-pws/pins/<desa>.json
+      // Pin tetap disimpan di pws-data.json sebagai cadangan utama, dan juga
+      // disimpan pada file terpisah per desa. Dengan begitu pin tetap pulih
+      // setelah reload meskipun file pin desa gagal dibaca sementara.
       pinColor:String(item.pinColor||"red"),
+      pins:(Array.isArray(item.pins)?item.pins:[]).map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean),
       diseases:(Array.isArray(item.diseases)?item.diseases:[]).map(d=>({
         name:String(d.name||""), k:Number(d.k)||0, p:Number(d.p)||0,
         s:Number(d.s)||0, m:Number(d.m)||0, saved:true, editing:false
@@ -12285,6 +12287,14 @@ function restorePwsFromCloudPayload(payload){
   if(!payload || payload.schema!=="pws-supabase-v1" || !payload.data) return false;
   const incoming=payload.data;
   const defaults=getDefaultState();
+  // Simpan snapshot pin lokal terlebih dahulu untuk kompatibilitas dengan
+  // pws-data.json versi lama yang belum memiliki properti `pins`.
+  const localPins={};
+  Object.keys(VILLAGES).forEach(key=>{
+    localPins[key]=Array.isArray(state?.[key]?.pins)
+      ? state[key].pins.map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
+      : [];
+  });
   legacyPwsPinsFromMain={};
   Object.keys(VILLAGES).forEach(key=>{
     if(!incoming[key]) return;
@@ -12298,10 +12308,18 @@ function restorePwsFromCloudPayload(payload){
       : [];
     if(legacyPins.length) legacyPwsPinsFromMain[key]=legacyPins;
 
+    const hasCloudPins=Object.prototype.hasOwnProperty.call(src,'pins');
+    const cloudPins=hasCloudPins && Array.isArray(src.pins)
+      ? src.pins.map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
+      : [];
+    const restoredPins=hasCloudPins ? cloudPins : (localPins[key] || []);
     defaults[key]={
       ...defaults[key],
-      // Pin sengaja dikosongkan di sini. Akan dipulihkan dari file pin desa.
-      pins:[],
+      // Pin dari file utama dipakai sebagai cadangan. Bila file pin desa
+      // tersedia, restorePwsVillagePinsFromSupabase() akan menggantinya
+      // dengan data pin desa yang paling baru. Untuk cloud lama tanpa `pins`,
+      // pertahankan pin lokal agar migrasi tidak menghilangkan data pengguna.
+      pins:restoredPins,
       pinColor: PIN_COLORS.some(p=>p.key===src.pinColor) ? src.pinColor : "red",
       diseases:normalizeDiseaseRows(diseases,key)
     };
@@ -12407,13 +12425,19 @@ async function restorePwsVillagePinsFromSupabase(){
       anyFound=true;
       continue;
     }
-    // Migrasi pin dari pws-data.json lama hanya bila file pin desa belum ada.
+    // Bila file pin desa belum ditemukan, JANGAN mengosongkan pin dari
+    // pws-data.json. Data utama menjadi fallback agar pin tetap tampil setelah reload.
     const legacy=legacyPwsPinsFromMain[key];
     if(Array.isArray(legacy) && legacy.length){
       state[key].pins=legacy;
       state[key].pin=null;
       anyFound=true;
       // Jangan menunggu penyimpanan ini untuk merender UI; migrasi jalan di background.
+      void savePwsVillagePinsToSupabase(key,{silent:true});
+    } else if(Array.isArray(state[key]?.pins) && state[key].pins.length){
+      state[key].pin=null;
+      anyFound=true;
+      // Pulihkan file per desa dari fallback file utama.
       void savePwsVillagePinsToSupabase(key,{silent:true});
     }
   }
@@ -12531,9 +12555,8 @@ async function savePwsToSupabase(options={}){
     pwsCloudReady=true;
     pwsCloudLocalDirty=false;
     pwsCloudLastSavedAt=payload.saved_at || null;
-    // Penting: jangan menulis ulang file pin semua desa di sini.
-    // File pin hanya boleh ditulis oleh aksi desa yang memang berubah,
-    // sehingga pin Desa A tidak pernah tertimpa state lama Desa B atau sebaliknya.
+    // File pin per desa tetap ditulis khusus oleh aksi desa yang berubah,
+    // sedangkan pws-data.json sekarang juga menyimpan snapshot pin sebagai fallback.
     setPwsCloudStatus("tersimpan",true);
     return true;
   }catch(err){
