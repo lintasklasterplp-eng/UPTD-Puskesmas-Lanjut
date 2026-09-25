@@ -4688,6 +4688,9 @@ footer {
         const PWS_STORAGE_BUCKET = "PWS";
         const PWS_STORAGE_FOLDER = "dashboard-pws";
         const PWS_STORAGE_PATH = `${PWS_STORAGE_FOLDER}/pws-data.json`;
+// Pin disimpan juga sebagai objek terpisah per desa agar perubahan di satu desa
+// tidak pernah menimpa pin desa lain saat state utama sedang disinkronkan.
+const PWS_PIN_STORAGE_FOLDER = `${PWS_STORAGE_FOLDER}/pins`;
         // Penanda bahwa Dashboard PWS terakhir kali direset ke kondisi kosong.
         // Mencegah seed/default lama muncul kembali setelah reset atau reload.
         const PWS_RESET_FLAG = "pws_all_data_reset_v1";
@@ -12305,6 +12308,104 @@ function restorePwsFromCloudPayload(payload){
   return true;
 }
 
+function sanitizePwsVillagePin(pin,key,idx=0){
+  if(!pin) return null;
+  const indicator=String(pin.indicator||"").trim();
+  const lat=Number(pin.lat), lng=Number(pin.lng);
+  if(!indicator || !Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if(indicator.toLowerCase()==='ibu hamil') return null;
+  return {
+    id:pin.id || `pin_${key}_cloud_${idx}`,
+    lat:Number(lat.toFixed(6)),
+    lng:Number(lng.toFixed(6)),
+    indicator,
+    colorKey:PIN_COLORS.some(p=>p.key===pin.colorKey)
+      ? pin.colorKey
+      : (PIN_COLORS.find(p=>String(p.indicator||"").toLowerCase()===indicator.toLowerCase())?.key || "red"),
+    countApplied:pin.countApplied!==false
+  };
+}
+
+function getPwsPinStoragePath(key){
+  return `${PWS_PIN_STORAGE_FOLDER}/${encodeURIComponent(key)}.json`;
+}
+
+function buildPwsVillagePinsPayload(key){
+  const pins=getVillagePins(key);
+  return {
+    schema:"pws-village-pins-v1",
+    village:key,
+    saved_at:new Date().toISOString(),
+    pins:(Array.isArray(pins)?pins:[]).map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
+  };
+}
+
+async function savePwsVillagePinsToSupabase(key,{silent=true}={}){
+  if(!supabaseClient || !VILLAGES[key]) return false;
+  try{
+    const payload=buildPwsVillagePinsPayload(key);
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    const {error}=await supabaseClient.storage
+      .from(PWS_STORAGE_BUCKET)
+      .upload(getPwsPinStoragePath(key),blob,{
+        cacheControl:"0",
+        upsert:true,
+        contentType:"application/json"
+      });
+    if(error) throw error;
+    return true;
+  }catch(err){
+    console.warn(`PWS pin desa ${key} gagal disimpan:`,err);
+    if(!silent) setPwsCloudStatus(`pin ${VILLAGES[key].name} gagal disimpan (${err.message||err})`,false);
+    return false;
+  }
+}
+
+async function loadPwsVillagePinsFromSupabase(key){
+  if(!supabaseClient || !VILLAGES[key]) return {found:false,pins:[]};
+  try{
+    const endpoint=`${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(PWS_STORAGE_BUCKET)}/${getPwsPinStoragePath(key)}?t=${Date.now()}`;
+    const response=await fetch(endpoint,{
+      method:"GET",
+      headers:{
+        Authorization:`Bearer ${SUPABASE_ANON_KEY}`,
+        apikey:SUPABASE_ANON_KEY,
+        "Cache-Control":"no-cache, no-store, max-age=0"
+      },
+      cache:"no-store"
+    });
+    if(response.status===404) return {found:false,pins:[]};
+    if(!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+    const payload=JSON.parse(await response.text());
+    if(payload?.schema!=="pws-village-pins-v1" || payload.village!==key || !Array.isArray(payload.pins)){
+      return {found:false,pins:[]};
+    }
+    return {
+      found:true,
+      pins:payload.pins.map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
+    };
+  }catch(err){
+    console.warn(`PWS pin desa ${key} gagal dimuat:`,err);
+    return {found:false,pins:[]};
+  }
+}
+
+async function restorePwsVillagePinsFromSupabase(){
+  if(!supabaseClient) return false;
+  let anyFound=false;
+  const keys=Object.keys(VILLAGES);
+  const results=await Promise.all(keys.map(key=>loadPwsVillagePinsFromSupabase(key)));
+  results.forEach((result,i)=>{
+    const key=keys[i];
+    if(result.found){
+      state[key].pins=result.pins;
+      state[key].pin=null;
+      anyFound=true;
+    }
+  });
+  return anyFound;
+}
+
 async function loadPwsFromSupabase(){
   if(!supabaseClient){
     setPwsCloudStatus("client Supabase tidak tersedia",false);
@@ -12359,6 +12460,10 @@ async function loadPwsFromSupabase(){
     const text=await response.text();
     const payload=JSON.parse(text);
     if(!restorePwsFromCloudPayload(payload)) throw new Error("Format pws-data.json tidak valid");
+    // Pin per desa adalah sumber tambahan yang independen dari state utama.
+    // Bila file pin desa tersedia, gunakan file tersebut sehingga pin Desa A
+    // tidak dapat hilang hanya karena state Desa B baru saja disimpan.
+    await restorePwsVillagePinsFromSupabase();
     saveState();
     drawAllPins();
     renderPinPalette();
@@ -12412,6 +12517,9 @@ async function savePwsToSupabase(options={}){
     pwsCloudReady=true;
     pwsCloudLocalDirty=false;
     pwsCloudLastSavedAt=payload.saved_at || null;
+    // Penting: jangan menulis ulang file pin semua desa di sini.
+    // File pin hanya boleh ditulis oleh aksi desa yang memang berubah,
+    // sehingga pin Desa A tidak pernah tertimpa state lama Desa B atau sebaliknya.
     setPwsCloudStatus("tersimpan",true);
     return true;
   }catch(err){
@@ -12449,6 +12557,7 @@ async function syncPwsFromCloudSilently(){
     const incomingSavedAt=payload.saved_at || null;
     if(incomingSavedAt && pwsCloudLastSavedAt && incomingSavedAt===pwsCloudLastSavedAt) return true;
     if(!restorePwsFromCloudPayload(payload)) return false;
+    await restorePwsVillagePinsFromSupabase();
     saveState();
     pwsCloudLastSavedAt=incomingSavedAt;
     pwsCloudReady=true;
@@ -12488,18 +12597,14 @@ function stopPwsCloudSync(){
 
 async function clearPwsSupabaseFolder(){
   try{
-    const {data:files,error}=await supabaseClient.storage
+    // Hapus file utama + enam file pin desa secara eksplisit.
+    // Storage list pada folder bertingkat dapat hanya mengembalikan nama folder,
+    // sehingga file pins/* tidak selalu ikut terhapus bila hanya memakai list().
+    const paths=[PWS_STORAGE_PATH,...Object.keys(VILLAGES).map(key=>getPwsPinStoragePath(key))];
+    const {error}=await supabaseClient.storage
       .from(PWS_STORAGE_BUCKET)
-      .list(PWS_STORAGE_FOLDER,{limit:1000,offset:0});
+      .remove(paths);
     if(error) throw error;
-    const paths=(files||[])
-      .filter(f=>f && f.name)
-      .map(f=>`${PWS_STORAGE_FOLDER}/${f.name}`);
-    if(paths.length){
-      const {error:removeError}=await supabaseClient.storage
-        .from(PWS_STORAGE_BUCKET).remove(paths);
-      if(removeError) throw removeError;
-    }
     return true;
   }catch(err){
     console.warn("PWS Supabase cleanup gagal:",err);
@@ -12556,8 +12661,14 @@ async function commitPwsPinAction(key,message){
   // Simpan state lokal sebagai cache hanya setelah perubahan berhasil dibentuk.
   saveState();
   const saved=await savePwsToSupabase({silent:false});
+  const pinSaved=await savePwsVillagePinsToSupabase(key,{silent:false});
   if(!saved){
     // Tandai dirty agar mekanisme sinkronisasi berkala tetap mencoba mengirim ulang.
+    pwsCloudLocalDirty=true;
+    queuePwsCloudSave();
+  }
+  // File pin per desa merupakan jalur persistensi utama pin.
+  if(!pinSaved){
     pwsCloudLocalDirty=true;
     queuePwsCloudSave();
   }
@@ -12567,9 +12678,11 @@ async function commitPwsPinAction(key,message){
   updateVillageUI();
   updateSixVillageGrid();
   if(message){
-    setSaveState(saved ? message+' • tersimpan di Supabase' : message+' • menunggu sinkronisasi Supabase');
+    setSaveState(saved && pinSaved
+      ? message+' • tersimpan di Supabase'
+      : message+' • pin tersimpan lokal dan menunggu sinkronisasi Supabase');
   }
-  return saved;
+  return !!(saved && pinSaved);
 }
 
 async function preparePwsPinActionFromCloud(){
@@ -12923,6 +13036,7 @@ function makePin(key,pin){
     saveState();
     pwsCloudLocalDirty=true;
     queuePwsCloudSave();
+    void savePwsVillagePinsToSupabase(key,{silent:true});
     if(activeVillage===key){updateVillageUI();updateSixVillageGrid();}
   });
   return m;
