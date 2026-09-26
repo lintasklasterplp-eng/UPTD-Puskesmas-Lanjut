@@ -4602,9 +4602,8 @@ footer {
                     <span class="info-label">Bucket Supabase</span>
                     <span class="info-value" id="statSupabaseBuckets" style="max-width:70%; text-align:right; line-height:1.5;">PENGATURAN, PPT-LOKMIN, APP-NOTIFIKASI, INVENTARIS, KIR, OBHPBMHP, PMI, PWS, Ambulance, RUJUKAN INTERNAL</span>
                 </div>
-                <div class="info-item"><span class="info-label">Status Sistem</span><span class="info-value" id="statSystemStatus"><span class="badge-active">Memeriksa...</span></span></div>
-                <div class="info-item"><span class="info-label">Backup Otomatis</span><span class="info-value" id="statBackupStatus"><span class="badge-active">Memeriksa...</span></span></div>
-                <div class="info-item"><span class="info-label">Informasi Sistem Cloud</span><span class="info-value" id="statSystemInfoCloud"><span class="badge-active">Memeriksa...</span></span></div>
+                <div class="info-item"><span class="info-label">Status Sistem</span><span class="badge-active">Aktif (Local Storage)</span></div>
+                <div class="info-item"><span class="info-label">Backup Otomatis</span><span class="badge-active">Aktif</span></div>
             </div>
         </div>
     </div>
@@ -4720,9 +4719,6 @@ const PWS_PIN_STORAGE_FOLDER = `${PWS_STORAGE_FOLDER}/pins`;
         // Bucket harus dibuat di Supabase Storage dengan nama PENGATURAN.
         const PASSWORD_SETTINGS_STORAGE_BUCKET = "PENGATURAN";
         const PASSWORD_SETTINGS_STORAGE_PATH = "keamanan/password-settings.json";
-        // Informasi Sistem disimpan lintas perangkat pada bucket PENGATURAN.
-        const SYSTEM_INFO_STORAGE_BUCKET = "PENGATURAN";
-        const SYSTEM_INFO_STORAGE_PATH = "sistem/informasi-sistem.json";
 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -7399,81 +7395,6 @@ const PWS_PIN_STORAGE_FOLDER = `${PWS_STORAGE_FOLDER}/pins`;
             }
         }
 
-        async function loadSystemInfoFromSupabase(){
-            const cloudEl=document.getElementById('statSystemInfoCloud');
-            if(cloudEl) cloudEl.innerHTML='<span class="badge-active">Menghubungkan...</span>';
-            try{
-                const endpoint=`${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(SYSTEM_INFO_STORAGE_BUCKET)}/${SYSTEM_INFO_STORAGE_PATH}?t=${Date.now()}`;
-                const response=await fetch(endpoint,{
-                    method:'GET',
-                    headers:{
-                        Authorization:`Bearer ${SUPABASE_ANON_KEY}`,
-                        apikey:SUPABASE_ANON_KEY,
-                        "Cache-Control":"no-cache, no-store, max-age=0"
-                    },
-                    cache:'no-store'
-                });
-                if(response.status===404){
-                    if(cloudEl) cloudEl.innerHTML='<span class="badge-active">Terhubung · belum ada data cloud</span>';
-                    return null;
-                }
-                if(!response.ok) throw new Error(`HTTP ${response.status}`);
-                const payload=JSON.parse(await response.text());
-                if(cloudEl){
-                    const when=payload?.saved_at ? new Date(payload.saved_at).toLocaleString('id-ID') : '';
-                    cloudEl.innerHTML=`<span class="badge-active">Tersimpan di Supabase${when ? ' · '+when : ''}</span>`;
-                }
-                return payload;
-            }catch(err){
-                console.warn('Informasi Sistem Supabase gagal dimuat:',err);
-                if(cloudEl) cloudEl.innerHTML='<span class="badge-active" style="background:#fef2f2;color:#b91c1c;border-color:#fecaca;">Belum dapat diverifikasi</span>';
-                return null;
-            }
-        }
-
-        async function saveSystemInfoToSupabase(snapshot){
-            if(!supabaseClient) return false;
-            try{
-                const blob=new Blob([JSON.stringify(snapshot,null,2)],{type:'application/json'});
-                const {error}=await supabaseClient.storage
-                    .from(SYSTEM_INFO_STORAGE_BUCKET)
-                    .upload(SYSTEM_INFO_STORAGE_PATH,blob,{
-                        cacheControl:'0',
-                        upsert:true,
-                        contentType:'application/json'
-                    });
-                if(error) throw error;
-                const cloudEl=document.getElementById('statSystemInfoCloud');
-                if(cloudEl) cloudEl.innerHTML='<span class="badge-active">Tersimpan di Supabase</span>';
-                return true;
-            }catch(err){
-                console.warn('Informasi Sistem gagal disimpan ke Supabase:',err);
-                return false;
-            }
-        }
-
-        function buildSystemInfoSnapshot(){
-            const now=new Date();
-            return {
-                schema:'system-info-v1',
-                saved_at:now.toISOString(),
-                app_title:'UPTD Puskesmas Lanjut - Integrasi Layanan Primer',
-                supabase_url:SUPABASE_URL,
-                supabase_connected:true,
-                storage_buckets:(document.getElementById('statSupabaseBuckets')?.innerText||'').split(',').map(s=>s.trim()).filter(Boolean),
-                pws:{
-                    bucket:PWS_STORAGE_BUCKET,
-                    pin_storage_mode:'per-village',
-                    pin_folder:PWS_PIN_STORAGE_FOLDER,
-                    cloud_ready:!!pwsCloudReady
-                },
-                backup:{
-                    local_storage:true,
-                    supabase_storage:true
-                }
-            };
-        }
-
         async function updateSupabaseStorageInfo() {
             const statusEl = document.getElementById('statSupabaseStorage');
             if (!statusEl) return;
@@ -7490,54 +7411,34 @@ const PWS_PIN_STORAGE_FOLDER = `${PWS_STORAGE_FOLDER}/pins`;
         }
 
         async function updateSystemStats() {
-            let docsLoaded=false;
             try {
                 const { data, error } = await supabaseClient.from('docs').select('*');
-                if (!error && Array.isArray(data)) {
-                    docsLoaded=true;
-                    const totalEl=document.getElementById('statTotalFile');
-                    const sizeEl=document.getElementById('statStorageSize');
-                    if(totalEl) totalEl.innerText = data.length;
-                    let totalBytes = data.reduce((acc, curr) => acc + (Number(curr.fileSize) || 0), 0);
-                    let sizeStr = (totalBytes / (1024 * 1024)).toFixed(1) + ' MB';
-                    if(totalBytes === 0) sizeStr = '0 MB';
-                    if(sizeEl) sizeEl.innerText = sizeStr;
-                }
+                if (error) throw error;
+                document.getElementById('statTotalFile').innerText = data.length;
+                let totalBytes = data.reduce((acc, curr) => acc + (curr.fileSize || 0), 0);
+                let sizeStr = (totalBytes / (1024 * 1024)).toFixed(1) + ' MB';
+                if(totalBytes === 0) sizeStr = '0 MB';
+                document.getElementById('statStorageSize').innerText = sizeStr;
             } catch (err) {
-                console.warn("Tabel Supabase 'docs' belum siap atau koneksi terbatas:", err?.message || err);
-            }
-
-            if(!docsLoaded){
+                console.warn("Tabel Supabase 'docs' belum siap atau koneksi terbatas:", err.message);
                 const totalEl = document.getElementById('statTotalFile');
                 const sizeEl = document.getElementById('statStorageSize');
                 if (totalEl) totalEl.innerText = '—';
                 if (sizeEl) sizeEl.innerText = '—';
             }
-
             await updateSupabaseStorageInfo();
-
-            const sysEl=document.getElementById('statSystemStatus');
-            const backupEl=document.getElementById('statBackupStatus');
-            if(sysEl) sysEl.innerHTML='<span class="badge-active">Aktif · Local Storage + Supabase</span>';
-            if(backupEl) backupEl.innerHTML='<span class="badge-active">Aktif · PWS pin per desa</span>';
-
-            const payload=await loadSystemInfoFromSupabase();
-            // Selalu perbarui snapshot agar Informasi Sistem di Supabase mengikuti kondisi aplikasi terbaru.
-            if(payload || document.getElementById('statSupabaseStorage')?.innerText?.includes('Terhubung')){
-                void saveSystemInfoToSupabase(buildSystemInfoSnapshot());
-            }
         }
-
         updateSystemStats();
 
         let currentMenuId = ""; 
         let slideshowInterval = null;
 
-        async function openInfoModal() {
+        function openInfoModal() {
+            updateSystemStats();
             document.getElementById('infoModal').style.display = 'flex';
-            await updateSystemStats();
         }
 
+        function closeInfoModal() { document.getElementById('infoModal').style.display = 'none'; }
 
         function kembaliKeBeranda() {
     try {
@@ -12216,7 +12117,6 @@ let map;
 let activeVillage = "berindat";
 let polygons = {};
 let markers = {};
-loadPwsPinDirtyVillages();
 let state = loadState();
 let baseStreet, baseSatellite, activeBase;
 let mapLocked = false;
@@ -12351,30 +12251,6 @@ let pwsCloudLocalDirty = false;
 let pwsCloudLastSavedAt = null;
 let pwsPinActionBusy = false;
 let legacyPwsPinsFromMain = {};
-let pwsPinDirtyVillages = {};
-
-function loadPwsPinDirtyVillages(){
-  try{
-    const raw=localStorage.getItem("pws_pin_dirty_villages_v2");
-    const obj=raw ? JSON.parse(raw) : {};
-    pwsPinDirtyVillages=(obj && typeof obj==="object") ? obj : {};
-  }catch(e){ pwsPinDirtyVillages={}; }
-}
-function savePwsPinDirtyVillages(){
-  try{ localStorage.setItem("pws_pin_dirty_villages_v2",JSON.stringify(pwsPinDirtyVillages||{})); }catch(e){}
-}
-function markPwsPinVillageDirty(key){
-  if(!VILLAGES[key]) return;
-  pwsPinDirtyVillages[key]=true;
-  savePwsPinDirtyVillages();
-}
-function clearPwsPinVillageDirty(key){
-  delete pwsPinDirtyVillages[key];
-  savePwsPinDirtyVillages();
-}
-function isPwsPinVillageDirty(key){
-  return pwsPinDirtyVillages?.[key]===true;
-}
 
 function setPwsCloudStatus(text, ok=null){
   const el=document.getElementById("pwsCloudStatus");
@@ -12388,11 +12264,11 @@ function buildPwsCloudPayload(){
   Object.keys(VILLAGES).forEach(key=>{
     const item=state[key] || {};
     clean[key]={
-      // PIN TIDAK disimpan lagi di pws-data.json. Setiap desa punya file pin
-      // sendiri sehingga penyimpanan Desa B tidak menimpa pin Desa A.
-      pin_storage:`${PWS_PIN_STORAGE_FOLDER}/${encodeURIComponent(key)}.json`,
-      pin_count:Array.isArray(item.pins)?item.pins.length:0,
+      // Pin tetap disimpan di pws-data.json sebagai cadangan utama, dan juga
+      // disimpan pada file terpisah per desa. Dengan begitu pin tetap pulih
+      // setelah reload meskipun file pin desa gagal dibaca sementara.
       pinColor:String(item.pinColor||"red"),
+      pins:(Array.isArray(item.pins)?item.pins:[]).map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean),
       diseases:(Array.isArray(item.diseases)?item.diseases:[]).map(d=>({
         name:String(d.name||""), k:Number(d.k)||0, p:Number(d.p)||0,
         s:Number(d.s)||0, m:Number(d.m)||0, saved:true, editing:false
@@ -12400,52 +12276,54 @@ function buildPwsCloudPayload(){
     };
   });
   return {
-    schema: "pws-supabase-v2",
+    schema: "pws-supabase-v1",
     saved_at: new Date().toISOString(),
     active_village: activeVillage,
-    pin_storage_mode: "per-village",
     data: clean
   };
 }
 
 function restorePwsFromCloudPayload(payload){
-  if(!payload || !["pws-supabase-v1","pws-supabase-v2"].includes(payload.schema) || !payload.data) return false;
+  if(!payload || payload.schema!=="pws-supabase-v1" || !payload.data) return false;
   const incoming=payload.data;
   const defaults=getDefaultState();
-
-  // Pertahankan pin lokal sampai file pin desa masing-masing berhasil dibaca.
+  // Simpan snapshot pin lokal terlebih dahulu untuk kompatibilitas dengan
+  // pws-data.json versi lama yang belum memiliki properti `pins`.
   const localPins={};
   Object.keys(VILLAGES).forEach(key=>{
     localPins[key]=Array.isArray(state?.[key]?.pins)
       ? state[key].pins.map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
       : [];
   });
-
   legacyPwsPinsFromMain={};
   Object.keys(VILLAGES).forEach(key=>{
     if(!incoming[key]) return;
     const src=incoming[key];
     const diseases=Array.isArray(src.diseases) ? src.diseases : [];
 
-    // Migrasi satu kali dari pws-data.json versi lama yang masih menyimpan array pins.
+    // Dukungan migrasi satu kali untuk pws-data.json versi lama
+    // yang masih menyimpan pin gabungan seluruh desa.
     const legacyPins=Array.isArray(src.pins)
       ? src.pins.map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
       : [];
     if(legacyPins.length) legacyPwsPinsFromMain[key]=legacyPins;
 
-    const preservedLocalPins=localPins[key] || [];
-    const fallbackPins=preservedLocalPins.length ? preservedLocalPins : legacyPins;
-
+    const hasCloudPins=Object.prototype.hasOwnProperty.call(src,'pins');
+    const cloudPins=hasCloudPins && Array.isArray(src.pins)
+      ? src.pins.map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
+      : [];
+    const restoredPins=hasCloudPins ? cloudPins : (localPins[key] || []);
     defaults[key]={
       ...defaults[key],
-      pins:fallbackPins,
+      // Pin dari file utama dipakai sebagai cadangan. Bila file pin desa
+      // tersedia, restorePwsVillagePinsFromSupabase() akan menggantinya
+      // dengan data pin desa yang paling baru. Untuk cloud lama tanpa `pins`,
+      // pertahankan pin lokal agar migrasi tidak menghilangkan data pengguna.
+      pins:restoredPins,
       pinColor: PIN_COLORS.some(p=>p.key===src.pinColor) ? src.pinColor : "red",
       diseases:normalizeDiseaseRows(diseases,key)
     };
-    defaults[key].pin=null;
-    delete defaults[key].pin;
   });
-
   state=defaults;
   if(VILLAGES[payload.active_village]) activeVillage=payload.active_village;
   return true;
@@ -12496,10 +12374,8 @@ async function savePwsVillagePinsToSupabase(key,{silent=true}={}){
         contentType:"application/json"
       });
     if(error) throw error;
-    clearPwsPinVillageDirty(key);
     return true;
   }catch(err){
-    markPwsPinVillageDirty(key);
     console.warn(`PWS pin desa ${key} gagal disimpan:`,err);
     if(!silent) setPwsCloudStatus(`pin ${VILLAGES[key].name} gagal disimpan (${err.message||err})`,false);
     return false;
@@ -12507,7 +12383,7 @@ async function savePwsVillagePinsToSupabase(key,{silent=true}={}){
 }
 
 async function loadPwsVillagePinsFromSupabase(key){
-  if(!supabaseClient || !VILLAGES[key]) return {found:false,notFound:false,error:true,pins:[]};
+  if(!supabaseClient || !VILLAGES[key]) return {found:false,pins:[]};
   try{
     const endpoint=`${SUPABASE_URL}/storage/v1/object/${encodeURIComponent(PWS_STORAGE_BUCKET)}/${getPwsPinStoragePath(key)}?t=${Date.now()}`;
     const response=await fetch(endpoint,{
@@ -12519,21 +12395,19 @@ async function loadPwsVillagePinsFromSupabase(key){
       },
       cache:"no-store"
     });
-    if(response.status===404) return {found:false,notFound:true,error:false,pins:[]};
+    if(response.status===404) return {found:false,pins:[]};
     if(!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
     const payload=JSON.parse(await response.text());
     if(payload?.schema!=="pws-village-pins-v1" || payload.village!==key || !Array.isArray(payload.pins)){
-      return {found:false,notFound:false,error:true,pins:[]};
+      return {found:false,pins:[]};
     }
     return {
       found:true,
-      notFound:false,
-      error:false,
-      pins:dedupePwsPins(payload.pins,key)
+      pins:payload.pins.map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
     };
   }catch(err){
     console.warn(`PWS pin desa ${key} gagal dimuat:`,err);
-    return {found:false,notFound:false,error:true,pins:[]};
+    return {found:false,pins:[]};
   }
 }
 
@@ -12542,62 +12416,32 @@ async function restorePwsVillagePinsFromSupabase(){
   let anyFound=false;
   const keys=Object.keys(VILLAGES);
   const results=await Promise.all(keys.map(key=>loadPwsVillagePinsFromSupabase(key)));
-
   for(let i=0;i<keys.length;i++){
     const key=keys[i];
     const result=results[i];
-    const local=Array.isArray(state[key]?.pins) ? dedupePwsPins(state[key].pins,key) : [];
-    const legacy=Array.isArray(legacyPwsPinsFromMain[key]) ? dedupePwsPins(legacyPwsPinsFromMain[key],key) : [];
-
     if(result.found){
-      state[key].pins=dedupePwsPins(result.pins,key);
+      state[key].pins=result.pins;
       state[key].pin=null;
       anyFound=true;
-      clearPwsPinVillageDirty(key);
       continue;
     }
-
-    if(local.length){
-      // Jangan kosongkan pin lokal ketika file cloud belum ada atau GET cloud gagal.
-      state[key].pins=local;
-      state[key].pin=null;
-      anyFound=true;
-      if(result.notFound || isPwsPinVillageDirty(key)) markPwsPinVillageDirty(key);
-      continue;
-    }
-
-    if(legacy.length && result.notFound){
+    // Bila file pin desa belum ditemukan, JANGAN mengosongkan pin dari
+    // pws-data.json. Data utama menjadi fallback agar pin tetap tampil setelah reload.
+    const legacy=legacyPwsPinsFromMain[key];
+    if(Array.isArray(legacy) && legacy.length){
       state[key].pins=legacy;
       state[key].pin=null;
       anyFound=true;
-      markPwsPinVillageDirty(key);
-      continue;
+      // Jangan menunggu penyimpanan ini untuk merender UI; migrasi jalan di background.
+      void savePwsVillagePinsToSupabase(key,{silent:true});
+    } else if(Array.isArray(state[key]?.pins) && state[key].pins.length){
+      state[key].pin=null;
+      anyFound=true;
+      // Pulihkan file per desa dari fallback file utama.
+      void savePwsVillagePinsToSupabase(key,{silent:true});
     }
-
-    // Tidak ada data lokal/legacy yang aman untuk dipulihkan.
-    state[key].pins=[];
-    state[key].pin=null;
   }
-
-  // Hanya retry desa yang benar-benar diketahui belum memiliki file atau yang dirty.
-  const dirtyKeys=keys.filter(key=>isPwsPinVillageDirty(key));
-  await Promise.all(dirtyKeys.map(key=>savePwsVillagePinsToSupabase(key,{silent:true})));
   return anyFound;
-}
-
-function dedupePwsPins(pins,key){
-  const seen=new Set();
-  return (Array.isArray(pins)?pins:[])
-    .map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx))
-    .filter(Boolean)
-    .filter(pin=>{
-      const id=String(pin.id||"");
-      const coord=`${pin.lat.toFixed(6)},${pin.lng.toFixed(6)},${String(pin.indicator||"").toLowerCase()}`;
-      const sig=id || coord;
-      if(seen.has(sig)) return false;
-      seen.add(sig);
-      return true;
-    });
 }
 
 async function loadPwsFromSupabase(){
@@ -12657,13 +12501,8 @@ async function loadPwsFromSupabase(){
     // Pin per desa adalah sumber tambahan yang independen dari state utama.
     // Bila file pin desa tersedia, gunakan file tersebut sehingga pin Desa A
     // tidak dapat hilang hanya karena state Desa B baru saja disimpan.
-    const hadLegacyPins=Object.values(legacyPwsPinsFromMain||{}).some(arr=>Array.isArray(arr)&&arr.length);
     await restorePwsVillagePinsFromSupabase();
     saveState();
-    if(hadLegacyPins){
-      // Setelah migrasi, tulis ulang pws-data.json tanpa array pins.
-      await savePwsToSupabase({silent:true});
-    }
     drawAllPins();
     renderPinPalette();
     renderDiseaseTable();
@@ -12716,8 +12555,8 @@ async function savePwsToSupabase(options={}){
     pwsCloudReady=true;
     pwsCloudLocalDirty=false;
     pwsCloudLastSavedAt=payload.saved_at || null;
-    // PIN tersimpan eksklusif pada file terpisah per desa.
-    // pws-data.json hanya memegang tabel/diagram agar tidak menjadi sumber penimpaan pin.
+    // File pin per desa tetap ditulis khusus oleh aksi desa yang berubah,
+    // sedangkan pws-data.json sekarang juga menyimpan snapshot pin sebagai fallback.
     setPwsCloudStatus("tersimpan",true);
     return true;
   }catch(err){
@@ -12752,7 +12591,7 @@ async function syncPwsFromCloudSilently(){
     });
     if(!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
     const payload=JSON.parse(await response.text());
-    if(!payload || !["pws-supabase-v1","pws-supabase-v2"].includes(payload.schema) || !payload.data) return false;
+    if(!payload || payload.schema!=="pws-supabase-v1" || !payload.data) return false;
     const incomingSavedAt=payload.saved_at || null;
     if(incomingSavedAt && pwsCloudLastSavedAt && incomingSavedAt===pwsCloudLastSavedAt) return true;
     if(!restorePwsFromCloudPayload(payload)) return false;
@@ -12860,7 +12699,6 @@ async function commitPwsPinAction(key,message){
   pwsPinActionBusy=true;
   try{
     saveState();
-    markPwsPinVillageDirty(key);
     // Simpan file pin DESA ini terlebih dahulu.
     const pinSaved=await savePwsVillagePinsToSupabase(key,{silent:false});
     // Data tabel/diagram tetap disimpan di pws-data.json, tetapi file itu tidak lagi
