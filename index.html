@@ -12250,6 +12250,7 @@ let pwsCloudSyncTimer = null;
 let pwsCloudLocalDirty = false;
 let pwsCloudLastSavedAt = null;
 let pwsPinActionBusy = false;
+let pwsVillagePinSavedAt = {};
 let legacyPwsPinsFromMain = {};
 
 function setPwsCloudStatus(text, ok=null){
@@ -12353,10 +12354,13 @@ function getPwsPinStoragePath(key){
 
 function buildPwsVillagePinsPayload(key){
   const pins=getVillagePins(key);
+  const savedAt=new Date().toISOString();
+  pwsVillagePinSavedAt[key]=savedAt;
   return {
     schema:"pws-village-pins-v1",
+    version:2,
     village:key,
-    saved_at:new Date().toISOString(),
+    saved_at:savedAt,
     pins:(Array.isArray(pins)?pins:[]).map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
   };
 }
@@ -12403,6 +12407,7 @@ async function loadPwsVillagePinsFromSupabase(key){
     }
     return {
       found:true,
+      saved_at:payload.saved_at || null,
       pins:payload.pins.map((pin,idx)=>sanitizePwsVillagePin(pin,key,idx)).filter(Boolean)
     };
   }catch(err){
@@ -12420,8 +12425,19 @@ async function restorePwsVillagePinsFromSupabase(){
     const key=keys[i];
     const result=results[i];
     if(result.found){
-      state[key].pins=result.pins;
+      // File per-desa adalah sumber pin utama. Namun file lama yang kosong
+      // tidak boleh menghapus snapshot pin yang masih ada di pws-data.json
+      // (atau state lokal). Ini juga memperbaiki migrasi dari file pin kosong/stale.
+      const fallbackPins=Array.isArray(state[key]?.pins) ? state[key].pins : [];
+      if(result.pins.length || !fallbackPins.length){
+        state[key].pins=result.pins;
+      } else {
+        state[key].pins=fallbackPins;
+        // Perbaiki file pin desa yang stale dengan snapshot yang masih lengkap.
+        void savePwsVillagePinsToSupabase(key,{silent:true});
+      }
       state[key].pin=null;
+      pwsVillagePinSavedAt[key]=result.saved_at || pwsVillagePinSavedAt[key] || null;
       anyFound=true;
       continue;
     }
@@ -12489,8 +12505,18 @@ async function loadPwsFromSupabase(){
       const msg=`HTTP ${response.status}: ${body}`;
       // File belum ada: gunakan data lokal tanpa menimpa cloud.
       if(response.status===404 || /not found|does not exist|no such/i.test(msg)){
+        // pws-data.json boleh saja belum ada/terlambat termuat.
+        // Pulihkan pin langsung dari file pins/<desa>.json agar pin tidak hilang setelah reload.
+        await restorePwsVillagePinsFromSupabase();
+        saveState();
+        drawAllPins();
+        renderPinPalette();
+        renderDiseaseTable();
+        renderDiseaseChart();
+        updateVillageUI();
+        updateSixVillageGrid();
         pwsCloudReady=true;
-        setPwsCloudStatus("belum ada file cloud; siap disimpan",null);
+        setPwsCloudStatus("file utama belum ada • pin desa dipulihkan",null);
         return false;
       }
       throw new Error(msg);
@@ -12516,6 +12542,19 @@ async function loadPwsFromSupabase(){
     return true;
   }catch(err){
     console.warn("PWS Supabase load gagal:",err);
+    // Walaupun file utama gagal dibaca, pin per desa tetap dicoba dipulihkan.
+    try{
+      await restorePwsVillagePinsFromSupabase();
+      saveState();
+      drawAllPins();
+      renderPinPalette();
+      renderDiseaseTable();
+      renderDiseaseChart();
+      updateVillageUI();
+      updateSixVillageGrid();
+    }catch(recoverErr){
+      console.warn("Pemulihan pin desa setelah kegagalan load juga gagal:",recoverErr);
+    }
     pwsCloudReady=false;
     setPwsCloudStatus(`gagal memuat (${err.message||err})`,false);
     return false;
@@ -12536,6 +12575,10 @@ function pwsStateHasData(){
 
 async function savePwsToSupabase(options={}){
   const silent=options.silent===true;
+  const fromPinAction=options.fromPinAction===true;
+  // Simpanan latar belakang tidak boleh menulis state saat aksi pin sedang berjalan.
+  // Aksi pin sendiri boleh melewati pengaman ini setelah file pin desa berhasil dikomit.
+  if(pwsPinActionBusy && !fromPinAction) return false;
   // Begitu pengguna memiliki data lagi, status reset selesai.
   if(pwsStateHasData()) localStorage.removeItem(PWS_RESET_FLAG);
   if(!supabaseClient){
@@ -12568,11 +12611,18 @@ async function savePwsToSupabase(options={}){
 }
 
 function queuePwsCloudSave(){
-  if(pwsPinActionBusy) return;
   if(pwsStateHasData()) localStorage.removeItem(PWS_RESET_FLAG);
   pwsCloudLocalDirty=true;
   clearTimeout(pwsCloudSaveTimer);
-  pwsCloudSaveTimer=setTimeout(()=>{ void savePwsToSupabase({silent:true}); },350);
+  pwsCloudSaveTimer=setTimeout(()=>{
+    pwsCloudSaveTimer=null;
+    if(pwsPinActionBusy){
+      // Tunggu sampai aksi pin selesai agar snapshot lama tidak mengalahkan pin baru.
+      queuePwsCloudSave();
+      return;
+    }
+    void savePwsToSupabase({silent:true});
+  },350);
 }
 
 async function syncPwsFromCloudSilently(){
@@ -12703,7 +12753,7 @@ async function commitPwsPinAction(key,message){
     const pinSaved=await savePwsVillagePinsToSupabase(key,{silent:false});
     // Data tabel/diagram tetap disimpan di pws-data.json, tetapi file itu tidak lagi
     // memiliki array pins sehingga tidak mungkin menghapus pin desa lain.
-    const saved=await savePwsToSupabase({silent:false});
+    const saved=await savePwsToSupabase({silent:false,fromPinAction:true});
 
     if(!saved || !pinSaved){
       pwsCloudLocalDirty=true;
@@ -13091,7 +13141,7 @@ function makePin(key,pin){
       pin.lng=Number(p.lng.toFixed(6));
       saveState();
       const pinSaved=await savePwsVillagePinsToSupabase(key,{silent:false});
-      const saved=await savePwsToSupabase({silent:false});
+      const saved=await savePwsToSupabase({silent:false,fromPinAction:true});
       if(!saved || !pinSaved){
         pwsCloudLocalDirty=true;
         queuePwsCloudSave();
